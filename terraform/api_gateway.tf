@@ -1,3 +1,10 @@
+locals {
+  api_gateway_subdomain = "api.${var.shared_resource_identifier}.${var.root_domain}"
+}
+data "aws_route53_zone" "root_domain" {
+  name = var.root_domain
+}
+
 data "aws_caller_identity" "current" {}
 output "account_id" {
   value = data.aws_caller_identity.current.account_id
@@ -62,4 +69,37 @@ resource "aws_api_gateway_deployment" "apig_deployment" {
     aws_api_gateway_method.method,
     aws_api_gateway_integration.integration
   ]
+}
+
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "4.3"
+
+  # providers = {
+  #   aws = var.aws_region
+  # }
+
+  domain_name = var.root_domain
+  zone_id     = data.aws_route53_zone.root_domain.id
+
+  subject_alternative_names = []
+  tags = var.tags
+
+  wait_for_validation = true
+}
+resource "aws_api_gateway_domain_name" "domain_name" {
+  domain_name = local.api_gateway_subdomain
+  certificate_arn = "${module.acm.acm_certificate_arn}"
+}
+
+resource "aws_route53_record" "api" {
+  zone_id = data.aws_route53_zone.root_domain.id
+  name    = local.api_gateway_subdomain
+  type    = "A"
+
+  alias {
+    name                   = "${aws_api_gateway_domain_name.domain_name.cloudfront_domain_name}"
+    zone_id                = "${aws_api_gateway_domain_name.domain_name.cloudfront_zone_id}"
+    evaluate_target_health = false
+  }
 }

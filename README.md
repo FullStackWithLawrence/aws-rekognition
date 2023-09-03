@@ -47,15 +47,15 @@ Ensure that your environment includes the latest stable releases of the followin
 If necessary, install [Homebrew](https://brew.sh/)
 
 ```console
-$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-$ echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/ubuntu/.profile
-$ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/ubuntu/.profile
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
 
 Use homebrew to install all required packages.
 
 ```console
-$ brew install awscli terraform
+brew install awscli terraform
 ```
 
 ### Configure the AWS CLI
@@ -63,7 +63,7 @@ $ brew install awscli terraform
 To configure the AWS CLI run the following command:
 
 ```console
-$ aws configure
+aws configure
 ```
 
 This will interactively prompt for your AWS IAM user access key, secret key and preferred region.
@@ -78,10 +78,10 @@ Use these three environment variables for creating the uniquely named resources 
 **IMPORTANT: these three settings should be consistent with the values your set in terraform.tfvars in the next section.**
 
 ```console
-$ AWS_ACCOUNT=012345678912      # add your 12-digit AWS account number here
+AWS_ACCOUNT=012345678912      # add your 12-digit AWS account number here
 $
-$ AWS_REGION=us-east-1          # any valid AWS region code.
-$ AWS_ENVIRONMENT=rekognition   # any valid string. Keep it short -- 3 characters is ideal.
+AWS_REGION=us-east-1          # any valid AWS region code.
+AWS_ENVIRONMENT=rekognition   # any valid string. Keep it short -- 3 characters is ideal.
 ```
 
 First create an AWS S3 Bucket
@@ -99,42 +99,36 @@ aws s3api create-bucket --bucket $AWS_S3_BUCKET --region $AWS_REGION --create-bu
 Then create a DynamoDB table
 
 ```console
-$ AWS_DYNAMODB_TABLE="${AWS_ACCOUNT}-tfstate-lock-${AWS_ENVIRONMENT}"
-$ aws dynamodb create-table --region $AWS_REGION --table-name $AWS_DYNAMODB_TABLE  \
+AWS_DYNAMODB_TABLE="${AWS_ACCOUNT}-tfstate-lock-${AWS_ENVIRONMENT}"
+aws dynamodb create-table --region $AWS_REGION --table-name $AWS_DYNAMODB_TABLE  \
                --attribute-definitions AttributeName=LockID,AttributeType=S  \
                --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput  \
                ReadCapacityUnits=1,WriteCapacityUnits=1
 ```
 
-## II. Build and Deploy WAS
+## II. Build and Deploy
 
 ### Step 1. Checkout the repository
 
 ```console
-$ git clone https://github.com/lpm0073/aws-rekognition.git
+git clone https://github.com/lpm0073/aws-rekognition.git
 ```
 
-### Step 2. Change directory to AWS
-
-```console
-$ cd ~/WAS-Kubernetes/EnvironmentSetup/AWS/
-```
-
-### Step 3. Configure your Terraform backend
+### Step 2. Configure your Terraform backend
 
 Edit the following snippet so that bucket, region and dynamodb_table are consistent with your values of $AWS_REGION, $AWS_S3_BUCKET, $AWS_DYNAMODB_TABLE
 
 ```console
-$ vim terraform/terraform.tf
+vim terraform/terraform.tf
 ```
 
 ```terraform
   backend "s3" {
     bucket         = "012345678912-tfstate-rekognition"
-    key            = "was/terraform.tfstate"
-    region         = "us-east-2"
+    key            = "rekognition/terraform.tfstate"
+    region         = "us-east-1"
     dynamodb_table = "012345678912-tfstate-lock-rekognition"
-    profile        = "default"
+    profile        = "lawrence"
     encrypt        = false
   }
 ````
@@ -142,7 +136,7 @@ $ vim terraform/terraform.tf
 ### Step 4. Configure your environment by setting Terraform global variable values
 
 ```console
-$ vim terraform/was/terraform.tfvars
+vim terraform/terraform.tfvars
 ```
 
 Required inputs are as follows:
@@ -155,7 +149,7 @@ shared_resource_name = "facialrecognition"
 ```
 
 
-### Step 5. Run the following command to set up EKS and deploy WAS
+### Step 3. Run the following command to initialize and build the solution
 
 The Terraform modules in this repo rely extensively on calls to other third party Terraform modules published and maintained by [AWS](https://registry.terraform.io/namespaces/terraform-aws-modules). These modules will be downloaded by Terraform so that these can be executed locally from your computer. Noteworth examples of such third party modules include:
 
@@ -163,49 +157,57 @@ The Terraform modules in this repo rely extensively on calls to other third part
 * [terraform-aws-modules/dynamodb](https://registry.terraform.io/modules/terraform-aws-modules/dynamodb-table/aws/latest)
 
 ```console
-$ cd terraform
-$ terraform init
+cd terraform
+terraform init
 ```
 
 Screen output should resemble the following:
 ![Terraform init](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/terraform-init.png "Terraform init")
 
+```console
+terraform plan
+```
+
+Screen output should resemble the following:
+![Terraform plan](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/terraform-plan.png "Terraform plan")
+
 To deploy the service run the following
 
 ```console
-$ terraform apply
+terraform apply
 ```
-## III. WAS Usage
+
+## III. Usage
 
 ## IV. Uninstall
 
 The following completely destroys everything including the kubernetes cluster, Wolfram Application Server and all resources:
 
 ```console
-$ cd terraform
-$ terraform init
-$ terraform destroy
+cd terraform
+terraform init
+terraform destroy
 ```
 
 Delete Terraform state management resources
 
 ```console
-$ AWS_ACCOUNT=012345678912      # add your 12-digit AWS account number here
-$ AWS_REGION=us-east-1
-$ AWS_ENVIRONMENT=rekognition   # any valid string. Keep it short
-$ AWS_S3_BUCKET="${AWS_ACCOUNT}-tfstate-${AWS_ENVIRONMENT}"
-$ AWS_DYNAMODB_TABLE="${AWS_ACCOUNT}-tfstate-lock-${AWS_ENVIRONMENT}"
+AWS_ACCOUNT=012345678912      # add your 12-digit AWS account number here
+AWS_REGION=us-east-1
+AWS_ENVIRONMENT=rekognition   # any valid string. Keep it short
+AWS_S3_BUCKET="${AWS_ACCOUNT}-tfstate-${AWS_ENVIRONMENT}"
+AWS_DYNAMODB_TABLE="${AWS_ACCOUNT}-tfstate-lock-${AWS_ENVIRONMENT}"
 ```
 
 To delete the DynamoDB table
 
 ```console
-$ aws dynamodb delete-table --region $AWS_REGION --table-name $AWS_DYNAMODB_TABLE
+aws dynamodb delete-table --region $AWS_REGION --table-name $AWS_DYNAMODB_TABLE
 ```
 
 To delete the AWS S3 bucket
 
 ```console
-$ aws s3 rm s3://$AWS_S3_BUCKET --recursive
-$ aws s3 rb s3://$AWS_S3_BUCKET --force
+aws s3 rm s3://$AWS_S3_BUCKET --recursive
+aws s3 rb s3://$AWS_S3_BUCKET --force
 ```
