@@ -79,10 +79,12 @@ module "acm" {
   #   aws = var.aws_region
   # }
 
-  domain_name = var.root_domain
+  domain_name = local.api_gateway_subdomain
   zone_id     = data.aws_route53_zone.root_domain.id
 
-  subject_alternative_names = []
+  subject_alternative_names = [
+    "*.${local.api_gateway_subdomain}",
+  ]
   tags = var.tags
 
   wait_for_validation = true

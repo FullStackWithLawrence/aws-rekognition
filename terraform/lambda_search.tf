@@ -1,40 +1,3 @@
-###############################################################################
-# IAM
-###############################################################################
-data "aws_iam_policy_document" "search_role_policy" {
-  version = "2012-10-17"
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "rekognition:DescribeCollection",
-      "rekognition:SearchFacesByImage",
-      "dynamodb:GetItem",
-    ]
-    resources = [
-      "arn:aws:logs:*:*:*",
-      "arn:aws:rekognition:*:*:collection/${local.collection_id}",
-      "arn:aws:dynamodb:*:*:table/${local.table_name}"
-    ]
-  }
-}
-
-resource "aws_iam_role" "search_function" {
-  name               = "faces-search-function-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.search_role_policy.json
-}
-
-resource "aws_iam_role_policy" "search_function" {
-  name   = "cloudwatch_search"
-  role   = aws_iam_role.search_function.id
-  policy = data.aws_iam_policy_document.search_role_policy.json
-}
-
-###############################################################################
-# Lambda
-###############################################################################
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_search" {
   type        = "zip"
@@ -45,10 +8,11 @@ data "archive_file" "lambda_search" {
 
 resource "aws_lambda_function" "search_function" {
 
-  function_name = "personnel-recognition-searcher"
-  role          = aws_iam_role.search_function.arn
+  # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+  function_name = "${var.shared_resource_identifier}-search"
+  role          = aws_iam_role.facialrecognition.arn
   publish       = true
-  runtime       = "python3.8"
+  runtime       = "python3.11"
   handler       = "search_function.lambda_handler"
   memory_size   = 512
   timeout       = 60

@@ -1,42 +1,4 @@
 ###############################################################################
-# IAM
-###############################################################################
-data "aws_iam_policy_document" "index_role_policy" {
-  version = "2012-10-17"
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "rekognition:DescribeCollection",
-      "rekognition:IndexFaces",
-      "dynamodb:PutItem",
-      "s3:GetObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:logs:*:*:*",
-      "arn:aws:rekognition:*:*:collection/${local.collection_id}",
-      "arn:aws:dynamodb:*:*:table/${local.table_name}",
-      module.personnel_bucket.s3_bucket_arn,
-      "${module.personnel_bucket.s3_bucket_arn}/*"
-    ]
-  }
-}
-
-resource "aws_iam_role" "index_function" {
-  name               = "faces-index-function-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.index_role_policy.json
-}
-
-resource "aws_iam_role_policy" "index_function" {
-  name   = "cloudwatch_index"
-  role   = aws_iam_role.index_function.id
-  policy = data.aws_iam_policy_document.index_role_policy.json
-}
-
-###############################################################################
 # Lambda
 ###############################################################################
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
@@ -70,8 +32,9 @@ resource "aws_s3_bucket_notification" "incoming" {
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function.html
 resource "aws_lambda_function" "index_function" {
 
+  # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
   function_name = "${var.shared_resource_identifier}-index"
-  role          = aws_iam_role.index_function.arn
+  role          = aws_iam_role.facialrecognition.arn
   publish       = true
   runtime       = "python3.11"
   handler       = "search_function.lambda_handler"
