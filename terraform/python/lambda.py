@@ -22,7 +22,7 @@ def index_faces(bucket, key):
             "Name": key}},
             CollectionId="famouspersons")
     return response
-    
+
 def update_index(tableName,faceId, fullName):
     response = dynamodb.put_item(
         TableName=tableName,
@@ -30,8 +30,8 @@ def update_index(tableName,faceId, fullName):
             'RekognitionId': {'S': faceId},
             'FullName': {'S': fullName}
             }
-        ) 
-    
+        )
+
 # --------------- Main handler ------------------
 
 def lambda_handler(event, context):
@@ -46,13 +46,13 @@ def lambda_handler(event, context):
 
     try:
 
-        # Calls Amazon Rekognition IndexFaces API to detect faces in S3 object 
+        # Calls Amazon Rekognition IndexFaces API to detect faces in S3 object
         # to index faces into specified collection
-        
+
         response = index_faces(bucket, key)
-        
+
         # Commit faceId and full name object metadata to DynamoDB
-        
+
         if response['ResponseMetadata']['HTTPStatusCode'] == 200:
             faceId = response['FaceRecords'][0]['Face']['FaceId']
 

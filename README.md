@@ -1,6 +1,15 @@
 # AWS Rekognition Demo
 
-Facial recognition implementation demo
+A facial recognition service implemented as a REST API with the following AWS serverless cloud infrastructure services
+
+- AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It has been sold to, and used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
+- S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
+- DynamoDB: a fully managed proprietary NoSQL database offered by Amazon.com as part of the Amazon Web Services portfolio. DynamoDB offers a fast persistent Key-Value Datastore with built-in support for replication, autoscaling, encryption at rest, and on-demand backup among other features.
+- Lambda: an event-driven, serverless computing platform provided by Amazon as a part of Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. It was introduced on November 13, 2014.
+- API Gateway: an AWS service for creating, publishing, maintaining, monitoring, and securing REST, HTTP, and WebSocket APIs at any scale.
+- Certificate Manager: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
+- Route53: a scalable and highly available Domain Name System service. Released on December 5, 2010.
+
 
 ```shell
 aws s3 cp file-to-be-upload.jpg s3://your-awesome-bucket/photos/portrait/ - metadata x-amz-meta-name=Mehmet,x-amz-meta-surname=Gungoren

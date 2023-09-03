@@ -1,3 +1,13 @@
+#------------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com/
+#
+# date: Feb-2022
+#
+# usage:  - implement a REST API with a single end point for posting an image.
+#         - add a DNS record for the REST API
+#         - add TLS/SSL termination for https
+#------------------------------------------------------------------------------
 locals {
   api_gateway_subdomain = "api.${var.shared_resource_identifier}.${var.root_domain}"
 }
@@ -58,7 +68,7 @@ resource "aws_lambda_permission" "search_function" {
 
 resource "aws_api_gateway_deployment" "apig_deployment" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = "apig"
+  stage_name  = var.stage
 
   lifecycle {
     create_before_destroy = true
@@ -75,6 +85,7 @@ module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "4.3"
 
+  # un-comment this is you choose a region other than us-east-1
   # providers = {
   #   aws = var.aws_region
   # }
@@ -90,8 +101,8 @@ module "acm" {
   wait_for_validation = true
 }
 resource "aws_api_gateway_domain_name" "domain_name" {
-  domain_name = local.api_gateway_subdomain
-  certificate_arn = "${module.acm.acm_certificate_arn}"
+  domain_name     = local.api_gateway_subdomain
+  certificate_arn = module.acm.acm_certificate_arn
 }
 
 resource "aws_route53_record" "api" {
@@ -100,8 +111,8 @@ resource "aws_route53_record" "api" {
   type    = "A"
 
   alias {
-    name                   = "${aws_api_gateway_domain_name.domain_name.cloudfront_domain_name}"
-    zone_id                = "${aws_api_gateway_domain_name.domain_name.cloudfront_zone_id}"
+    name                   = aws_api_gateway_domain_name.domain_name.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.domain_name.cloudfront_zone_id
     evaluate_target_health = false
   }
 }

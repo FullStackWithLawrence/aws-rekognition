@@ -11,7 +11,7 @@ images=[('image1.jpg','Elon Musk'),
       ('image6.jpg','Sundar Pichai')
       ]
 
-# Iterate through list to upload objects to S3   
+# Iterate through list to upload objects to S3
 for image in images:
     file = open(image[0],'rb')
     object = s3.Object('famouspersons-images','index/'+ image[0])
