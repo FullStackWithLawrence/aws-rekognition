@@ -13,7 +13,7 @@
 locals {
   api_gateway_subdomain = "api.${var.shared_resource_identifier}.${var.root_domain}"
   api_name              = "${var.shared_resource_identifier}-api"
-  iam_role_name         = "${var.shared_resource_identifier}-s3"
+  iam_role_name         = "${var.shared_resource_identifier}-apigateway"
   iam_role_policy_name  = "${var.shared_resource_identifier}-apigateway"
 }
 
@@ -31,47 +31,13 @@ data "aws_caller_identity" "current" {}
 ###############################################################################
 resource "aws_api_gateway_rest_api" "facialrecognition" {
   name = local.api_name
+  tags = var.tags
 }
 resource "aws_api_gateway_api_key" "facialrecognition" {
   name = var.shared_resource_identifier
-
-}
-
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> 4.3"
-
-  # un-comment this if you choose a region other than us-east-1
-  # providers = {
-  #   aws = var.aws_region
-  # }
-
-  domain_name = local.api_gateway_subdomain
-  zone_id     = data.aws_route53_zone.root_domain.id
-
-  subject_alternative_names = [
-    "*.${local.api_gateway_subdomain}",
-  ]
   tags = var.tags
-
-  wait_for_validation = true
-}
-resource "aws_api_gateway_domain_name" "facialrecognition" {
-  domain_name     = local.api_gateway_subdomain
-  certificate_arn = module.acm.acm_certificate_arn
 }
 
-resource "aws_route53_record" "api" {
-  zone_id = data.aws_route53_zone.root_domain.id
-  name    = local.api_gateway_subdomain
-  type    = "A"
-
-  alias {
-    name                   = aws_api_gateway_domain_name.facialrecognition.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.facialrecognition.cloudfront_zone_id
-    evaluate_target_health = false
-  }
-}
 
 resource "aws_api_gateway_deployment" "facialrecognition" {
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
@@ -95,6 +61,7 @@ resource "aws_api_gateway_stage" "facialrecognition" {
   cache_cluster_size = "0.5"
   rest_api_id        = aws_api_gateway_rest_api.facialrecognition.id
   stage_name         = var.stage
+  tags               = var.tags
 }
 resource "aws_api_gateway_usage_plan" "facialrecognition" {
   name        = var.shared_resource_identifier
@@ -112,6 +79,7 @@ resource "aws_api_gateway_usage_plan" "facialrecognition" {
     burst_limit = var.throttle_settings_burst_limit
     rate_limit  = var.throttle_settings_rate_limit
   }
+  tags = var.tags
 }
 resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
   key_id        = aws_api_gateway_api_key.facialrecognition.id
@@ -123,67 +91,28 @@ resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
 ###############################################################################
 # REST API resources - IAM
 ###############################################################################
-resource "aws_iam_role" "apigateway_operator" {
-  name = local.iam_role_name
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Sid" : "",
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "apigateway.amazonaws.com"
-          },
-          "Action" : "sts:AssumeRole"
-        }
-      ]
-    }
-  )
-  tags = var.tags
+resource "aws_iam_role" "apigateway_s3_uploader" {
+  name               = local.iam_role_name
+  description        = "Allows API Gateway to push logs to CloudWatch Logs."
+  assume_role_policy = file("${path.module}/json/iam_role_apigateway_s3_uploader.json")
+  tags               = var.tags
 }
 resource "aws_iam_role_policy_attachment" "cloudwatch_apigateway" {
-  role       = aws_iam_role.apigateway_operator.id
+  role       = aws_iam_role.apigateway_s3_uploader.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
-resource "aws_iam_role_policy" "ping_data_allow_access" {
-  name = local.iam_role_policy_name
-  role = aws_iam_role.apigateway_operator.id
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Sid" : "VisualEditor0",
-          "Effect" : "Allow",
-          "Action" : [
-            "s3:ListStorageLensConfigurations",
-            "s3:ListAccessPointsForObjectLambda",
-            "s3:GetAccessPoint",
-            "s3:PutAccountPublicAccessBlock",
-            "s3:GetAccountPublicAccessBlock",
-            "s3:ListAllMyBuckets",
-            "s3:ListAccessPoints",
-            "s3:PutAccessPointPublicAccessBlock",
-            "s3:ListJobs",
-            "s3:PutStorageLensConfiguration",
-            "s3:ListMultiRegionAccessPoints",
-            "s3:CreateJob"
-          ],
-          "Resource" : "*"
-        },
-        {
-          "Sid" : "VisualEditor1",
-          "Effect" : "Allow",
-          "Action" : "s3:*",
-          "Resource" : [
-            "arn:aws:s3:::webhook-apigateway*",
-            "arn:aws:s3:::webhook-apigateway/*"
-          ]
-        }
-      ]
-    }
-  )
+data "template_file" "iam_policy_apigateway_s3_readwrite" {
+  template = file("${path.module}/json/iam_policy_apigateway_s3_readwrite.json.tpl")
+  vars = {
+    aws_account_id = var.aws_account_id
+    bucket_name    = module.s3_bucket.s3_bucket_id
+  }
+}
+
+resource "aws_iam_role_policy" "iam_policy_apigateway_s3_readwrite" {
+  name   = local.iam_role_policy_name
+  role   = aws_iam_role.apigateway_s3_uploader.id
+  policy = data.template_file.iam_policy_apigateway_s3_readwrite.rendered
 }
 
 ###############################################################################
@@ -218,14 +147,13 @@ resource "aws_api_gateway_method" "index_method" {
   resource_id      = aws_api_gateway_resource.index.id
   http_method      = "POST"
   authorization    = "NONE"
-  api_key_required = "true"
+  api_key_required = "false"
   # request_models = {
   #   "application/json" = aws_api_gateway_model.upload.name
   # }
   request_parameters = {
     "method.request.path.folder" = true
   }
-
 }
 
 resource "aws_api_gateway_integration" "index" {
@@ -235,7 +163,7 @@ resource "aws_api_gateway_integration" "index" {
   integration_http_method = "PUT"
   type                    = "AWS"
   uri                     = "arn:aws:apigateway:${var.aws_region}:s3:path/{bucket}/{fileName}"
-  credentials             = aws_iam_role.apigateway_operator.arn
+  credentials             = aws_iam_role.apigateway_s3_uploader.arn
   request_templates = {
     "application/json" = "#set($context.requestOverride.path.fileName = $context.requestId + '.json')\n$input.json('$')"
   }

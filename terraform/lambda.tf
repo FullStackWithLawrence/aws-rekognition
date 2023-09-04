@@ -18,32 +18,20 @@
 ###############################################################################
 resource "aws_iam_role" "facialrecognition" {
   name               = "${var.shared_resource_identifier}-iam-role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "lambda.amazonaws.com",
-          "rekognition.amazonaws.com",
-          "dynamodb.amazonaws.com",
-          "apigateway.amazonaws.com"
-        ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+  assume_role_policy = file("${path.module}/json/iam_role_lambda.json")
 }
 
+data "template_file" "iam_policy_lambda" {
+  template = file("${path.module}/json/iam_policy_lambda.json.tpl")
+  vars = {
+    s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
+    dynamodb_table_arn = module.dynamodb_table.dynamodb_table_arn
+  }
+}
 resource "aws_iam_policy" "facialrecognition" {
   name        = "${var.shared_resource_identifier}-iam-policy"
   description = "generic IAM policy"
-  policy      = file("${path.module}/json/lambda-iam-policy.json")
+  policy      = data.template_file.iam_policy_lambda.rendered
 }
 
 
@@ -60,7 +48,7 @@ resource "aws_iam_role_policy_attachment" "facialrecognition" {
 data "archive_file" "lambda_index" {
   type        = "zip"
   source_file = "${path.module}/python/lambda_index.py"
-  output_path = "${path.module}/python/lambda_search_payload.zip"
+  output_path = "${path.module}/python/lambda_index_payload.zip"
 }
 
 resource "aws_lambda_permission" "s3_permission_to_trigger_lambda" {

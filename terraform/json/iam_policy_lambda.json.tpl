@@ -18,13 +18,13 @@
     {
       "Effect": "Allow",
       "Action": ["s3:GetObject"],
-      "Resource": ["arn:aws:s3:::bucket-name/*"]
+      "Resource": ["${s3_bucket_arn}/*"]
     },
     {
       "Effect": "Allow",
       "Action": ["dynamodb:PutItem"],
       "Resource": [
-        "arn:aws:dynamodb:aws-region:account-id:table/family_collection"
+        "${dynamodb_table_arn}/*"
       ]
     },
     {

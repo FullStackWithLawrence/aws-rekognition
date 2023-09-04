@@ -17,7 +17,11 @@ curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com
 curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/search
 ```
 
-See further instructions on how to use AWS API Gateway URL end points with Postman [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+See further instructions:
+
+- how to use AWS API Gateway URL end points with Postman [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+- [Testing API Gateway Endpoints](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+- [How do I upload an image or PDF file to Amazon S3 through API Gateway?](https://repost.aws/knowledge-center/api-gateway-upload-image-s3)
 
 ## Architecture
 

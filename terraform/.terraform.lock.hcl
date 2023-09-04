@@ -80,3 +80,10 @@ provider "registry.terraform.io/hashicorp/random" {
     "zh:eab0d0495e7e711cca367f7d4df6e322e6c562fc52151ec931176115b83ed014",
   ]
 }
+
+provider "registry.terraform.io/hashicorp/template" {
+  version = "2.2.0"
+  hashes = [
+    "h1:LLixa6j2MWnirPzYZPMD9/B5CVuN4Alg01SddOIoA5s=",
+  ]
+}

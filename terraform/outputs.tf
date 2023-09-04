@@ -16,11 +16,11 @@ output "aws_profile" {
   value = var.aws_profile
 }
 
-output "stage" {
+output "api_gateway_deployment_stage" {
   value = var.stage
 }
-output "api_gateway_arn" {
-  value = aws_api_gateway_deployment.facialrecognition.id
+output "api_gateway_api_key" {
+  value = nonsensitive(aws_api_gateway_api_key.facialrecognition.value)
 }
 
 output "api_gateway_url" {
@@ -36,13 +36,9 @@ output "lambda_search" {
 }
 
 output "s3_bucket" {
-  value = module.s3_bucket.s3_bucket_bucket_domain_name
+  value = module.s3_bucket.s3_bucket_id
 }
 
 output "dynamodb_table" {
   value = module.dynamodb_table.dynamodb_table_arn
-}
-
-output "aws_api_gateway_api_key" {
-  value = nonsensitive(aws_api_gateway_api_key.facialrecognition.value)
 }
