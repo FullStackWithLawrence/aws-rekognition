@@ -17,6 +17,8 @@ curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com
 curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/search
 ```
 
+See further instructions on how to use AWS API Gateway URL end points with Postman [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+
 ## Architecture
 
 Implemented as a REST API with the following AWS serverless cloud infrastructure services
@@ -207,7 +209,7 @@ terraform apply
 
 ## IV. Uninstall
 
-The following completely destroys everything including the kubernetes cluster, Wolfram Application Server and all resources:
+The following completely destroys all AWS resources. Note that this operation might take up to 20 minutes to complete.
 
 ```console
 cd terraform

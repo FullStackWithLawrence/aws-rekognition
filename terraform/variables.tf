@@ -52,3 +52,27 @@ variable "face_detect_threshold" {
   type    = number
   default = 10
 }
+
+variable "quota_settings_limit" {
+  type    = number
+  default = 20
+}
+
+variable "quota_settings_offset" {
+  type    = number
+  default = 2
+}
+
+variable "quota_settings_period" {
+  type    = string
+  default = "WEEK"
+}
+
+variable "throttle_settings_burst_limit" {
+  type    = number
+  default = 5
+}
+variable "throttle_settings_rate_limit" {
+  type    = number
+  default = 10
+}

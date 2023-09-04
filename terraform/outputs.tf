@@ -28,11 +28,11 @@ output "api_gateway_url" {
 }
 
 output "lambda_index" {
-  value = aws_lambda_function.index_function.arn
+  value = aws_lambda_function.index.arn
 }
 
 output "lambda_search" {
-  value = aws_lambda_function.search_function.arn
+  value = aws_lambda_function.search.arn
 }
 
 output "s3_bucket" {
