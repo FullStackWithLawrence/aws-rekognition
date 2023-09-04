@@ -44,6 +44,5 @@ output "dynamodb_table" {
 }
 
 output "aws_api_gateway_api_key" {
-  value     = aws_api_gateway_api_key.facialrecognition.value
-  sensitive = true
+  value = nonsensitive(aws_api_gateway_api_key.facialrecognition.value)
 }

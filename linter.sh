@@ -3,7 +3,7 @@
 # written by:   mcdaniel
 #               https://lawrencemcdaniel.com
 #
-# date:         mar-2022
+# date:         sep-2023
 #
 # usage:        Runs terraform fmt -recursive
 #------------------------------------------------------------------------------

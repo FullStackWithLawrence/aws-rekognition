@@ -2,7 +2,7 @@
 # written by: Lawrence McDaniel
 #             https://lawrencemcdaniel.com/
 #
-# date: Feb-2022
+# date: sep-2023
 #
 # usage:  - implement a REST API with a single end point for posting an image.
 #         - add a DNS record for the REST API
@@ -22,9 +22,15 @@ data "aws_caller_identity" "current" {}
 ###############################################################################
 # REST API resources
 ###############################################################################
-resource "aws_api_gateway_rest_api" "api" {
+resource "aws_api_gateway_rest_api" "facialrecognition" {
   name = "${var.shared_resource_identifier}-api"
 }
+resource "aws_api_gateway_api_key" "facialrecognition" {
+  name = var.shared_resource_identifier
+
+}
+
+
 
 ###############################################################################
 # REST API resources - IAM
@@ -92,17 +98,12 @@ resource "aws_iam_role_policy" "ping_data_allow_access" {
   )
 }
 
-resource "aws_api_gateway_api_key" "facialrecognition" {
-  name = var.shared_resource_identifier
-
-}
-
 ###############################################################################
 # REST API resources - Index
 ###############################################################################
 # see https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7
 resource "aws_api_gateway_model" "upload" {
-  rest_api_id  = aws_api_gateway_rest_api.api.id
+  rest_api_id  = aws_api_gateway_rest_api.facialrecognition.id
   name         = "upload"
   description  = "basic upload JSON schema"
   content_type = "application/json"
@@ -113,12 +114,12 @@ resource "aws_api_gateway_model" "upload" {
 
 resource "aws_api_gateway_resource" "index" {
   path_part   = "index"
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
 }
 
 resource "aws_api_gateway_method" "index_method" {
-  rest_api_id      = aws_api_gateway_rest_api.api.id
+  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
   resource_id      = aws_api_gateway_resource.index.id
   http_method      = "POST"
   authorization    = "NONE"
@@ -133,7 +134,7 @@ resource "aws_api_gateway_method" "index_method" {
 }
 
 resource "aws_api_gateway_integration" "index" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
+  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
   resource_id             = aws_api_gateway_resource.index.id
   http_method             = aws_api_gateway_method.index_method.http_method
   integration_http_method = "PUT"
@@ -149,7 +150,7 @@ resource "aws_api_gateway_integration" "index" {
 }
 
 resource "aws_api_gateway_method_response" "index_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
   resource_id = aws_api_gateway_resource.index.id
   http_method = aws_api_gateway_method.index_method.http_method
   status_code = "200"
@@ -159,7 +160,7 @@ resource "aws_api_gateway_method_response" "index_response_200" {
   response_parameters = {}
 }
 resource "aws_api_gateway_integration_response" "post" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
   resource_id = aws_api_gateway_resource.index.id
   http_method = aws_api_gateway_method.index_method.http_method
   status_code = aws_api_gateway_method_response.index_response_200.status_code
@@ -175,19 +176,20 @@ resource "aws_api_gateway_integration_response" "post" {
 ###############################################################################
 resource "aws_api_gateway_resource" "search" {
   path_part   = "search"
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
 }
 
 resource "aws_api_gateway_method" "search_method" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.search.id
-  http_method   = "POST"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
+  resource_id      = aws_api_gateway_resource.search.id
+  api_key_required = "true"
+  http_method      = "POST"
+  authorization    = "NONE"
 }
 
 resource "aws_api_gateway_integration" "search" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
+  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
   resource_id             = aws_api_gateway_resource.search.id
   http_method             = aws_api_gateway_method.search_method.http_method
   integration_http_method = "POST"
@@ -197,7 +199,7 @@ resource "aws_api_gateway_integration" "search" {
 }
 
 resource "aws_api_gateway_method_response" "search_response_200" {
-  rest_api_id         = aws_api_gateway_rest_api.api.id
+  rest_api_id         = aws_api_gateway_rest_api.facialrecognition.id
   resource_id         = aws_api_gateway_resource.search.id
   http_method         = aws_api_gateway_method.search_method.http_method
   status_code         = "200"
@@ -212,24 +214,55 @@ resource "aws_lambda_permission" "search_function" {
   principal     = "apigateway.amazonaws.com"
 
   # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
-  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.search_method.http_method}${aws_api_gateway_resource.search.path}"
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.facialrecognition.id}/*/${aws_api_gateway_method.search_method.http_method}${aws_api_gateway_resource.search.path}"
 }
 
 resource "aws_api_gateway_deployment" "facialrecognition" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = var.stage
-
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  depends_on = [
+    aws_api_gateway_integration.index,
+    aws_api_gateway_integration.search,
+    aws_api_gateway_rest_api.facialrecognition
+  ]
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.facialrecognition.body,
+      aws_api_gateway_integration.index.id,
+      aws_api_gateway_integration.search.id
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
-
-  depends_on = [
-    aws_api_gateway_resource.search,
-    aws_api_gateway_method.search_method,
-    aws_api_gateway_integration.search
-  ]
 }
-
+resource "aws_api_gateway_stage" "facialrecognition" {
+  deployment_id      = aws_api_gateway_deployment.facialrecognition.id
+  cache_cluster_size = "0.5"
+  rest_api_id        = aws_api_gateway_rest_api.facialrecognition.id
+  stage_name         = var.stage
+}
+resource "aws_api_gateway_usage_plan" "facialrecognition" {
+  name        = var.shared_resource_identifier
+  description = "Default usage plan"
+  api_stages {
+    api_id = aws_api_gateway_rest_api.facialrecognition.id
+    stage  = aws_api_gateway_stage.facialrecognition.stage_name
+  }
+  quota_settings {
+    limit  = 20
+    offset = 2
+    period = "WEEK"
+  }
+  throttle_settings {
+    burst_limit = 5
+    rate_limit  = 10
+  }
+}
+resource "aws_api_gateway_usage_plan_key" "main" {
+  key_id        = aws_api_gateway_api_key.facialrecognition.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.facialrecognition.id
+}
 ###############################################################################
 # URL end point
 ###############################################################################

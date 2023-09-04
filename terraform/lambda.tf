@@ -2,7 +2,7 @@
 # written by: Lawrence McDaniel
 #             https://lawrencemcdaniel.com/
 #
-# date: Feb-2022
+# date: sep-2023
 #
 # usage:  - implement a Python Lambda function to create a 'faceprint' of an image
 #           triggered by uploading the image to the S3 bucket
