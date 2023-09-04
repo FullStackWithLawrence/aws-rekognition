@@ -1,3 +1,11 @@
+#------------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com/
+#
+# date:       sep-2023
+#
+# usage:      all Terraform variable declarations
+#------------------------------------------------------------------------------
 variable "aws_profile" {
   description = "a valid AWS CLI profile located in $HOME/.aws/credentials"
   type        = string

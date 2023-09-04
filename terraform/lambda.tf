@@ -43,7 +43,7 @@ EOF
 resource "aws_iam_policy" "facialrecognition" {
   name        = "${var.shared_resource_identifier}-iam-policy"
   description = "generic IAM policy"
-  policy      = file("${path.module}/json/policy.json")
+  policy      = file("${path.module}/json/lambda-iam-policy.json")
 }
 
 
@@ -68,17 +68,42 @@ resource "aws_lambda_permission" "s3_permission_to_trigger_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.index_function.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = module.personnel_bucket.s3_bucket_arn
+  source_arn    = module.s3_bucket.s3_bucket_arn
 }
 
-resource "aws_s3_bucket_notification" "incoming" {
-  bucket = module.personnel_bucket.s3_bucket_id
+# see https://github.com/hashicorp/terraform-provider-aws/blob/main/website/docs/r/s3_bucket_notification.html.markdown
+resource "aws_s3_bucket_notification" "incoming_jpg" {
+  bucket = module.s3_bucket.s3_bucket_id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.index_function.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "photos/portrait"
+    filter_prefix       = "images/"
     filter_suffix       = ".jpg"
+  }
+
+  depends_on = [aws_lambda_permission.s3_permission_to_trigger_lambda]
+}
+resource "aws_s3_bucket_notification" "incoming_jpeg" {
+  bucket = module.s3_bucket.s3_bucket_id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.index_function.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "images/"
+    filter_suffix       = ".jpeg"
+  }
+
+  depends_on = [aws_lambda_permission.s3_permission_to_trigger_lambda]
+}
+resource "aws_s3_bucket_notification" "incoming_png" {
+  bucket = module.s3_bucket.s3_bucket_id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.index_function.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "images/"
+    filter_suffix       = ".png"
   }
 
   depends_on = [aws_lambda_permission.s3_permission_to_trigger_lambda]

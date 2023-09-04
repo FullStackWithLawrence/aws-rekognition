@@ -2,7 +2,7 @@
 
 A facial recognition service implemented as a REST API with the following AWS serverless cloud infrastructure services
 
-- AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It has been sold to, and used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
+- AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
 - S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
 - DynamoDB: a fully managed proprietary NoSQL database offered by Amazon.com as part of the Amazon Web Services portfolio. DynamoDB offers a fast persistent Key-Value Datastore with built-in support for replication, autoscaling, encryption at rest, and on-demand backup among other features.
 - Lambda: an event-driven, serverless computing platform provided by Amazon as a part of Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. It was introduced on November 13, 2014.
@@ -10,16 +10,20 @@ A facial recognition service implemented as a REST API with the following AWS se
 - Certificate Manager: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
 - Route53: a scalable and highly available Domain Name System service. Released on December 5, 2010.
 
-
 ```shell
-aws s3 cp file-to-be-upload.jpg s3://your-awesome-bucket/photos/portrait/ - metadata x-amz-meta-name=Mehmet,x-amz-meta-surname=Gungoren
+aws s3 cp file-to-be-upload.jpg s3://your-awesome-bucket/images// - metadata x-amz-meta-name=Mehmet,x-amz-meta-surname=Gungoren
+
+curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com
 ```
 
-## Alternative Command-line implementation
+## Original Source
+
+Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Both of these sources are well-presented, and they provide additional instruction and explanetory theory that I've ommited. I'd therefore recommend giving both of these a look.
 
 - [YouTube - Create your own Face Recognition Service with AWS Rekognition, by Tech Raj](https://www.youtube.com/watch?v=oHSesteFK5c)
 - [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-i-c4530f9b3c74)
 - [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-ii-c6e9100709b5)
+- [Webhook for S3 Bucket By Terraform (REST API in API Gateway to proxy Amazon S3)](https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7)
 
 ## Introduction
 
