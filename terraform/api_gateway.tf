@@ -186,23 +186,28 @@ resource "aws_api_gateway_integration" "index_put" {
   type                    = "AWS"
 
   passthrough_behavior = "WHEN_NO_TEMPLATES"
-  # content_handling        = "CONVERT_TO_BINARY"
+  content_handling     = "CONVERT_TO_TEXT"
 
   # For AWS integrations, the URI should be of the form
   #   arn:aws:apigateway:{region}:{subdomain.service|service}:{path|action}/{service_api}
   #   arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:012345678901:function:my-func/invocations
+  #   arn:aws:apigateway:ap-southeast-2:s3:path/{bucket}/{fileName}
   #   arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{key}
-  uri         = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{key}"
+  uri         = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{filename}"
   credentials = aws_iam_role.apigateway_s3_uploader.arn
 
   request_parameters = {
-    "integration.request.path.key" = "method.request.path.filename"
+    "integration.request.path.filename" = "method.request.path.filename"
   }
 
   # see https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
   # request_templates = {
   #   "application/json" = file("${path.module}/json/apigateway_index_request_template.json.tpl")
   # }
+  # request_templates       = {
+  #   "image/jpeg" = "#set($context.requestOverride.path.filename = $context.requestId + '.json')\n$input.json('$')"
+  # }
+
 }
 
 resource "aws_api_gateway_method_response" "index_response_200" {
