@@ -34,9 +34,14 @@ variable "shared_resource_identifier" {
 }
 
 variable "stage" {
-  description = "Examples: dev, staging, prod"
+  description = "Examples: dev, staging, prod, v0, v1, etc."
   type        = string
-  default     = "prod"
+  default     = "v1"
+}
+
+variable "logging_level" {
+  type    = string
+  default = "INFO"
 }
 variable "tags" {
   description = "A map of tags to add to all resources. Tags added to launch configuration or templates override these values."

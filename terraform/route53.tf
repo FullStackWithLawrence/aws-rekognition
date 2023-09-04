@@ -10,6 +10,7 @@
 #         ROOT DOMAIN MANAGED BY AWS ROUTE53.
 #------------------------------------------------------------------------------
 
+# see https://registry.terraform.io/providers/-/aws/4.51.0/docs/resources/api_gateway_domain_name
 resource "aws_api_gateway_domain_name" "facialrecognition" {
   domain_name     = local.api_gateway_subdomain
   certificate_arn = module.acm.acm_certificate_arn

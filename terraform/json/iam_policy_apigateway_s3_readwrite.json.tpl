@@ -3,7 +3,6 @@
 	"Statement": [
 		{
 			"Action": [
-				"s3:GetObject",
 				"s3:PutObject"
 			],
 			"Effect": "Allow",

@@ -8,7 +8,8 @@
 #         - add a DNS record for the REST API
 #         - add TLS/SSL termination for https
 #
-# see:    https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway
+# see:    https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_model.html
+#         https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway
 #------------------------------------------------------------------------------
 locals {
   api_gateway_subdomain = "api.${var.shared_resource_identifier}.${var.root_domain}"
@@ -29,8 +30,19 @@ data "aws_caller_identity" "current" {}
 ###############################################################################
 # Top-level REST API resources
 ###############################################################################
+
+# see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_rest_api
 resource "aws_api_gateway_rest_api" "facialrecognition" {
-  name = local.api_name
+  name        = local.api_name
+  description = "Facial recognition micro service"
+  binary_media_types = [
+    "image/jpeg"
+  ]
+  api_key_source = "HEADER"
+  endpoint_configuration {
+    types = ["EDGE"]
+  }
+
   tags = var.tags
 }
 resource "aws_api_gateway_api_key" "facialrecognition" {
@@ -42,13 +54,13 @@ resource "aws_api_gateway_api_key" "facialrecognition" {
 resource "aws_api_gateway_deployment" "facialrecognition" {
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
   depends_on = [
-    aws_api_gateway_integration.index,
+    aws_api_gateway_integration.index_put,
     aws_api_gateway_integration.search
   ]
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_rest_api.facialrecognition.body,
-      aws_api_gateway_integration.index.id,
+      aws_api_gateway_integration.index_put.id,
       aws_api_gateway_integration.search.id
     ]))
   }
@@ -56,12 +68,27 @@ resource "aws_api_gateway_deployment" "facialrecognition" {
     create_before_destroy = true
   }
 }
+# see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_stage
 resource "aws_api_gateway_stage" "facialrecognition" {
   deployment_id      = aws_api_gateway_deployment.facialrecognition.id
   cache_cluster_size = "0.5"
   rest_api_id        = aws_api_gateway_rest_api.facialrecognition.id
   stage_name         = var.stage
   tags               = var.tags
+}
+
+resource "aws_api_gateway_method_settings" "facialrecognition" {
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  stage_name  = aws_api_gateway_stage.facialrecognition.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled        = true
+    data_trace_enabled     = true
+    logging_level          = var.logging_level
+    throttling_burst_limit = var.throttle_settings_burst_limit
+    throttling_rate_limit  = var.throttle_settings_rate_limit
+  }
 }
 resource "aws_api_gateway_usage_plan" "facialrecognition" {
   name        = var.shared_resource_identifier
@@ -93,7 +120,7 @@ resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
 ###############################################################################
 resource "aws_iam_role" "apigateway_s3_uploader" {
   name               = local.iam_role_name
-  description        = "Allows API Gateway to push logs to CloudWatch Logs."
+  description        = "Allows API Gateway to push files to an S3 bucket"
   assume_role_policy = file("${path.module}/json/iam_role_apigateway_s3_uploader.json")
   tags               = var.tags
 }
@@ -126,72 +153,78 @@ resource "aws_iam_role_policy" "iam_policy_apigateway_s3_readwrite" {
 #
 # see https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7
 ###############################################################################
-resource "aws_api_gateway_resource" "index" {
-  path_part   = "index"
+resource "aws_api_gateway_resource" "index_root" {
   parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  path_part   = "index"
 }
 
-# resource "aws_api_gateway_model" "upload" {
-#   rest_api_id  = aws_api_gateway_rest_api.facialrecognition.id
-#   name         = "upload"
-#   description  = "basic upload JSON schema"
-#   content_type = "application/json"
+# see https://stackoverflow.com/questions/39040739/in-terraform-how-do-you-specify-an-api-gateway-endpoint-with-a-variable-in-the
+resource "aws_api_gateway_resource" "index" {
+  parent_id   = aws_api_gateway_resource.index_root.id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  path_part   = "{filename}"
+}
 
-#   schema = file("${path.module}/json/upload_model.json")
-# }
-
-
-resource "aws_api_gateway_method" "index_method" {
+# see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
+resource "aws_api_gateway_method" "index_put" {
   rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
   resource_id      = aws_api_gateway_resource.index.id
-  http_method      = "POST"
+  http_method      = "PUT"
   authorization    = "NONE"
-  api_key_required = "false"
-  # request_models = {
-  #   "application/json" = aws_api_gateway_model.upload.name
-  # }
+  api_key_required = "true"
   request_parameters = {
-    "method.request.path.folder" = true
+    "method.request.path.filename" = true
   }
 }
 
-resource "aws_api_gateway_integration" "index" {
+resource "aws_api_gateway_integration" "index_put" {
   rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
   resource_id             = aws_api_gateway_resource.index.id
-  http_method             = aws_api_gateway_method.index_method.http_method
+  http_method             = aws_api_gateway_method.index_put.http_method
   integration_http_method = "PUT"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:s3:path/{bucket}/{fileName}"
-  credentials             = aws_iam_role.apigateway_s3_uploader.arn
-  request_templates = {
-    "application/json" = "#set($context.requestOverride.path.fileName = $context.requestId + '.json')\n$input.json('$')"
-  }
-  request_parameters = {
-    "integration.request.path.bucket" = "method.request.path.folder"
-  }
-}
 
-resource "aws_api_gateway_integration_response" "index" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id = aws_api_gateway_resource.index.id
-  http_method = aws_api_gateway_method.index_method.http_method
-  status_code = aws_api_gateway_method_response.index_response_200.status_code
-  depends_on = [
-    aws_api_gateway_integration.index,
-    aws_api_gateway_integration.index
-  ]
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
+  # content_handling        = "CONVERT_TO_BINARY"
+
+  # For AWS integrations, the URI should be of the form
+  #   arn:aws:apigateway:{region}:{subdomain.service|service}:{path|action}/{service_api}
+  #   arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:012345678901:function:my-func/invocations
+  #   arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{key}
+  uri         = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{key}"
+  credentials = aws_iam_role.apigateway_s3_uploader.arn
+
+  request_parameters = {
+    "integration.request.path.key" = "method.request.path.filename"
+  }
+
+  # see https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+  # request_templates = {
+  #   "application/json" = file("${path.module}/json/apigateway_index_request_template.json.tpl")
+  # }
 }
 
 resource "aws_api_gateway_method_response" "index_response_200" {
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
   resource_id = aws_api_gateway_resource.index.id
-  http_method = aws_api_gateway_method.index_method.http_method
+  http_method = aws_api_gateway_method.index_put.http_method
   status_code = "200"
   response_models = {
     "application/json" = "Empty"
   }
   response_parameters = {}
+}
+
+resource "aws_api_gateway_integration_response" "index_put" {
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  resource_id = aws_api_gateway_resource.index.id
+  http_method = aws_api_gateway_method.index_put.http_method
+  status_code = aws_api_gateway_method_response.index_response_200.status_code
+
+  depends_on = [
+    aws_api_gateway_integration.index_put
+  ]
 }
 
 ###############################################################################

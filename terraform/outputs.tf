@@ -27,9 +27,9 @@ output "api_gateway_url" {
   value = "https://${aws_route53_record.api.fqdn}"
 }
 
-output "lambda_index" {
-  value = aws_lambda_function.index.arn
-}
+# output "lambda_index" {
+#   value = aws_lambda_function.index.arn
+# }
 
 output "lambda_search" {
   value = aws_lambda_function.search.arn
