@@ -1,6 +1,20 @@
 # AWS Rekognition Demo
 
-A facial recognition service implemented as a REST API with the following AWS serverless cloud infrastructure services
+A machine learning and artificial inteligence based facial recognition service, implemented as a REST API.
+
+## Usage
+
+```shell
+# add an image of a face to the index
+curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/index
+
+# run an image against the model
+curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/search
+```
+
+## Architecture
+
+Implemented as a REST API with the following AWS serverless cloud infrastructure services
 
 - AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
 - S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
@@ -9,12 +23,6 @@ A facial recognition service implemented as a REST API with the following AWS se
 - API Gateway: an AWS service for creating, publishing, maintaining, monitoring, and securing REST, HTTP, and WebSocket APIs at any scale.
 - Certificate Manager: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
 - Route53: a scalable and highly available Domain Name System service. Released on December 5, 2010.
-
-```shell
-aws s3 cp file-to-be-upload.jpg s3://your-awesome-bucket/images// - metadata x-amz-meta-name=Mehmet,x-amz-meta-surname=Gungoren
-
-curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com
-```
 
 ## Original Source
 
