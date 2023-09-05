@@ -34,7 +34,9 @@ MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
 THRESHOLD = float(os.environ["FACE_DETECT_THRESHOLD"])
 QUALITY_FILTER = os.environ["QUALITY_FILTER"]
 TABLE_ID = os.environ["TABLE_ID"]
-AWS_REGION = os.environ["AWS_REGION"]
+AWS_REGION = os.environ["REGION"]
+COLLECTION_ID = os.environ["COLLECTION_ID"]
+DEBUG_MODE = False or bool(os.environ["DEBUG_MODE"])
 
 rekognition_client = boto3.client("rekognition", AWS_REGION)
 
@@ -43,6 +45,7 @@ dynamodb_table = dynamodb_client.Table(TABLE_ID)
 
 def lambda_handler(event, context):
     try:
+        # https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal
         # Image: base64-encoded bytes or an S3 object.
         # Image={
         #     'Bytes': b'bytes',
@@ -53,57 +56,27 @@ def lambda_handler(event, context):
         #     }
         # },
 
-        image = {'Bytes': event['image'].encode()}
+        image = {
+            'Bytes': event['image'].encode()
+            }
         faces = rekognition_client.search_faces_by_image(
-            CollectionId='string',
             Image=image,
+            CollectionId=COLLECTION_ID,
             MaxFaces=MAX_FACES,
             FaceMatchThreshold=THRESHOLD,
             QualityFilter=QUALITY_FILTER
         )
-        #return faces['FaceMatches']
 
         #----------------------------------------------------------------------
-        # expected return structure
+        # return structure: doc/rekogition_search_faces_by_image.json
         #----------------------------------------------------------------------
-        # {
-        #     'SearchedFaceBoundingBox': {
-        #         'Width': ...,
-        #         'Height': ...,
-        #         'Left': ...,
-        #         'Top': ...
-        #     },
-        #     'SearchedFaceConfidence': ...,
-        #     'FaceMatches': [
-        #         {
-        #             'Similarity': ...,
-        #             'Face': {
-        #                 'FaceId': 'string',
-        #                 'BoundingBox': {
-        #                     'Width': ...,
-        #                     'Height': ...,
-        #                     'Left': ...,
-        #                     'Top': ...
-        #                 },
-        #                 'ImageId': 'string',
-        #                 'ExternalImageId': 'string',
-        #                 'Confidence': ...,
-        #                 'IndexFacesModelVersion': 'string',
-        #                 'UserId': 'string'
-        #             }
-        #         },
-        #     ],
-        #     'FaceModelVersion': 'string'
-        # }
+
         result = []
         for face in faces['FaceMatches']:
             item = dynamodb_table.get_item(Key={'FaceId': face["Face"]["FaceId"]})
             if "Item" in item:
                 result.append(item['Item']["object_metadata"])
-        return {
-            'statusCode': 200,
-            'data': result
-        }
+        return {'statusCode': 200, 'data': result}
     except rekognition_client.exceptions.InvalidS3ObjectException:
         print("ERROR: InvalidS3ObjectException")
         return {'statusCode': 406, 'data': None}
@@ -131,5 +104,8 @@ def lambda_handler(event, context):
     except rekognition_client.exceptions.InvalidImageFormatException:
         print("ERROR: InvalidImageFormatException")
         return {'statusCode': 406, 'data': None}
-    except Exception:
+    except Exception as e:
+        print("ERROR: a {e} exception was encountered".format(
+            e=type(e)
+        ))
         return {'statusCode': 500, 'data': None}

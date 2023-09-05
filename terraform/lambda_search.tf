@@ -105,11 +105,14 @@ resource "aws_lambda_function" "search" {
 
   environment {
     variables = {
-      MAX_FACES_COUNT       = var.max_faces_count
-      FACE_DETECT_THRESHOLD = var.face_detect_threshold
-      QUALITY_FILTER        = var.face_detect_quality_filter
-      TABLE_ID              = local.table_name
-      AWS_REGION            = var.aws_region
+      DEBUG_MODE             = var.debug_mode
+      MAX_FACES_COUNT        = var.max_faces_count
+      FACE_DETECT_THRESHOLD  = var.face_detect_threshold
+      QUALITY_FILTER         = var.face_detect_quality_filter
+      FACE_DETECT_ATTRIBUTES = var.face_detect_attributes
+      TABLE_ID               = local.table_name
+      REGION                 = var.aws_region
+      COLLECTION_ID          = local.collection_id
     }
   }
 }

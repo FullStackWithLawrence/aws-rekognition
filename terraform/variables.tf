@@ -73,9 +73,13 @@ variable "face_detect_threshold" {
 variable "face_detect_quality_filter" {
   description = "'NONE'|'AUTO'|'LOW'|'MEDIUM'|'HIGH'"
   type        = string
-  defdefault  = "NONE"
+  default     = "AUTO"
 }
-
+variable "face_detect_attributes" {
+  descrdescription = "'DEFAULT'|'ALL'"
+  type             = string
+  default          = "DEFAULT"
+}
 variable "quota_settings_limit" {
   type    = number
   default = 20
@@ -101,8 +105,8 @@ variable "throttle_settings_rate_limit" {
 }
 
 variable "lambda_python_runtime" {
-  type       = string
-  defdefault = "python3.11"
+  type    = string
+  default = "python3.11"
 }
 variable "lambda_memory_size" {
   description = "Lambda function memory allocations in Mb"
