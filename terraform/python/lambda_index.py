@@ -26,7 +26,7 @@
 #               or as a reference to an image in an Amazon S3 bucket.
 #
 # OFFICIAL DOCUMENTATION:
-#             https://boto3.amazonaws.com/v1/documentation/api/1.26.99/reference/services/rekognition/client/index_faces.html
+#             https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/index_faces.html
 #------------------------------------------------------------------------------
 import os
 import json
@@ -40,7 +40,7 @@ TABLE_ID = os.environ["TABLE_ID"]
 MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
 FACE_DETECT_ATTRIBUTES = os.environ["FACE_DETECT_ATTRIBUTES"]
 QUALITY_FILTER = os.environ["QUALITY_FILTER"]
-DEBUG_MODE = False or bool(os.environ["DEBUG_MODE"])
+DEBUG_MODE = os.getenv("DEBUG_MODE", 'False').lower() in ('true', '1', 't')
 
 s3_client = boto3.resource('s3')
 
@@ -54,12 +54,28 @@ urllib3_logger = logging.getLogger('urllib3')
 urllib3_logger.setLevel(logging.CRITICAL)
 
 def lambda_handler(event, context):
-    if not 'Records' in event:
+    # basic sanity checks
+    # ---------------------------
+    if not "Records" in event:
         print('WARNING: Records object not found. Nothing to do. Exiting.')
-        return {'statusCode': 200, 'data': None}
+        return {'statusCode': 500, 'data': None}
 
-    s3_bucket_name = event['Records'][0]['s3']['bucket']['name']
-    for record in event['Records']:
+    records = event["Records"]
+    if records[0]["eventSource"] != "aws:s3":
+        print('ERROR: lambda_index() is intended to be called from aws:s3, but was invoked by {service}'.format(
+            service=records[0]["eventSource"]
+        ))
+        return {'statusCode': 401, 'data': None}
+
+    if records[0]["eventName"] != "ObjectCreated:Put":
+        print('WARNING: lambda_index() is intended to be called for ObjectCreated:Put event, but was invoked by {event}'.format(
+            event=records[0]["eventName"]
+        ))
+
+    # all good. process the event
+    # ---------------------------
+    s3_bucket_name = records[0]['s3']['bucket']['name']
+    for record in records:
         key = unquote_plus(record['s3']['object']['key'], encoding='utf-8')
         try:
             s3_object = s3_client.Object(s3_bucket_name, key)
@@ -74,8 +90,6 @@ def lambda_handler(event, context):
                     ))
 
             # analyze our newly uploaded image.
-            # index_faces() will return a dict of 'faceprint' dicts
-            # see https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/index_faces.html#
             faces = rekognition_client.index_faces(
                 CollectionId=COLLECTION_ID,
                 Image={
@@ -132,7 +146,4 @@ def lambda_handler(event, context):
             print("ERROR: ServiceQuotaExceededException")
             return {'statusCode': 401, 'data': None}
         except Exception as e:
-            print("ERROR: a {e} exception was encountered".format(
-                e=type(e)
-            ))
-            return {'statusCode': 500, 'data': None}
+            raise e

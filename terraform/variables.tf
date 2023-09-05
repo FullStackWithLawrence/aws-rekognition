@@ -76,9 +76,9 @@ variable "face_detect_quality_filter" {
   default     = "AUTO"
 }
 variable "face_detect_attributes" {
-  descrdescription = "'DEFAULT'|'ALL'"
-  type             = string
-  default          = "DEFAULT"
+  description = "'DEFAULT'|'ALL'"
+  type        = string
+  default     = "DEFAULT"
 }
 variable "quota_settings_limit" {
   type    = number

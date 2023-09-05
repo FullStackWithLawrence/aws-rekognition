@@ -55,6 +55,11 @@ resource "aws_iam_role_policy_attachment" "lambda_AWSLambdaExecute" {
   policy_arn = "arn:aws:iam::aws:policy/AWSLambdaExecute"
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonDynamoDBFullAccess" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
 resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   path        = "/"

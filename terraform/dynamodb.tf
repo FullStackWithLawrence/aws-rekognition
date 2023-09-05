@@ -5,7 +5,7 @@ module "dynamodb_table" {
   version = "~> 3.3"
 
   name                        = local.table_name
-  hash_key                    = "RekognitionId"
+  hash_key                    = "FaceId"
   table_class                 = "STANDARD"
   deletion_protection_enabled = false
   billing_mode                = "PROVISIONED"
@@ -15,7 +15,7 @@ module "dynamodb_table" {
 
   attributes = [
     {
-      name = "RekognitionId"
+      name = "FaceId"
       type = "S"
     }
   ]

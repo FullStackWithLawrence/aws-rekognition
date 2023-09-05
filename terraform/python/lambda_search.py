@@ -36,7 +36,7 @@ QUALITY_FILTER = os.environ["QUALITY_FILTER"]
 TABLE_ID = os.environ["TABLE_ID"]
 AWS_REGION = os.environ["REGION"]
 COLLECTION_ID = os.environ["COLLECTION_ID"]
-DEBUG_MODE = False or bool(os.environ["DEBUG_MODE"])
+DEBUG_MODE = os.getenv("DEBUG_MODE", 'False').lower() in ('true', '1', 't')
 
 rekognition_client = boto3.client("rekognition", AWS_REGION)
 
@@ -105,7 +105,4 @@ def lambda_handler(event, context):
         print("ERROR: InvalidImageFormatException")
         return {'statusCode': 406, 'data': None}
     except Exception as e:
-        print("ERROR: a {e} exception was encountered".format(
-            e=type(e)
-        ))
-        return {'statusCode': 500, 'data': None}
+        raise e
