@@ -5,7 +5,7 @@
 
 # AWS Rekognition Demo
 
-A machine learning and artificial inteligence based facial recognition service, implemented as a REST API.
+A facial recognition microservice implemented as a REST API.
 
 ## Usage
 
@@ -29,6 +29,9 @@ See further instructions:
 
 Implemented as a REST API with the following AWS serverless cloud infrastructure services
 
+![REST API - index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-index.drawio.png
+![REST API - search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-search.drawio.png
+
 - AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
 - S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
 - DynamoDB: a fully managed proprietary NoSQL database offered by Amazon.com as part of the Amazon Web Services portfolio. DynamoDB offers a fast persistent Key-Value Datastore with built-in support for replication, autoscaling, encryption at rest, and on-demand backup among other features.
@@ -36,6 +39,12 @@ Implemented as a REST API with the following AWS serverless cloud infrastructure
 - API Gateway: an AWS service for creating, publishing, maintaining, monitoring, and securing REST, HTTP, and WebSocket APIs at any scale.
 - Certificate Manager: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
 - Route53: a scalable and highly available Domain Name System service. Released on December 5, 2010.
+
+## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
+
+This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first 'base64' encode the file. Base64 encoding schemes are commonly used to encode binary data, like image files for example, for storage or transfer over media that can only deal with ASCII text.
+
+This repo includes a utility script [base64encode.sh](./base64encode.sh) that you can use to encode your test images prior to uploading these with Postman.
 
 ## Original Source
 
@@ -46,7 +55,7 @@ Much of the code in this repository was scaffolded from these examples that I fo
 - [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-ii-c6e9100709b5)
 - [Webhook for S3 Bucket By Terraform (REST API in API Gateway to proxy Amazon S3)](https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7)
 
-## Introduction
+## If You're New To AWS or Terraform
 
 This document describes how to deploy a [AWS Rekognition Service](https://aws.amazon.com/rekognition/) using a combination of AWS resources.
 
