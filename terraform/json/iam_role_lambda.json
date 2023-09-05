@@ -6,10 +6,7 @@
       "Effect": "Allow",
       "Principal": {
         "Service": [
-          "lambda.amazonaws.com",
-          "rekognition.amazonaws.com",
-          "dynamodb.amazonaws.com",
-          "apigateway.amazonaws.com"
+          "lambda.amazonaws.com"
         ]
       },
       "Action": "sts:AssumeRole"

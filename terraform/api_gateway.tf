@@ -12,10 +12,10 @@
 #         https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway
 #------------------------------------------------------------------------------
 locals {
-  api_gateway_subdomain = "api.${var.shared_resource_identifier}.${var.root_domain}"
-  api_name              = "${var.shared_resource_identifier}-api"
-  iam_role_name         = "${var.shared_resource_identifier}-apigateway"
-  iam_role_policy_name  = "${var.shared_resource_identifier}-apigateway"
+  api_gateway_subdomain    = "api.${var.shared_resource_identifier}.${var.root_domain}"
+  api_name                 = "${var.shared_resource_identifier}-api"
+  apigateway_iam_role_name = "${var.shared_resource_identifier}-apigateway"
+  iam_role_policy_name     = "${var.shared_resource_identifier}-apigateway"
 }
 
 # WARNING: You need a pre-existing Route53 Hosted Zone
@@ -119,7 +119,7 @@ resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
 # REST API resources - IAM
 ###############################################################################
 resource "aws_iam_role" "apigateway_s3_uploader" {
-  name               = local.iam_role_name
+  name               = local.apigateway_iam_role_name
   description        = "Allows API Gateway to push files to an S3 bucket"
   assume_role_policy = file("${path.module}/json/iam_role_apigateway_s3_uploader.json")
   tags               = var.tags
@@ -184,30 +184,13 @@ resource "aws_api_gateway_integration" "index_put" {
   http_method             = aws_api_gateway_method.index_put.http_method
   integration_http_method = "PUT"
   type                    = "AWS"
-
-  passthrough_behavior = "WHEN_NO_TEMPLATES"
-  content_handling     = "CONVERT_TO_TEXT"
-
-  # For AWS integrations, the URI should be of the form
-  #   arn:aws:apigateway:{region}:{subdomain.service|service}:{path|action}/{service_api}
-  #   arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:012345678901:function:my-func/invocations
-  #   arn:aws:apigateway:ap-southeast-2:s3:path/{bucket}/{fileName}
-  #   arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{key}
+  #passthrough_behavior    = "WHEN_NO_TEMPLATES"
+  #content_handling        = "CONVERT_TO_TEXT"
   uri         = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{filename}"
   credentials = aws_iam_role.apigateway_s3_uploader.arn
-
   request_parameters = {
     "integration.request.path.filename" = "method.request.path.filename"
   }
-
-  # see https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
-  # request_templates = {
-  #   "application/json" = file("${path.module}/json/apigateway_index_request_template.json.tpl")
-  # }
-  # request_templates       = {
-  #   "image/jpeg" = "#set($context.requestOverride.path.filename = $context.requestId + '.json')\n$input.json('$')"
-  # }
-
 }
 
 resource "aws_api_gateway_method_response" "index_response_200" {
@@ -244,28 +227,40 @@ resource "aws_api_gateway_integration_response" "index_put" {
 #              4. method response       (hopefully, an http 200 response)
 #
 ###############################################################################
-resource "aws_api_gateway_resource" "search" {
+resource "aws_api_gateway_resource" "search_root" {
   path_part   = "search"
   parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+}
+resource "aws_api_gateway_resource" "search" {
+  parent_id   = aws_api_gateway_resource.search_root.id
+  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  path_part   = "{filename}"
 }
 
 resource "aws_api_gateway_method" "search" {
   rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
   resource_id      = aws_api_gateway_resource.search.id
-  http_method      = "POST"
+  http_method      = "PUT"
   authorization    = "NONE"
   api_key_required = "true"
+  request_parameters = {
+    "method.request.path.filename" = true
+  }
+
 }
 
 resource "aws_api_gateway_integration" "search" {
   rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
   resource_id             = aws_api_gateway_resource.search.id
   http_method             = aws_api_gateway_method.search.http_method
-  integration_http_method = "POST"
+  integration_http_method = "PUT"
   type                    = "AWS"
   uri                     = aws_lambda_function.search.invoke_arn
   content_handling        = "CONVERT_TO_TEXT"
+  request_parameters = {
+    "integration.request.path.filename" = "method.request.path.filename"
+  }
 }
 
 resource "aws_api_gateway_method_response" "search_response_200" {

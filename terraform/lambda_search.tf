@@ -7,18 +7,18 @@
 # usage:  - implement a Python Lambda function to create a 'faceprint' of an image
 #           triggered by uploading the image to the S3 bucket
 #
-#         - implement a Python Lambda function to search the Rekognition index
-#           for an image uploaded using the REST API endpoint.
-#
 #         - implement role-based security for both Lambda functions.
 #------------------------------------------------------------------------------
+locals {
+  lambda_role_name     = "${var.shared_resource_identifier}-lambda"
+  lambda_policy_name   = "${var.shared_resource_identifier}-lambda"
+  search_function_name = "${var.shared_resource_identifier}-search"
+}
 
-###############################################################################
-# Lambda IAM
-###############################################################################
-resource "aws_iam_role" "facialrecognition" {
-  name               = "${var.shared_resource_identifier}-iam-role"
+resource "aws_iam_role" "lambda" {
+  name               = local.lambda_role_name
   assume_role_policy = file("${path.module}/json/iam_role_lambda.json")
+  tags               = var.tags
 }
 
 data "template_file" "iam_policy_lambda" {
@@ -28,18 +28,39 @@ data "template_file" "iam_policy_lambda" {
     dynamodb_table_arn = module.dynamodb_table.dynamodb_table_arn
   }
 }
-resource "aws_iam_policy" "facialrecognition" {
-  name        = "${var.shared_resource_identifier}-iam-policy"
+resource "aws_iam_policy" "lambda" {
+  name        = local.lambda_policy_name
   description = "generic IAM policy"
   policy      = data.template_file.iam_policy_lambda.rendered
 }
 
 
-resource "aws_iam_role_policy_attachment" "facialrecognition" {
-  role       = aws_iam_role.facialrecognition.id
-  policy_arn = "arn:aws:iam::${var.aws_account_id}:policy/${var.shared_resource_identifier}-iam-policy"
+resource "aws_iam_role_policy_attachment" "lambda" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = aws_iam_policy.lambda.arn
 }
 
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+  policy      = file("${path.module}/json/iam_policy_lambda_logging.json")
+  tags        = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
+}
+
+###############################################################################
+# Cloudwatch logging
+###############################################################################
+resource "aws_cloudwatch_log_group" "search" {
+  name              = "/aws/lambda/${local.search_function_name}"
+  retention_in_days = var.log_retention_days
+  tags              = var.tags
+}
 
 
 ###############################################################################
@@ -57,7 +78,7 @@ resource "aws_lambda_function" "search" {
 
   # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
   function_name = "${var.shared_resource_identifier}-search"
-  role          = aws_iam_role.facialrecognition.arn
+  role          = aws_iam_role.lambda.arn
   publish       = true
   runtime       = "python3.11"
   handler       = "search.lambda_handler"

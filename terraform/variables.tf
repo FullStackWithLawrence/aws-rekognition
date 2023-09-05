@@ -43,6 +43,10 @@ variable "logging_level" {
   type    = string
   default = "INFO"
 }
+variable "log_retention_days" {
+  type    = number
+  default = 3
+}
 variable "tags" {
   description = "A map of tags to add to all resources. Tags added to launch configuration or templates override these values."
   type        = map(string)
