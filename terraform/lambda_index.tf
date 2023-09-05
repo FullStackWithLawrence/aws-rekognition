@@ -35,6 +35,7 @@ resource "aws_lambda_function" "index" {
 
   environment {
     variables = {
+      DEBUG_MODE      = var.debug_mode
       COLLECTION_ID   = local.collection_id
       TABLE_ID        = local.table_name
       MAX_FACES_COUNT = var.max_faces_count

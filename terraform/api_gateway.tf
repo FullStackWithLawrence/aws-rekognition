@@ -42,7 +42,6 @@ resource "aws_api_gateway_rest_api" "facialrecognition" {
   endpoint_configuration {
     types = ["EDGE"]
   }
-
   tags = var.tags
 }
 resource "aws_api_gateway_api_key" "facialrecognition" {
@@ -188,7 +187,9 @@ resource "aws_api_gateway_integration" "index_put" {
   credentials             = aws_iam_role.apigateway_s3_uploader.arn
 
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
+  # returns "Execution failed due to configuration error: Unable to base64 decode the body."
   content_handling = "CONVERT_TO_BINARY"
+  #content_handling = "CONVERT_TO_TEXT"
   request_parameters = {
     "integration.request.path.filename" = "method.request.path.filename"
   }
