@@ -95,10 +95,10 @@ resource "aws_lambda_function" "search" {
   function_name = local.search_function_name
   role          = aws_iam_role.lambda.arn
   publish       = true
-  runtime       = "python3.11"
+  runtime       = var.lambda_python_runtime
+  memory_size   = var.lambda_memory_size
+  timeout       = var.lambda_timeout
   handler       = "lambda_search.lambda_handler"
-  memory_size   = 512
-  timeout       = 60
 
   filename         = data.archive_file.lambda_search.output_path
   source_code_hash = data.archive_file.lambda_search.output_base64sha256
@@ -107,8 +107,9 @@ resource "aws_lambda_function" "search" {
     variables = {
       MAX_FACES_COUNT       = var.max_faces_count
       FACE_DETECT_THRESHOLD = var.face_detect_threshold
-      COLLECTION_ID         = local.collection_id
+      QUALITY_FILTER        = var.face_detect_quality_filter
       TABLE_ID              = local.table_name
+      AWS_REGION            = var.aws_region
     }
   }
 }

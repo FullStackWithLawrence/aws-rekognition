@@ -1,15 +1,24 @@
+#------------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com/
+#
+# date:       sep-2023
+#
+# usage:      AWS Lambda to process jpeg image files uploaded to S3.
+#             - run image file against index_faces() to generate a faceprint
+#             - persist the faceprint to DynamoDB
+#------------------------------------------------------------------------------
 import os
 import json
-import boto3
 from decimal import Decimal
 from urllib.parse import unquote_plus
 import logging
+import boto3
 
 COLLECTION_ID = os.environ["COLLECTION_ID"]
 TABLE_ID = os.environ["TABLE_ID"]
 MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
 DEBUG_MODE = False or bool(os.environ["DEBUG_MODE"])
-
 
 s3_client = boto3.resource('s3')
 

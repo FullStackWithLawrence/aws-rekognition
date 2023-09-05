@@ -25,10 +25,10 @@ resource "aws_lambda_function" "index" {
   function_name = local.index_function_name
   role          = aws_iam_role.lambda.arn
   publish       = true
-  runtime       = "python3.11"
+  runtime       = var.lambda_python_runtime
+  memory_size   = var.lambda_memory_size
+  timeout       = var.lambda_timeout
   handler       = "lambda_index.lambda_handler"
-  memory_size   = 512
-  timeout       = 60
 
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256

@@ -25,6 +25,12 @@ variable "aws_account_id" {
   description = "12-digit AWS account number"
   type        = string
 }
+variable "tags" {
+  description = "A map of tags to add to all resources. Tags added to launch configuration or templates override these values."
+  type        = map(string)
+  default     = {}
+}
+
 
 variable "root_domain" {
   description = "a valid Internet domain name which you directly control using AWS Route53 in this account"
@@ -51,12 +57,6 @@ variable "log_retention_days" {
   type    = number
   default = 3
 }
-variable "tags" {
-  description = "A map of tags to add to all resources. Tags added to launch configuration or templates override these values."
-  type        = map(string)
-  default     = {}
-}
-
 variable "max_faces_count" {
   type    = number
   default = 10
@@ -64,6 +64,16 @@ variable "max_faces_count" {
 variable "face_detect_threshold" {
   type    = number
   default = 10
+}
+
+# The QualityFilter input parameter allows you to filter out detected faces that don’t
+# meet a required quality bar. The quality bar is based on a variety of common use cases.
+# Use QualityFilter to set the quality bar for filtering by specifying LOW, MEDIUM, or HIGH.
+# If you do not want to filter detected faces, specify NONE. The default value is NONE.
+variable "face_detect_quality_filter" {
+  description = "'NONE'|'AUTO'|'LOW'|'MEDIUM'|'HIGH'"
+  type        = string
+  defdefault  = "NONE"
 }
 
 variable "quota_settings_limit" {
@@ -88,4 +98,20 @@ variable "throttle_settings_burst_limit" {
 variable "throttle_settings_rate_limit" {
   type    = number
   default = 10
+}
+
+variable "lambda_python_runtime" {
+  type       = string
+  defdefault = "python3.11"
+}
+variable "lambda_memory_size" {
+  description = "Lambda function memory allocations in Mb"
+  type        = number
+  default     = 512
+}
+
+variable "lambda_timeout" {
+  description = "Lambda function timeout in seconds"
+  type        = number
+  default     = 60
 }

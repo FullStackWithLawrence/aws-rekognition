@@ -1,7 +1,13 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# written by:   mcdaniel
+#               https://lawrencemcdaniel.com
+#
+# date:         sep-2023
+#
+# usage:        Generate a base64 encoded representation of a binary file
+#------------------------------------------------------------------------------
 
-
-
-# echo $0 was called with $# arguments.
 if [ $# == 2 ]; then
     openssl base64 -in $1 -out $2
 else

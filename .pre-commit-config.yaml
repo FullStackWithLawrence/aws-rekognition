@@ -27,7 +27,6 @@ repos:
       - id: terraform-fmt
       - id: helmlint
     #  - id: terraform-validate
-    #  - id: terragrunt-hclfmt
     #  - id: tflint
     #  - id: shellcheck
     #  - id: yapf
