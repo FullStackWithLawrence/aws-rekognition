@@ -29,8 +29,8 @@ See further instructions:
 
 Implemented as a REST API with the following AWS serverless cloud infrastructure services
 
-![REST API - index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-index.drawio.png
-![REST API - search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-search.drawio.png
+![REST API - index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-index.drawio.png)
+![REST API - search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-search.drawio.png)
 
 - AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
 - S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
