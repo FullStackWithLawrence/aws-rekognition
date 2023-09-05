@@ -26,7 +26,7 @@ resource "aws_lambda_function" "index" {
   role          = aws_iam_role.lambda.arn
   publish       = true
   runtime       = "python3.11"
-  handler       = "index.lambda_handler"
+  handler       = "lambda_index.lambda_handler"
   memory_size   = 512
   timeout       = 60
 
@@ -38,6 +38,7 @@ resource "aws_lambda_function" "index" {
       COLLECTION_ID   = local.collection_id
       TABLE_ID        = local.table_name
       MAX_FACES_COUNT = var.max_faces_count
+      S3_BUCKET_NAME  = module.s3_bucket.s3_bucket_id
     }
   }
   tags = var.tags
@@ -58,43 +59,12 @@ resource "aws_s3_bucket_notification" "incoming_jpg" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.index.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = ""
-    filter_suffix       = ".jpg"
+    #filter_prefix       = ""
+    filter_suffix = ".jpg"
   }
 
   depends_on = [
-    aws_lambda_permission.s3_permission_to_trigger_lambda,
-    aws_lambda_function.index
-  ]
-}
-resource "aws_s3_bucket_notification" "incoming_jpeg" {
-  bucket = module.s3_bucket.s3_bucket_id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.index.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = ""
-    filter_suffix       = ".jpeg"
-  }
-
-  depends_on = [
-    aws_lambda_permission.s3_permission_to_trigger_lambda,
-    aws_lambda_function.index
-  ]
-}
-resource "aws_s3_bucket_notification" "incoming_png" {
-  bucket = module.s3_bucket.s3_bucket_id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.index.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = ""
-    filter_suffix       = ".png"
-  }
-
-  depends_on = [
-    aws_lambda_permission.s3_permission_to_trigger_lambda,
-    aws_lambda_function.index
+    aws_lambda_permission.s3_permission_to_trigger_lambda
   ]
 }
 

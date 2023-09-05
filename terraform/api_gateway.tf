@@ -184,10 +184,11 @@ resource "aws_api_gateway_integration" "index_put" {
   http_method             = aws_api_gateway_method.index_put.http_method
   integration_http_method = "PUT"
   type                    = "AWS"
-  #passthrough_behavior    = "WHEN_NO_TEMPLATES"
-  #content_handling        = "CONVERT_TO_TEXT"
-  uri         = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{filename}"
-  credentials = aws_iam_role.apigateway_s3_uploader.arn
+  uri                     = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{filename}"
+  credentials             = aws_iam_role.apigateway_s3_uploader.arn
+
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
+  content_handling = "CONVERT_TO_BINARY"
   request_parameters = {
     "integration.request.path.filename" = "method.request.path.filename"
   }
@@ -257,7 +258,9 @@ resource "aws_api_gateway_integration" "search" {
   integration_http_method = "PUT"
   type                    = "AWS"
   uri                     = aws_lambda_function.search.invoke_arn
-  content_handling        = "CONVERT_TO_TEXT"
+
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
+  # content_handling        = "CONVERT_TO_BINARY"
   request_parameters = {
     "integration.request.path.filename" = "method.request.path.filename"
   }

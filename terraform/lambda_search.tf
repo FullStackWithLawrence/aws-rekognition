@@ -40,6 +40,21 @@ resource "aws_iam_role_policy_attachment" "lambda" {
   policy_arn = aws_iam_policy.lambda.arn
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_AmazonS3FullAccess" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_CloudWatchFullAccess" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_AWSLambdaExecute" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaExecute"
+}
+
 resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   path        = "/"
@@ -77,11 +92,11 @@ data "archive_file" "lambda_search" {
 resource "aws_lambda_function" "search" {
 
   # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-  function_name = "${var.shared_resource_identifier}-search"
+  function_name = local.search_function_name
   role          = aws_iam_role.lambda.arn
   publish       = true
   runtime       = "python3.11"
-  handler       = "search.lambda_handler"
+  handler       = "lambda_search.lambda_handler"
   memory_size   = 512
   timeout       = 60
 

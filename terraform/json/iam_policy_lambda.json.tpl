@@ -29,7 +29,10 @@
     },
     {
       "Effect": "Allow",
-      "Action": ["rekognition:IndexFaces"],
+      "Action": [
+        "rekognition:IndexFaces",
+        "rekognition:DescribeCollection"
+        ],
       "Resource": "*"
     }
   ]
