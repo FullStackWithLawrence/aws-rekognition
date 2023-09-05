@@ -37,9 +37,9 @@ import boto3
 
 COLLECTION_ID = os.environ["COLLECTION_ID"]
 TABLE_ID = os.environ["TABLE_ID"]
-MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
-FACE_DETECT_ATTRIBUTES = os.environ["FACE_DETECT_ATTRIBUTES"]
-QUALITY_FILTER = os.environ["QUALITY_FILTER"]
+MAX_FACES = int(os.getenv("MAX_FACES_COUNT", "10"))
+FACE_DETECT_ATTRIBUTES = os.getenv("FACE_DETECT_ATTRIBUTES", "DEFAULT")
+QUALITY_FILTER = os.getenv("QUALITY_FILTER", "AUTO")
 DEBUG_MODE = os.getenv("DEBUG_MODE", 'False').lower() in ('true', '1', 't')
 
 s3_client = boto3.resource('s3')
