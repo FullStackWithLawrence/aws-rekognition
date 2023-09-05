@@ -6,6 +6,10 @@
 #
 # usage:      all Terraform variable declarations
 #------------------------------------------------------------------------------
+variable "debug_mode" {
+  type    = bool
+  default = false
+}
 variable "aws_profile" {
   description = "a valid AWS CLI profile located in $HOME/.aws/credentials"
   type        = string
