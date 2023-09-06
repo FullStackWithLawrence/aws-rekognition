@@ -23,6 +23,7 @@ resource "aws_lambda_function" "index" {
 
   # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
   function_name = local.index_function_name
+  description   = "Facial recognition analysis and indexing of images. Invoked by S3."
   role          = aws_iam_role.lambda.arn
   publish       = true
   runtime       = var.lambda_python_runtime
@@ -50,7 +51,7 @@ resource "aws_lambda_function" "index" {
 resource "aws_lambda_permission" "s3_permission_to_trigger_lambda" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.index.arn
+  function_name = aws_lambda_function.index.function_name
   principal     = "s3.amazonaws.com"
   source_arn    = module.s3_bucket.s3_bucket_arn
 }

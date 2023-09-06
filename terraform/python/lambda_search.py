@@ -4,30 +4,34 @@
 #
 # date:       sep-2023
 #
-# usage:      AWS Lambda to process jpeg image files uploaded to S3.
+# Rekognition.search_faces_by_image()
+# ------------------------------------
+# For a given input image, first detects the largest face in the image,
+# and then searches the specified collection for matching faces.
+# The operation compares the features of the input face with faces in the specified collection.
 #
-#             For a given input image, first detects the largest face in the image,
-#             and then searches the specified collection for matching faces.
-#             The operation compares the features of the input face with faces in the specified collection.
+# The response returns an array of faces that match, ordered by similarity
+# score with the highest similarity first. More specifically, it is an
+# array of metadata for each face match found. Along with the metadata,
+# the response also includes a similarity indicating how similar the face
+# is to the input face. In the response, the operation also returns the
+# bounding box (and a confidence level that the bounding box contains a face)
+# of the face that Amazon Rekognition used for the input image.
 #
-#             The response returns an array of faces that match, ordered by similarity
-#             score with the highest similarity first. More specifically, it is an
-#             array of metadata for each face match found. Along with the metadata,
-#             the response also includes a similarity indicating how similar the face
-#             is to the input face. In the response, the operation also returns the
-#             bounding box (and a confidence level that the bounding box contains a face)
-#             of the face that Amazon Rekognition used for the input image.
-#
-# Notes:      The image must be either a PNG or JPEG formatted file.
-#
+# Notes:
+# - The image must be either a PNG or JPEG formatted file.
 #
 # OFFICIAL DOCUMENTATION:
-#             https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/search_faces_by_image.html
-#             https://docs.aws.amazon.com/rekognition_client/latest/dg/example_rekognition_Usage_FindFacesInCollection_section.html
+# - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/search_faces_by_image.html
+# - https://docs.aws.amazon.com/rekognition_client/latest/dg/example_rekognition_Usage_FindFacesInCollection_section.html
 #
-# GISTS: https://gist.github.com/alexcasalboni/0f21a1889f09760f8981b643326730ff
+# GISTS:
+# - https://gist.github.com/alexcasalboni/0f21a1889f09760f8981b643326730ff
 # ------------------------------------------------------------------------------
-import os  # utilities for interacting with the operating system
+import sys, traceback  # libraries for error management
+import os  # library for interacting with the operating system
+import platform  # library to view informatoin about the server host this Lambda runs on
+import json  # library for interacting with JSON data https://www.json.org/json-en.html
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
 MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
@@ -45,6 +49,73 @@ dynamodb_table = dynamodb_client.Table(TABLE_ID)
 
 
 def lambda_handler(event, context):
+    """
+    Facial recognition image analysis and search for indexed faces. invoked by API Gateway.
+    """
+    if DEBUG_MODE:
+        cloudwatch_dump = {
+            "environment": {
+                "os": os.name,
+                "system": platform.system(),
+                "release": platform.release(),
+                "boto3": boto3.__version__,
+                "MAX_FACES": MAX_FACES,
+                "THRESHOLD": THRESHOLD,
+                "QUALITY_FILTER": QUALITY_FILTER,
+                "TABLE_ID": TABLE_ID,
+                "AWS_REGION": AWS_REGION,
+                "COLLECTION_ID": COLLECTION_ID,
+                "DEBUG_MODE": DEBUG_MODE,
+            }
+        }
+        print(json.dumps(cloudwatch_dump))
+
+    def http_response_factory(status_code: int, body: json) -> json:
+        """
+        Generate a standardized JSON return dictionary for all possible response scenarios.
+
+        status_code: an HTTP response code. see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+        body: a JSON dict of Rekognition results for status 200, an error dict otherwise.
+
+        see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
+        """
+        if status_code < 100 or status_code > 599:
+            raise ValueError(
+                "Invalid HTTP response code received: {status_code}".format(
+                    status_code=status_code
+                )
+            )
+
+        # see https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
+        retval = {
+            "isBase64Encoded": False,
+            "statusCode": status_code,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(body),
+        }
+
+        if DEBUG_MODE:
+            # log our output to the CloudWatch log for this Lambda
+            print(json.dumps({"retval": retval}))
+
+        return retval
+
+    def exception_response_factory(exception) -> json:
+        """
+        Generate a standardized error response dictionary that includes
+        the Python exception type and stack trace.
+
+        exception: a descendant of Python Exception class
+        """
+        print(json.dumps({"event": event}))
+        exc_info = sys.exc_info()
+        retval = {
+            "error": str(exception),
+            "description": "".join(traceback.format_exception(*exc_info)),
+        }
+
+        return retval
+
     faces = {}  # Rekognition return value
     matched_faces = []  # any indexed faces found in the Rekognition return value
     try:
@@ -75,38 +146,49 @@ def lambda_handler(event, context):
             if "Item" in item:
                 matched_faces.append(item["Item"]["object_metadata"])
 
-    except rekognition_client.exceptions.InvalidS3ObjectException:
-        print("ERROR: InvalidS3ObjectException")
-        return {"statusCode": 406, "data": None}
-    except rekognition_client.exceptions.InvalidParameterException:
-        # If no faces are detected in the input image, SearchFacesByImage returns an InvalidParameterException error
+    # handle anything that went wrong
+    # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
+    except rekognition_client.exceptions.InvalidParameterException as e:
+        # If no faces are detected in the image, then index_faces()
+        # returns an InvalidParameterException error
         pass
-    except rekognition_client.exceptions.ImageTooLargeException:
-        print("ERROR: ImageTooLargeException")
-        return {"statusCode": 406, "data": None}
-    except rekognition_client.exceptions.AccessDeniedException:
-        print("ERROR: AccessDeniedException")
-        return {"statusCode": 403, "data": None}
-    except rekognition_client.exceptions.InternalServerError:
-        print("ERROR: InternalServerError")
-        return {"statusCode": 500, "data": None}
-    except rekognition_client.exceptions.ThrottlingException:
-        print("ERROR: ThrottlingException")
-        return {"statusCode": 401, "data": None}
-    except rekognition_client.exceptions.ProvisionedThroughputExceededException:
-        print("ERROR: ProvisionedThroughputExceededException")
-        return {"statusCode": 401, "data": None}
-    except rekognition_client.exceptions.ResourceNotFoundException:
-        print("ERROR: ResourceNotFoundException")
-        return {"statusCode": 404, "data": None}
-    except rekognition_client.exceptions.InvalidImageFormatException:
-        print("ERROR: InvalidImageFormatException")
-        return {"statusCode": 406, "data": None}
-    except Exception as e:
-        raise e
 
+    except (
+        rekognition_client.exceptions.ThrottlingException,
+        rekognition_client.exceptions.ProvisionedThroughputExceededException,
+        rekognition_client.exceptions.ServiceQuotaExceededException,
+    ) as e:
+        return http_response_factory(
+            status_code=401, body=exception_response_factory(e)
+        )
+
+    except rekognition_client.exceptions.AccessDeniedException as e:
+        return http_response_factory(
+            status_code=403, body=exception_response_factory(e)
+        )
+
+    except rekognition_client.exceptions.ResourceNotFoundException as e:
+        return http_response_factory(
+            status_code=404, body=exception_response_factory(e)
+        )
+
+    except (
+        rekognition_client.exceptions.InvalidS3ObjectException,
+        rekognition_client.exceptions.ImageTooLargeException,
+        rekognition_client.exceptions.InvalidImageFormatException,
+    ) as e:
+        return http_response_factory(
+            status_code=406, body=exception_response_factory(e)
+        )
+
+    except (rekognition_client.exceptions.InternalServerError, Exception) as e:
+        return http_response_factory(
+            status_code=500, body=exception_response_factory(e)
+        )
+
+    # success!! return the results
     retval = {
         "faces": faces,  # all of the faces that Rekognition found in the image
         "matchedFaces": matched_faces,  # any indexed faces found in DynamoDB
     }
-    return {"statusCode": 200, "data": retval}
+    return http_response_factory(status_code=200, body=retval)

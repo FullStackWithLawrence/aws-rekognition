@@ -11,6 +11,13 @@
 				"arn:aws:s3:::${bucket_name}/*"
 			],
 			"Sid": "1"
-		}
+		},
+    {
+      "Effect": "Allow",
+      "Action": [
+          "lambda:InvokeFunction"
+      ],
+      "Resource": "*"
+    }
 	]
 }

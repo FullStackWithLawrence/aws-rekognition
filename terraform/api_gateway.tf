@@ -117,173 +117,26 @@ resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
 ###############################################################################
 # REST API resources - IAM
 ###############################################################################
-resource "aws_iam_role" "apigateway_s3_uploader" {
+resource "aws_iam_role" "apigateway" {
   name               = local.apigateway_iam_role_name
   description        = "Allows API Gateway to push files to an S3 bucket"
-  assume_role_policy = file("${path.module}/json/iam_role_apigateway_s3_uploader.json")
+  assume_role_policy = file("${path.module}/json/iam_role_apigateway.json")
   tags               = var.tags
 }
 resource "aws_iam_role_policy_attachment" "cloudwatch_apigateway" {
-  role       = aws_iam_role.apigateway_s3_uploader.id
+  role       = aws_iam_role.apigateway.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
-data "template_file" "iam_policy_apigateway_s3_readwrite" {
-  template = file("${path.module}/json/iam_policy_apigateway_s3_readwrite.json.tpl")
+data "template_file" "iam_policy_apigateway" {
+  template = file("${path.module}/json/iam_policy_apigateway.json.tpl")
   vars = {
     aws_account_id = var.aws_account_id
     bucket_name    = module.s3_bucket.s3_bucket_id
   }
 }
 
-resource "aws_iam_role_policy" "iam_policy_apigateway_s3_readwrite" {
+resource "aws_iam_role_policy" "iam_policy_apigateway" {
   name   = local.iam_role_policy_name
-  role   = aws_iam_role.apigateway_s3_uploader.id
-  policy = data.template_file.iam_policy_apigateway_s3_readwrite.rendered
-}
-
-###############################################################################
-# REST API resources - index end point
-# This is an HTTP Post request, to upload an image file to an AWS S3 bucket.
-#
-# workflow is: 1. method request        (from Postman, curl, your application, etc.)
-#              2. integration request   (we're integrating to an AWS S3 bucket)
-#              3. integration response
-#              4. method response       (hopefully, an http 200 response)
-#
-# see https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7
-###############################################################################
-resource "aws_api_gateway_resource" "index_root" {
-  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  path_part   = "index"
-}
-
-# see https://stackoverflow.com/questions/39040739/in-terraform-how-do-you-specify-an-api-gateway-endpoint-with-a-variable-in-the
-resource "aws_api_gateway_resource" "index" {
-  parent_id   = aws_api_gateway_resource.index_root.id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  path_part   = "{filename}"
-}
-
-# see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
-resource "aws_api_gateway_method" "index_put" {
-  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id      = aws_api_gateway_resource.index.id
-  http_method      = "PUT"
-  authorization    = "NONE"
-  api_key_required = "true"
-  request_parameters = {
-    "method.request.path.filename" = true
-  }
-}
-
-resource "aws_api_gateway_integration" "index_put" {
-  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id             = aws_api_gateway_resource.index.id
-  http_method             = aws_api_gateway_method.index_put.http_method
-  integration_http_method = "PUT"
-  type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:s3:path/${module.s3_bucket.s3_bucket_id}/{filename}"
-  credentials             = aws_iam_role.apigateway_s3_uploader.arn
-
-  # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
-  # returns "Execution failed due to configuration error: Unable to base64 decode the body."
-  content_handling = "CONVERT_TO_BINARY"
-  #content_handling = "CONVERT_TO_TEXT"
-  request_parameters = {
-    "integration.request.path.filename" = "method.request.path.filename"
-  }
-}
-
-resource "aws_api_gateway_method_response" "index_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id = aws_api_gateway_resource.index.id
-  http_method = aws_api_gateway_method.index_put.http_method
-  status_code = "200"
-  response_models = {
-    "application/json" = "Empty"
-  }
-  response_parameters = {}
-}
-
-resource "aws_api_gateway_integration_response" "index_put" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id = aws_api_gateway_resource.index.id
-  http_method = aws_api_gateway_method.index_put.http_method
-  status_code = aws_api_gateway_method_response.index_response_200.status_code
-
-  depends_on = [
-    aws_api_gateway_integration.index_put
-  ]
-}
-
-###############################################################################
-# REST API resources - Search
-# This is an HTTP Post request, to upload an image file that will be passed
-# to a Lambda function that will generate a Rekognition faceprint and then
-# search for it in the Rekognition collection.
-#
-# workflow is: 1. method request        (from Postman, curl, your application, etc.)
-#              2. integration request   (we're integrating to an AWS Lambda function)
-#              3. integration response  (the results from the Lambda function)
-#              4. method response       (hopefully, an http 200 response)
-#
-###############################################################################
-resource "aws_api_gateway_resource" "search_root" {
-  path_part   = "search"
-  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-}
-resource "aws_api_gateway_resource" "search" {
-  parent_id   = aws_api_gateway_resource.search_root.id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  path_part   = "{filename}"
-}
-
-resource "aws_api_gateway_method" "search" {
-  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id      = aws_api_gateway_resource.search.id
-  http_method      = "PUT"
-  authorization    = "NONE"
-  api_key_required = "true"
-  request_parameters = {
-    "method.request.path.filename" = true
-  }
-
-}
-
-resource "aws_api_gateway_integration" "search" {
-  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id             = aws_api_gateway_resource.search.id
-  http_method             = aws_api_gateway_method.search.http_method
-  integration_http_method = "PUT"
-  type                    = "AWS"
-  uri                     = aws_lambda_function.search.invoke_arn
-
-  # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
-  # content_handling        = "CONVERT_TO_BINARY"
-  request_parameters = {
-    "integration.request.path.filename" = "method.request.path.filename"
-  }
-}
-
-resource "aws_api_gateway_method_response" "search_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  resource_id = aws_api_gateway_resource.search.id
-  http_method = aws_api_gateway_method.search.http_method
-  status_code = "200"
-  response_models = {
-    "application/json" = "Empty"
-  }
-  response_parameters = {}
-}
-
-resource "aws_lambda_permission" "search" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.search.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
-  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.facialrecognition.id}/*/${aws_api_gateway_method.search.http_method}${aws_api_gateway_resource.search.path}"
+  role   = aws_iam_role.apigateway.id
+  policy = data.template_file.iam_policy_apigateway.rendered
 }

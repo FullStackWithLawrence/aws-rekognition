@@ -27,7 +27,7 @@
 
 import sys, traceback  # libraries for error management
 import os  # library for interacting with the operating system
-import platform # library to view informatoin about the server host this Lambda runs on
+import platform  # library to view informatoin about the server host this Lambda runs on
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 from decimal import (
     Decimal,
@@ -62,6 +62,8 @@ urllib3_logger.setLevel(logging.CRITICAL)
 
 def lambda_handler(event, context):
     """
+    Facial recognition analysis and indexing of images. Invoked by S3.
+
     AWS Lambda to process image files uploaded to S3.
     1.) analyze image file with Rekognition.index_faces() to generate
         'faceprints' of all faces found in the image
@@ -87,17 +89,17 @@ def lambda_handler(event, context):
                 "MAX_FACES": MAX_FACES,
                 "FACE_DETECT_ATTRIBUTES": FACE_DETECT_ATTRIBUTES,
                 "QUALITY_FILTER": QUALITY_FILTER,
-                "DEBUG_MODE": DEBUG_MODE
-                }
+                "DEBUG_MODE": DEBUG_MODE,
+            }
         }
         print(json.dumps(cloudwatch_dump))
 
-    def retval_factory(status_code: int, body: json) -> json:
+    def http_response_factory(status_code: int, body: json) -> json:
         """
         Generate a standardized JSON return dictionary for all possible response scenarios.
 
         status_code: an HTTP response code. see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-        body: a JSON dict if status_code == 200, otherwise a string with an error message
+        body: a JSON dict of Rekognition results for status 200, an error dict otherwise.
 
         see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
         """
@@ -108,10 +110,12 @@ def lambda_handler(event, context):
                 )
             )
 
+        # see https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
         retval = {
-            "StatusCode": status_code,
+            "isBase64Encoded": False,
+            "statusCode": status_code,
             "headers": {"Content-Type": "application/json"},
-            "body": body,
+            "body": json.dumps(body),
         }
 
         if DEBUG_MODE:
@@ -120,7 +124,7 @@ def lambda_handler(event, context):
 
         return retval
 
-    def exception_response_body(exception) -> json:
+    def exception_response_factory(exception) -> json:
         """
         Generate a standardized error response dictionary that includes
         the Python exception type and stack trace.
@@ -130,7 +134,7 @@ def lambda_handler(event, context):
         print(json.dumps({"event": event}))
         exc_info = sys.exc_info()
         retval = {
-            "error": exception.__name__,
+            "error": str(exception),
             "description": "".join(traceback.format_exception(*exc_info)),
         }
 
@@ -164,7 +168,9 @@ def lambda_handler(event, context):
             raise TypeError(msg)
 
     except TypeError as e:
-        return retval_factory(status_code=500, body=exception_response_body(e))
+        return http_response_factory(
+            status_code=500, body=exception_response_factory(e)
+        )
 
     # all good. lets process the event!
     # ---------------------------
@@ -214,23 +220,33 @@ def lambda_handler(event, context):
             rekognition_client.exceptions.ProvisionedThroughputExceededException,
             rekognition_client.exceptions.ServiceQuotaExceededException,
         ) as e:
-            return retval_factory(status_code=401, body=exception_response_body(e))
+            return http_response_factory(
+                status_code=401, body=exception_response_factory(e)
+            )
 
         except rekognition_client.exceptions.AccessDeniedException as e:
-            return retval_factory(status_code=403, body=exception_response_body(e))
+            return http_response_factory(
+                status_code=403, body=exception_response_factory(e)
+            )
 
         except rekognition_client.exceptions.ResourceNotFoundException as e:
-            return retval_factory(status_code=404, body=exception_response_body(e))
+            return http_response_factory(
+                status_code=404, body=exception_response_factory(e)
+            )
 
         except (
             rekognition_client.exceptions.InvalidS3ObjectException,
             rekognition_client.exceptions.ImageTooLargeException,
             rekognition_client.exceptions.InvalidImageFormatException,
         ) as e:
-            return retval_factory(status_code=406, body=exception_response_body(e))
+            return http_response_factory(
+                status_code=406, body=exception_response_factory(e)
+            )
 
         except (rekognition_client.exceptions.InternalServerError, Exception) as e:
-            return retval_factory(status_code=500, body=exception_response_body(e))
+            return http_response_factory(
+                status_code=500, body=exception_response_factory(e)
+            )
 
         # success!! return the results
-        return retval_factory(status_code=200, body=faces)
+        return http_response_factory(status_code=200, body=faces)
