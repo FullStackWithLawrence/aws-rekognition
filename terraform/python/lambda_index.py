@@ -4,17 +4,6 @@
 #
 # date:       sep-2023
 #
-# usage:      AWS Lambda to process image files uploaded to S3.
-#             - analyze image file with Rekognition.index_faces() to generate
-#               'faceprints' of all faces found in the image
-#             - index each 'faceprint' by persisting it to DynamoDB
-#
-# return:     a JSON HTTP response object. Note that this Lambda is invoked by an
-#             S3 'put' event, and as of sep-2023 the response goes undetected by S3.
-#
-#             I'm hopeful that the http response object might become useful in the future
-#             if for example, S3 begins detecting and forwarding these downstream to API Gateway.
-#
 # Rekognition.index_faces():
 #             https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/index_faces.html
 #
@@ -70,16 +59,31 @@ urllib3_logger = logging.getLogger("urllib3")
 urllib3_logger.setLevel(logging.CRITICAL)
 
 
-# see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
 def lambda_handler(event, context):
     """
-    Generate a standardized JSON return dictionary for all possible response scenarios.
+    AWS Lambda to process image files uploaded to S3.
+    1.) analyze image file with Rekognition.index_faces() to generate
+        'faceprints' of all faces found in the image
 
-    status_code: an HTTP response code. see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-    body: a JSON dict if status_code == 200, otherwise a string with an error message
+    2.) index each 'faceprint' by persisting it to DynamoDB
+
+    returns: a JSON HTTP response object.
+
+    Note that this Lambda is invoked by an S3 'put' event, and as of sep-2023
+    the response goes undetected by S3. I'm hopeful that the http response
+    object might become useful in the future if for example, S3 begins
+    detecting and forwarding these downstream to API Gateway.
     """
 
-    def retval_factory(status_code: int = 200, body=None) -> json:
+    def retval_factory(status_code: int, body: json) -> json:
+        """
+        Generate a standardized JSON return dictionary for all possible response scenarios.
+
+        status_code: an HTTP response code. see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+        body: a JSON dict if status_code == 200, otherwise a string with an error message
+
+        see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
+        """
         if status_code < 100 or status_code > 599:
             raise ValueError(
                 "Invalid HTTP response code received: {status_code}".format(
@@ -87,16 +91,24 @@ def lambda_handler(event, context):
                 )
             )
 
-        return {
+        retval = {
             "StatusCode": status_code,
             "headers": {"Content-Type": "application/json"},
             "body": body,
         }
 
+        if DEBUG_MODE:
+            # log our output to the CloudWatch log for this Lambda
+            print(json.dumps(retval))
+
+        return retval
+
     def exception_response_body(exception) -> json:
         """
         Generate a standardized error response dictionary that includes
         the Python exception type and stack trace.
+
+        exception: a descendant of Python Exception class
         """
         exc_info = sys.exc_info()
         retval = {
@@ -104,8 +116,6 @@ def lambda_handler(event, context):
             "description": "".join(traceback.format_exception(*exc_info)),
         }
 
-        # post this exception to the CloudWatch log for this Lambda
-        print(json.dumps(retval))
         return retval
 
     records = event["Records"]
@@ -151,14 +161,7 @@ def lambda_handler(event, context):
             for key in s3_object.metadata.keys()
         }
         if DEBUG_MODE:
-            print("record: {var}".format(var=json.dumps(record, indent=4)))
-            print(
-                "key={key}, s3_object={s3_object}, s3_object_metadata={s3_object_metadata}".format(
-                    s3_object=s3_object,
-                    key=s3_object_key,
-                    s3_object_metadata=s3_object_metadata,
-                )
-            )
+            print(json.dumps(record))
         try:
             # analyze the image.
             faces = rekognition_client.index_faces(

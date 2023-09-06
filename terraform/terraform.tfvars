@@ -23,7 +23,7 @@ tags = {
 # Lambda parameters
 ###############################################################################
 lambda_python_runtime = "python3.11"
-debug_mode            = false
+debug_mode            = true
 lambda_memory_size    = 512
 lambda_timeout        = 60
 
@@ -63,4 +63,3 @@ throttle_settings_burst_limit = 5
 
 # The API request steady-state rate limit.
 throttle_settings_rate_limit = 10
-
