@@ -27,10 +27,6 @@ output "api_apigateway_url" {
   value = aws_api_gateway_stage.facialrecognition.invoke_url
 }
 
-output "api_custom_apigateway_url" {
-  value = "https://${aws_route53_record.api.fqdn}"
-}
-
 output "lambda_index" {
   value = aws_lambda_function.index.arn
 }
