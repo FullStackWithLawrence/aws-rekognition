@@ -26,7 +26,8 @@
 # ------------------------------------------------------------------------------
 
 import sys, traceback  # libraries for error management
-import os  # libarary for interacting with the operating system
+import os  # library for interacting with the operating system
+import platform # library to view informatoin about the server host this Lambda runs on
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 from decimal import (
     Decimal,
@@ -74,6 +75,22 @@ def lambda_handler(event, context):
     object might become useful in the future if for example, S3 begins
     detecting and forwarding these downstream to API Gateway.
     """
+    if DEBUG_MODE:
+        cloudwatch_dump = {
+            "environment": {
+                "os": os.name,
+                "system": platform.system(),
+                "release": platform.release(),
+                "boto3": boto3.__version__,
+                "COLLECTION_ID": COLLECTION_ID,
+                "TABLE_ID": TABLE_ID,
+                "MAX_FACES": MAX_FACES,
+                "FACE_DETECT_ATTRIBUTES": FACE_DETECT_ATTRIBUTES,
+                "QUALITY_FILTER": QUALITY_FILTER,
+                "DEBUG_MODE": DEBUG_MODE
+                }
+        }
+        print(json.dumps(cloudwatch_dump))
 
     def retval_factory(status_code: int, body: json) -> json:
         """
@@ -99,7 +116,7 @@ def lambda_handler(event, context):
 
         if DEBUG_MODE:
             # log our output to the CloudWatch log for this Lambda
-            print(json.dumps(retval))
+            print(json.dumps({"retval": retval}))
 
         return retval
 
@@ -110,6 +127,7 @@ def lambda_handler(event, context):
 
         exception: a descendant of Python Exception class
         """
+        print(json.dumps({"event": event}))
         exc_info = sys.exc_info()
         retval = {
             "error": exception.__name__,
@@ -161,7 +179,7 @@ def lambda_handler(event, context):
             for key in s3_object.metadata.keys()
         }
         if DEBUG_MODE:
-            print(json.dumps(record))
+            print(json.dumps({"event_record": record}))
         try:
             # analyze the image.
             faces = rekognition_client.index_faces(
