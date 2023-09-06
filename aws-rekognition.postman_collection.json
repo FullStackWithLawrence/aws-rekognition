@@ -54,18 +54,18 @@
 				"body": {
 					"mode": "file",
 					"file": {
-						"src": "test-data/TestImageFile_encoded.jpg"
+						"src": "/Users/mcdaniel/Desktop/test-data/Lawrence2_encoded.jpg"
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/{{stage}}/index/TestImageFile.jpeg",
+					"raw": "{{base_url}}/{{stage}}/index/Lawrence2.jpeg",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"{{stage}}",
 						"index",
-						"TestImageFile.jpeg"
+						"Lawrence2.jpeg"
 					]
 				},
 				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -98,27 +98,28 @@
 						"key": "x-api-key",
 						"value": "{{api_key}}",
 						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
+					"mode": "file",
+					"file": {
+						"src": "/Users/mcdaniel/Desktop/test-data/Lawrence3-encoded.jpg"
 					}
 				},
 				"url": {
-					"raw": "https://{{base_url}}/{{stage}}/search/TestImageFile.jpg",
-					"protocol": "https",
+					"raw": "{{base_url}}/{{stage}}/search/Lawrence3.jpg",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"{{stage}}",
 						"search",
-						"TestImageFile.jpg"
+						"Lawrence3.jpg"
 					],
 					"query": [
 						{

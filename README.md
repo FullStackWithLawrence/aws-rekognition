@@ -154,7 +154,7 @@ vim terraform/terraform.tf
     key            = "rekognition/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "012345678912-tfstate-lock-rekognition"
-    profile        = "lawrence"
+    profile        = "default"
     encrypt        = false
   }
 ````
@@ -240,7 +240,7 @@ aws s3 rb s3://$AWS_S3_BUCKET --force
 
 ## Original Sources
 
-Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Both of these sources are well-presented, and they provide additional instruction and explanetory theory that I've ommited. I'd therefore recommend giving both of these a look.
+Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Several of these are well-presented, and they provide additional instruction and explanetory theory that I've ommited, so you might want to give these a look.
 
 - [YouTube - Create your own Face Recognition Service with AWS Rekognition, by Tech Raj](https://www.youtube.com/watch?v=oHSesteFK5c)
 - [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-i-c4530f9b3c74)

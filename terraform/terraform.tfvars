@@ -16,7 +16,7 @@ aws_profile    = "lawrence"
 tags = {
   "terraform" = "true",
   "project"   = "Facial Recognition microservice"
-  "contact"   = "lpm0073@gmail.com"
+  "contact"   = "Lawrence McDaniel - lawrence@domain.com"
 }
 
 ###############################################################################
