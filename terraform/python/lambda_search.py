@@ -87,6 +87,16 @@ def lambda_handler(event, context):
                 )
             )
 
+        if DEBUG_MODE:
+            retval = {
+                "isBase64Encoded": False,
+                "statusCode": status_code,
+                "headers": {"Content-Type": "application/json"},
+                "body": body,
+            }
+            # log our output to the CloudWatch log for this Lambda
+            print(json.dumps({"retval": retval}))
+
         # see https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
         retval = {
             "isBase64Encoded": False,
@@ -94,10 +104,6 @@ def lambda_handler(event, context):
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(body),
         }
-
-        if DEBUG_MODE:
-            # log our output to the CloudWatch log for this Lambda
-            print(json.dumps({"retval": retval}))
 
         return retval
 
