@@ -108,18 +108,18 @@
 				"body": {
 					"mode": "file",
 					"file": {
-						"src": "/Users/mcdaniel/Desktop/test-data/Lawrence3-encoded.jpg"
+						"src": "/Users/mcdaniel/Desktop/test-data/bad-face-encoded-jpg"
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/{{stage}}/search/Lawrence3.jpg",
+					"raw": "{{base_url}}/{{stage}}/search/",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"{{stage}}",
 						"search",
-						"Lawrence3.jpg"
+						""
 					],
 					"query": [
 						{

@@ -10,27 +10,17 @@
 #              4. method response       (hopefully, an http 200 response)
 #
 ###############################################################################
-resource "aws_api_gateway_resource" "search_root" {
+resource "aws_api_gateway_resource" "search" {
   path_part   = "search"
   parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
 }
-resource "aws_api_gateway_resource" "search" {
-  parent_id   = aws_api_gateway_resource.search_root.id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  path_part   = "{filename}"
-}
-
 resource "aws_api_gateway_method" "search" {
   rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
   resource_id      = aws_api_gateway_resource.search.id
   http_method      = "ANY"
   authorization    = "NONE"
   api_key_required = "true"
-  request_parameters = {
-    "method.request.path.filename" = true
-  }
-
 }
 
 resource "aws_api_gateway_integration" "search" {
@@ -40,13 +30,6 @@ resource "aws_api_gateway_integration" "search" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.search.invoke_arn
-  #credentials             = aws_iam_role.apigateway.arn
-
-  # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-workflow.html
-  # content_handling        = "CONVERT_TO_BINARY"
-  request_parameters = {
-    "integration.request.path.filename" = "method.request.path.filename"
-  }
 }
 resource "aws_lambda_permission" "search" {
   statement_id  = "AllowExecutionFromAPIGateway"
