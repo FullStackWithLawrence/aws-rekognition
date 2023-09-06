@@ -32,6 +32,7 @@ import sys, traceback  # libraries for error management
 import os  # library for interacting with the operating system
 import platform  # library to view informatoin about the server host this Lambda runs on
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
+import base64  # library with base63 encoding/decoding functions
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
 MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
@@ -116,6 +117,7 @@ def lambda_handler(event, context):
 
         return retval
 
+    # all good, lets process the event!
     faces = {}  # Rekognition return value
     matched_faces = []  # any indexed faces found in the Rekognition return value
     try:
@@ -129,7 +131,8 @@ def lambda_handler(event, context):
         #         'Version': 'string'
         #     }
         # },
-        image = {"Bytes": event["image"].encode()}
+        image = str(event["body"]).encode("ascii")
+        image = {"Bytes": base64.decodebytes(image)}
         faces = rekognition_client.search_faces_by_image(
             Image=image,
             CollectionId=COLLECTION_ID,
@@ -144,7 +147,7 @@ def lambda_handler(event, context):
         for face in faces["FaceMatches"]:
             item = dynamodb_table.get_item(Key={"FaceId": face["Face"]["FaceId"]})
             if "Item" in item:
-                matched_faces.append(item["Item"]["object_metadata"])
+                matched_faces.append(item["Item"]["ExternalImageId"])
 
     # handle anything that went wrong
     # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
