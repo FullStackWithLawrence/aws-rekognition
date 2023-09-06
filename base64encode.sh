@@ -8,6 +8,11 @@
 # usage:        Generate a base64 encoded representation of a binary file
 #------------------------------------------------------------------------------
 
+if [ $# == 1 ]; then
+    openssl base64 -in $1 -out $1-encoded
+    exit 0
+fi
+
 if [ $# == 2 ]; then
     openssl base64 -in $1 -out $2
 else
