@@ -9,51 +9,34 @@ A facial recognition microservice implemented as a REST API.
 
 ## Usage
 
-```shell
-# add an image of a face to the index
-curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/index
+1. base64 encode your image files
 
-# run an image against the model
-curl -F ‘data=@path/to/local/file’ https://api.facialrecognition.example.com/search
+```shell
+./base64encode ImageWithFaces1.jpg ImageWithFaces1-encoded.jpg
+./base64encode ImageWithMoreFaces2.jpg ImageWithMoreFaces2-encoded.jpg
 ```
 
-See further instructions:
+2. Use Postman to upload one or more base64-encoded images to the 'index' URL endpoint. This will perform facial recognition analysis, and then index all faces found in the image, storing the indexes in a DynamoDB table.
 
-- how to use AWS API Gateway URL end points with Postman [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
-- [Testing API Gateway Endpoints](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
-- [How do I upload an image or PDF file to Amazon S3 through API Gateway?](https://repost.aws/knowledge-center/api-gateway-upload-image-s3)
-- [Upload files to S3 using API Gateway - Step by Step Tutorial](https://www.youtube.com/watch?v=Q_2CIivxVVs)
-- [Tutorial: Create a REST API as an Amazon S3 proxy in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html)
+3. Use Postman to upload a base64-encoded image to the 'search' URL endpoint. This will perform facial analysis on the image and then search the DynamoDB table for any matches. Results are returned in JSON format.
 
 ## Architecture
 
-Implemented as a REST API with the following AWS serverless cloud infrastructure services
+Implements as a REST API that leverages the following additional AWS serverless services:
 
-![REST API - index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-index.drawio.png)
-![REST API - search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-rekognition-search.drawio.png)
-
-- AWS Rekognition: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
-- S3: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
-- DynamoDB: a fully managed proprietary NoSQL database offered by Amazon.com as part of the Amazon Web Services portfolio. DynamoDB offers a fast persistent Key-Value Datastore with built-in support for replication, autoscaling, encryption at rest, and on-demand backup among other features.
-- Lambda: an event-driven, serverless computing platform provided by Amazon as a part of Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. It was introduced on November 13, 2014.
-- API Gateway: an AWS service for creating, publishing, maintaining, monitoring, and securing REST, HTTP, and WebSocket APIs at any scale.
-- Certificate Manager: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
-- Route53: a scalable and highly available Domain Name System service. Released on December 5, 2010.
+- **AWS Rekognition**: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
+- **S3**: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
+- **DynamoDB**: a fully managed proprietary NoSQL database offered by Amazon.com as part of the Amazon Web Services portfolio. DynamoDB offers a fast persistent Key-Value Datastore with built-in support for replication, autoscaling, encryption at rest, and on-demand backup among other features.
+- **Lambda**: an event-driven, serverless computing platform provided by Amazon as a part of Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. It was introduced on November 13, 2014.
+- **API Gateway**: an AWS service for creating, publishing, maintaining, monitoring, and securing REST, HTTP, and WebSocket APIs at any scale.
+- **Certificate Manager**: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
+- **Route53**: a scalable and highly available Domain Name System service. Released on December 5, 2010.
 
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
 This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first 'base64' encode the file. Base64 encoding schemes are commonly used to encode binary data, like image files for example, for storage or transfer over media that can only deal with ASCII text.
 
 This repo includes a utility script [base64encode.sh](./base64encode.sh) that you can use to encode your test images prior to uploading these with Postman.
-
-## Original Source
-
-Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Both of these sources are well-presented, and they provide additional instruction and explanetory theory that I've ommited. I'd therefore recommend giving both of these a look.
-
-- [YouTube - Create your own Face Recognition Service with AWS Rekognition, by Tech Raj](https://www.youtube.com/watch?v=oHSesteFK5c)
-- [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-i-c4530f9b3c74)
-- [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-ii-c6e9100709b5)
-- [Webhook for S3 Bucket By Terraform (REST API in API Gateway to proxy Amazon S3)](https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7)
 
 ## If You're New To AWS or Terraform
 
@@ -254,3 +237,17 @@ To delete the AWS S3 bucket
 aws s3 rm s3://$AWS_S3_BUCKET --recursive
 aws s3 rb s3://$AWS_S3_BUCKET --force
 ```
+
+## Original Sources
+
+Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Both of these sources are well-presented, and they provide additional instruction and explanetory theory that I've ommited. I'd therefore recommend giving both of these a look.
+
+- [YouTube - Create your own Face Recognition Service with AWS Rekognition, by Tech Raj](https://www.youtube.com/watch?v=oHSesteFK5c)
+- [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-i-c4530f9b3c74)
+- [Personnel Recognition with AWS Rekognition — Part II](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-ii-c6e9100709b5)
+- [Webhook for S3 Bucket By Terraform (REST API in API Gateway to proxy Amazon S3)](https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7)
+- [how to use AWS API Gateway URL end points with Postman](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+- [Testing API Gateway Endpoints](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-usage-plans-with-rest-api.html#api-gateway-usage-plan-test-with-postman)
+- [How do I upload an image or PDF file to Amazon S3 through API Gateway?](https://repost.aws/knowledge-center/api-gateway-upload-image-s3)
+- [Upload files to S3 using API Gateway - Step by Step Tutorial](https://www.youtube.com/watch?v=Q_2CIivxVVs)
+- [Tutorial: Create a REST API as an Amazon S3 proxy in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html)
