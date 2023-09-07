@@ -1,7 +1,11 @@
 default_language_version:
   # default language version for each language
-  python: python3.9
+  python: python3.11
 repos:
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+    - id: black
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
@@ -26,8 +30,8 @@ repos:
     hooks:
       - id: terraform-fmt
       - id: helmlint
-    #  - id: terraform-validate
-    #  - id: tflint
+      - id: terraform-validate
+      - id: tflint
     #  - id: shellcheck
     #  - id: yapf
     #  - id: markdown-link-check
