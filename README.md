@@ -75,6 +75,12 @@ Index faces are persisted to a DynamoDB table as per the two screen shots below.
 ![DynamoDB console](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-1.png "DynamoDB console")
 ![DynamoDB query](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-2.png "DynamoDB query")
 
+## Working With S3
+
+Indexed images are persisted to S3, essantially as an archive as well as for future development of additional features such as an endpoint to download indexed images and their corresponding Rekognition faceprint output.
+
+![S3 Console](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/s3-1.png "S3 Console")
+
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
 This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first [base64-encode](https://en.wikipedia.org/wiki/Base64) the file. Base64 encoding schemes are commonly used to encode binary data, like image files, for storage or transfer over media that can only deal with ASCII text.
