@@ -153,7 +153,8 @@ def lambda_handler(event, context):
         for face in faces["FaceMatches"]:
             item = dynamodb_table.get_item(Key={"FaceId": face["Face"]["FaceId"]})
             if "Item" in item:
-                matched_faces.append(item["Item"]["ExternalImageId"])
+                matched = str(item["Item"]["ExternalImageId"]).replace("-", " ").replace("_", " ").capitalize()
+                matched_faces.append(matched)
 
     # handle anything that went wrong
     # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
