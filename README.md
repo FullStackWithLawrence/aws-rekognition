@@ -49,9 +49,13 @@ Implements as a REST API that leverages the following additional AWS serverless 
 
 ### Facial Recognition Index Workflow
 
+Deploys a URL endpoint for uploading an Image file to S3. S3 is configured to invoke a Lambda function on 'put' events. The Lambda function sends the image file to Rekognition, which will analyze the contents any facial features found, returning a [JSON file of this format](./doc/rekognition_index_faces.json). Individual facial features are persistened in DynamoDB, and are searchable by Rekognition 'faceprint'.
+
 ![Facial Recognition Index Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-index.png "Facial Recognition Index Workflow")
 
 ### Facial Recognition Search Workflow
+
+Deploys a URL endpoint for uploading an image file to be analyzed by Rekognition. The 'faceprint' of the dominant face in the image is searched against all indexed faces in DynamoDB. Usually, this will be the largest face in the image, but the algorithm also considers other factors, including facial angle to the camera. Returns a [JSON file of this format](./doc/rekogition_search_faces_by_image.json).
 
 ![Facial Recognition Search Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-search.png "Facial Recognition Search Workflow")
 
