@@ -37,7 +37,9 @@ As a convenience, this repo includes a set of test data that has already been ba
 
 ## Architecture
 
-Implements as a REST API that leverages the following additional AWS serverless services:
+As of Sep-2023 AWS has introduced a large and still-growing list of AI/ML services that seamlessly interoperate with other infrastructure and services in the AWS ecosystem. This solution is based fundamentally on AWS Rekognition, one of AWS' two vision services.
+
+![AWS ML Stack](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-ml-stack.png "AWS ML Stack")
 
 - **AWS Rekognition**: a cloud-based software as a service computer vision platform that was launched in 2016. It is an AWS managed Machine Learning Service with Content moderation, Face compare and search, Face Detection and analysis, Labeling, Custom labels, Text detection, Celebrity recognition, Video segment detection and Streaming Video Events detection features. It is used by a number of United States government agencies, including U.S. Immigration and Customs Enforcement and Orlando, Florida police, as well as private entities.
 - **S3**: Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its e-commerce network.
