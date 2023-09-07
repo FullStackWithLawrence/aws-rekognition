@@ -26,14 +26,10 @@ As a convenience, this repo includes a set of test data that has already been ba
 ./base64encode ImageWithMoreFaces2.jpg
 ```
 
-3. Index one or more images which includes human faces.
+3. Index faces by uploading images to the `index` endpoint.
 
-![Postman Index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-index.png "Postman Index")
+4. Search for indexed faces by uploading images to the `search` endpoint. Results are returned in JSON format. See [sample output](./doc/rekognition_search_output.json).
 
-
-4. Search any image to see if Rekognition finds any matching faces. Results are returned in JSON format. See this [sample output](./doc/rekognition_search_output.json).
-
-![Postman Search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-search.png "Postman Search")
 
 ## Architecture
 
@@ -293,6 +289,14 @@ aws s3 rb s3://$AWS_S3_BUCKET --force
 For your convenience there's a preconfigured ['postman_collection'](./aws-rekognition.postman_collection.json) file added to the root directly of this repo. Regardless of whether you use this template, you'll need to provide the following three pieces of information from the Terraform output:
 
 ![Postman Configuration](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-config.png "Postman Configuration")
+
+Upload images
+
+![Postman Index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-index.png "Postman Index")
+
+Search images
+
+![Postman Search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-search.png "Postman Search")
 
 ## Original Sources
 
