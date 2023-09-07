@@ -76,7 +76,7 @@ The service stack consists of the following:
 
 **WARNINGS**:
 
-**1. The EKS service will create many AWS resources in other parts of your AWS account including EC2, VPC, IAM and KMS. You should not directly modify any of these resources, as this could lead to unintended consequences in the safe operation of your Kubernetes cluster up to and including permanent loss of access to the cluster itself.**
+**1. The EKS service will create many AWS resources in other parts of your AWS account including S3, API Gateway, IAM, Rekognition, DynamoDB and Lambda. You should not directly modify any of these resources, as this could lead to unintended consequences in the safe operation of your Kubernetes cluster up to and including permanent loss of access to the cluster itself.**
 
 **2. Terraform is a memory intensive application. For best results you should run this on a computer with at least 4Gib of free memory.**
 
@@ -227,9 +227,7 @@ terraform apply
 
 ![Terraform apply](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/terraform-apply2.png "Terraform apply")
 
-## III. Usage
-
-## IV. Uninstall
+## III. Uninstall
 
 The following completely destroys all AWS resources. Note that this operation might take up to 20 minutes to complete.
 
