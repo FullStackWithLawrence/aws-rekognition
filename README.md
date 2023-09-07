@@ -49,7 +49,7 @@ Implements as a REST API that leverages the following additional AWS serverless 
 
 ### Facial Recognition Index Workflow
 
-Deploys a URL endpoint for uploading an Image file to S3. S3 is configured to invoke a Lambda function on 'put' events. The Lambda function sends the image file to Rekognition, which will analyze the contents any facial features found, returning a [JSON file of this format](./doc/rekognition_index_faces.json). Individual facial features are persistened in DynamoDB, and are searchable by Rekognition 'faceprint'.
+Deploys a URL endpoint for uploading an Image file to S3. S3 is configured to invoke a Lambda function on 'put' events. The Lambda function sends the image file to Rekognition, which will analyze the contents for any facial features found, returning a [JSON file of this format](./doc/rekognition_index_faces.json). Individual facial features are persistened in DynamoDB, and are searchable by Rekognition 'faceprint'.
 
 ![Facial Recognition Index Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-index.png "Facial Recognition Index Workflow")
 
@@ -68,9 +68,16 @@ I refined the contents and formatting of each log group to suit my own needs whi
 ![CloudWatch Logs](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/cloudwatch-1.png "CloudWatch Logs")
 ![CloudWatch Logs](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/cloudwatch-2.png "CloudWatch Logs")
 
+## Working With DynamoDB
+
+Index faces are persisted to a DynamoDB table as per the two screen shots below. The AWS DynamoDB console includes a useful query tool named [PartiQL](https://partiql.org/) which you can use to inspect your Rekognition output. See this [sample DynamoDB Rekognition output file](./doc/dynamodb-sample-records.json).
+
+![DynamoDB console](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-1.png "DynamoDB console")
+![DynamoDB query](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-1.png "DynamoDB query")
+
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
-This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first 'base64' encode the file. Base64 encoding schemes are commonly used to encode binary data, like image files for example, for storage or transfer over media that can only deal with ASCII text.
+This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first [base64-encode](https://en.wikipedia.org/wiki/Base64) the file. Base64 encoding schemes are commonly used to encode binary data, like image files, for storage or transfer over media that can only deal with ASCII text.
 
 This repo includes a utility script [base64encode.sh](./base64encode.sh) that you can use to encode your test images prior to uploading these with Postman.
 
