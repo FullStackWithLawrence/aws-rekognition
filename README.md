@@ -55,6 +55,15 @@ Implements as a REST API that leverages the following additional AWS serverless 
 
 ![Facial Recognition Search Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-search.png "Facial Recognition Search Workflow")
 
+## Trouble Shooting and Logging
+
+The terraform scripts will automatically create a collection of CloudWatch Log Groups. Additionally, note the Terraform global variable 'debug_mode' (defaults to 'true') which will increase the verbosity of log entries in the [Lambda functions](./terraform/python/), which are implemented with Python.
+
+I refined the contents and formatting of each log group to suit my own needs while building this solution, and in particular while coding the Python Lambda functions.
+
+![CloudWatch Logs](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/cloudwatch-1.png "CloudWatch Logs")
+![CloudWatch Logs](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/cloudwatch-2.png "CloudWatch Logs")
+
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
 This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first 'base64' encode the file. Base64 encoding schemes are commonly used to encode binary data, like image files for example, for storage or transfer over media that can only deal with ASCII text.
@@ -76,7 +85,7 @@ The service stack consists of the following:
 
 **WARNINGS**:
 
-**1. The EKS service will create many AWS resources in other parts of your AWS account including S3, API Gateway, IAM, Rekognition, DynamoDB and Lambda. You should not directly modify any of these resources, as this could lead to unintended consequences in the safe operation of your Kubernetes cluster up to and including permanent loss of access to the cluster itself.**
+**1. The EKS service will create many AWS resources in other parts of your AWS account including S3, API Gateway, IAM, Rekognition, DynamoDB, CloudWatch and Lambda. You should not directly modify any of these resources, as this could lead to unintended consequences in the safe operation of your Kubernetes cluster up to and including permanent loss of access to the cluster itself.**
 
 **2. Terraform is a memory intensive application. For best results you should run this on a computer with at least 4Gib of free memory.**
 
