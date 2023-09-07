@@ -37,7 +37,7 @@ As a convenience, this repo includes a set of test data that has already been ba
 
 ## Architecture
 
-As of Sep-2023 AWS has introduced a large and still-growing list of AI/ML services that seamlessly interoperate with other infrastructure and services in the AWS ecosystem. This solution is based fundamentally on AWS Rekognition, one of AWS' two vision services.
+As of Sep-2023 AWS has introduced a large and still-growing [list of AI/ML services](https://aws.amazon.com/getting-started/decision-guides/machine-learning-on-aws-how-to-choose/) that seamlessly interoperate with other infrastructure and services in the AWS ecosystem. This solution is based fundamentally on AWS Rekognition, one of AWS' two vision services.
 
 ![AWS ML Stack](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/aws-ml-stack.png "AWS ML Stack")
 
