@@ -19,6 +19,9 @@
 # of the face that Amazon Rekognition used for the input image.
 #
 # Notes:
+# - incoming image file is base64 encoded.
+#   see https://code.tutsplus.com/base64-encoding-and-decoding-using-python--cms-25588t
+#
 # - The image must be either a PNG or JPEG formatted file.
 #
 # OFFICIAL DOCUMENTATION:
@@ -127,6 +130,16 @@ def lambda_handler(event, context):
     faces = {}  # Rekognition return value
     matched_faces = []  # any indexed faces found in the Rekognition return value
     try:
+        # see https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20
+        # image_raw = event["body"]
+        image_raw = str(event["body"]).encode("ascii")
+
+        # line 39, in _bytes_from_decode_data ValueError: string argument should contain only ASCII characters
+        # image_raw = ''.join(image_raw).encode('ascii').strip()
+
+        # https://stackoverflow.com/questions/53340627/typeerror-expected-bytes-like-object-not-str
+        image_decoded = base64.b64decode(image_raw)
+
         # https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal
         # Image: base64-encoded bytes or an S3 object.
         # Image={
@@ -137,8 +150,8 @@ def lambda_handler(event, context):
         #         'Version': 'string'
         #     }
         # },
-        image = str(event["body"]).encode("ascii")
-        image = {"Bytes": base64.decodebytes(image)}
+        image = {"Bytes": image_decoded}
+
         faces = rekognition_client.search_faces_by_image(
             Image=image,
             CollectionId=COLLECTION_ID,

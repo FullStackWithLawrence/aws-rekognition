@@ -35,8 +35,12 @@ data "aws_caller_identity" "current" {}
 resource "aws_api_gateway_rest_api" "facialrecognition" {
   name        = local.api_name
   description = "Facial recognition micro service"
+
+  # Note: our api is used exclusively to upload images file, hence
+  # we want ALL requests to be treated as 'binary'. An example
+  # alternative to this might be, say, 'image/jpeg', 'image/png', etc.
   binary_media_types = [
-    "image/jpeg"
+    "*/*"
   ]
   api_key_source = "HEADER"
   endpoint_configuration {

@@ -33,6 +33,7 @@ resource "aws_lambda_function" "index" {
 
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256
+  tags = var.tags
 
   environment {
     variables = {
@@ -45,7 +46,6 @@ resource "aws_lambda_function" "index" {
       QUALITY_FILTER         = var.face_detect_quality_filter
     }
   }
-  tags = var.tags
 }
 
 resource "aws_lambda_permission" "s3_permission_to_trigger_lambda" {

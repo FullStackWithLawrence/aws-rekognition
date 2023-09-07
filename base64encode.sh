@@ -9,7 +9,11 @@
 #------------------------------------------------------------------------------
 
 if [ $# == 1 ]; then
-    openssl base64 -in $1 -out $1-encoded
+    # see https://www.mytecbits.com/apple/macos/image-to-base64
+    base64 -i $1 -o $1-encoded
+
+    # this is an alternate implementation that works 80% of the time
+    # openssl base64 -in $1 -out $1-encoded
     exit 0
 fi
 
