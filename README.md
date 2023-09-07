@@ -73,7 +73,7 @@ I refined the contents and formatting of each log group to suit my own needs whi
 Index faces are persisted to a DynamoDB table as per the two screen shots below. The AWS DynamoDB console includes a useful query tool named [PartiQL](https://partiql.org/) which you can use to inspect your Rekognition output. See this [sample DynamoDB Rekognition output file](./doc/dynamodb-sample-records.json).
 
 ![DynamoDB console](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-1.png "DynamoDB console")
-![DynamoDB query](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-1.png "DynamoDB query")
+![DynamoDB query](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/dynamodb-2.png "DynamoDB query")
 
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
