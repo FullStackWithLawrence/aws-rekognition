@@ -9,16 +9,31 @@ A facial recognition microservice implemented as a REST API.
 
 ## Usage
 
-1. base64 encode your image files
+1. configure Terraform for your AWS account. Set these three values in [terraform.tfvars](./terraform/terraform.tfvars):
 
-```shell
-./base64encode ImageWithFaces1.jpg ImageWithFaces1-encoded.jpg
-./base64encode ImageWithMoreFaces2.jpg ImageWithMoreFaces2-encoded.jpg
+```terraform
+account_id           = "012345678912"   # your 12-digit AWS account number
+aws_region           = "us-east-1"      # an AWS data center
+aws_profile          = "default"        # for aws cli credentials
 ```
 
-2. Use Postman to upload one or more base64-encoded images to the 'index' URL endpoint. This will perform facial recognition analysis, and then index all faces found in the image, storing the indexes in a DynamoDB table.
+2. base64 encode your image files
 
-3. Use Postman to upload a base64-encoded image to the 'search' URL endpoint. This will perform facial analysis on the image and then search the DynamoDB table for any matches. Results are returned in JSON format.
+As a convenience, this repo includes a set of test data that has already been base64-encoded for you, located here: [test-data](./test-data/). It also includes this [base64encode.sh](./base64encode.sh) script that you can use to encode your own images, as per these examples.
+
+```shell
+./base64encode ImageWithFaces1.jpg
+./base64encode ImageWithMoreFaces2.jpg
+```
+
+3. Index one or more images which includes human faces.
+
+![Postman Index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-index.png "Postman Index")
+
+
+4. Search any image to see if Rekognition finds any matching faces. Results are returned in JSON format. See this [sample output](./doc/rekognition_search_output.json).
+
+![Postman Search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-search.png "Postman Search")
 
 ## Architecture
 
@@ -178,8 +193,7 @@ Required inputs are as follows:
 ```terraform
 account_id           = "012345678912"
 aws_region           = "us-east-1"
-domain               = "example.com"
-shared_resource_name = "facialrecognition"
+aws_profile          = "default"
 ```
 
 
@@ -247,6 +261,12 @@ To delete the AWS S3 bucket
 aws s3 rm s3://$AWS_S3_BUCKET --recursive
 aws s3 rb s3://$AWS_S3_BUCKET --force
 ```
+
+## If You're New To Postman
+
+For your convenience there's a preconfigured ['postman_collection'](./aws-rekognition.postman_collection.json) file added to the root directly of this repo. Regardless of whether you use this template, you'll need to provide the following three pieces of information from the Terraform output:
+
+![Postman Configuration](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/postman-config.png "Postman Configuration")
 
 ## Original Sources
 

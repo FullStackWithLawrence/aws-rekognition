@@ -1,0 +1,95 @@
+{
+  "faces": {
+      "SearchedFaceBoundingBox": {
+          "Width": 0.38344231247901917,
+          "Height": 0.5404366850852966,
+          "Left": 0.33523082733154297,
+          "Top": 0.1338842660188675
+      },
+      "SearchedFaceConfidence": 99.9979019165039,
+      "FaceMatches": [
+          {
+              "Similarity": 100.0,
+              "Face": {
+                  "FaceId": "a2f560af-be60-44b8-9cca-2cd280aca18a",
+                  "BoundingBox": {
+                      "Width": 0.3834420144557953,
+                      "Height": 0.5404369831085205,
+                      "Left": 0.3352310061454773,
+                      "Top": 0.133883997797966
+                  },
+                  "ImageId": "8d44141e-cfce-3f8a-b5b5-c11db1a67fb3",
+                  "ExternalImageId": "Lawrence2.jpg",
+                  "Confidence": 99.9979019165039,
+                  "IndexFacesModelVersion": "6.0"
+              }
+          },
+          {
+              "Similarity": 99.99995422363281,
+              "Face": {
+                  "FaceId": "df1faf37-6aa7-4636-89d7-579f16d0e13f",
+                  "BoundingBox": {
+                      "Width": 0.6752679944038391,
+                      "Height": 0.6300020217895508,
+                      "Left": 0.14113099873065948,
+                      "Top": 0.14488999545574188
+                  },
+                  "ImageId": "d1d0410d-01b8-322a-b79b-974b70eae5a5",
+                  "ExternalImageId": "Lawrence4.jpg",
+                  "Confidence": 99.99970245361328,
+                  "IndexFacesModelVersion": "6.0"
+              }
+          },
+          {
+              "Similarity": 99.99994659423828,
+              "Face": {
+                  "FaceId": "77a75f21-8079-428a-94a4-64f850b4d093",
+                  "BoundingBox": {
+                      "Width": 0.12419100105762482,
+                      "Height": 0.11222200095653534,
+                      "Left": 0.40661299228668213,
+                      "Top": 0.052646201103925705
+                  },
+                  "ImageId": "f293e331-9b5e-3447-9bde-c5b0eb179bab",
+                  "ExternalImageId": "Lawrence3.jpg",
+                  "Confidence": 99.9114990234375,
+                  "IndexFacesModelVersion": "6.0"
+              }
+          },
+          {
+              "Similarity": 99.99993133544922,
+              "Face": {
+                  "FaceId": "601497ff-3b28-4962-aeab-5b4b47261f4a",
+                  "BoundingBox": {
+                      "Width": 0.690172016620636,
+                      "Height": 0.6782780289649963,
+                      "Left": 0.17868299782276154,
+                      "Top": 0.14326800405979156
+                  },
+                  "ImageId": "708b44a6-bd78-3071-a7b2-c3b2566d6aab",
+                  "ExternalImageId": "Lawrence19.jpg",
+                  "Confidence": 99.99970245361328,
+                  "IndexFacesModelVersion": "6.0"
+              }
+          }
+      ],
+      "FaceModelVersion": "6.0",
+      "ResponseMetadata": {
+          "RequestId": "9785766d-83b3-4df1-b2c7-1c8eb1647ef1",
+          "HTTPStatusCode": 200,
+          "HTTPHeaders": {
+              "x-amzn-requestid": "9785766d-83b3-4df1-b2c7-1c8eb1647ef1",
+              "content-type": "application/x-amz-json-1.1",
+              "content-length": "1642",
+              "date": "Thu, 07 Sep 2023 15:29:27 GMT"
+          },
+          "RetryAttempts": 0
+      }
+  },
+  "matchedFaces": [
+      "Lawrence2.jpg",
+      "Lawrence4.jpg",
+      "Lawrence3.jpg",
+      "Lawrence19.jpg"
+  ]
+}
