@@ -32,6 +32,14 @@ Implements as a REST API that leverages the following additional AWS serverless 
 - **Certificate Manager**: handles the complexity of creating, storing, and renewing public and private SSL/TLS X.509 certificates and keys that protect your AWS websites and applications.
 - **Route53**: a scalable and highly available Domain Name System service. Released on December 5, 2010.
 
+### Facial Recognition Index Workflow
+
+![Facial Recognition Index Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-index.png "Facial Recognition Index Workflow")
+
+### Facial Recognition Search Workflow
+
+![Facial Recognition Search Workflow](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/diagram-search.png "Facial Recognition Search Workflow")
+
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 
 This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first 'base64' encode the file. Base64 encoding schemes are commonly used to encode binary data, like image files for example, for storage or transfer over media that can only deal with ASCII text.
@@ -202,6 +210,8 @@ To deploy the service run the following
 ```console
 terraform apply
 ```
+
+![Terraform apply](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/terraform-apply2.png "Terraform apply")
 
 ## III. Usage
 
