@@ -166,7 +166,14 @@ def lambda_handler(event, context):
         for face in faces["FaceMatches"]:
             item = dynamodb_table.get_item(Key={"FaceId": face["Face"]["FaceId"]})
             if "Item" in item:
-                matched = str(item["Item"]["ExternalImageId"]).replace("-", " ").replace("_", " ").capitalize()
+                matched = (
+                    str(item["Item"]["ExternalImageId"])
+                    .replace("-", " ")
+                    .replace("_", " ")
+                    .replace(".jpg", "")
+                    .replace(".png", "")
+                    .capitalize()
+                )
                 matched_faces.append(matched)
 
     # handle anything that went wrong

@@ -33,7 +33,7 @@ resource "aws_lambda_function" "index" {
 
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256
-  tags = var.tags
+  tags             = var.tags
 
   environment {
     variables = {
