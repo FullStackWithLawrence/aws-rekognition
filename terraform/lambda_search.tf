@@ -13,6 +13,34 @@ locals {
   search_function_name = "${var.shared_resource_identifier}-search"
 }
 
+resource "aws_lambda_function" "search" {
+
+  # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+  function_name    = local.search_function_name
+  description      = "Facial recognition image analysis and search for indexed faces. invoked by API Gateway."
+  role             = aws_iam_role.lambda.arn
+  publish          = true
+  runtime          = var.lambda_python_runtime
+  memory_size      = var.lambda_memory_size
+  timeout          = var.lambda_timeout
+  handler          = "lambda_search.lambda_handler"
+  filename         = data.archive_file.lambda_search.output_path
+  source_code_hash = data.archive_file.lambda_search.output_base64sha256
+  tags             = var.tags
+
+  environment {
+    variables = {
+      DEBUG_MODE             = var.debug_mode
+      MAX_FACES_COUNT        = var.max_faces_count
+      FACE_DETECT_THRESHOLD  = var.face_detect_threshold
+      QUALITY_FILTER         = var.face_detect_quality_filter
+      FACE_DETECT_ATTRIBUTES = var.face_detect_attributes
+      TABLE_ID               = local.table_name
+      REGION                 = var.aws_region
+      COLLECTION_ID          = local.collection_id
+    }
+  }
+}
 
 ###############################################################################
 # Cloudwatch logging
@@ -32,35 +60,4 @@ data "archive_file" "lambda_search" {
   type        = "zip"
   source_file = "${path.module}/python/lambda_search.py"
   output_path = "${path.module}/python/lambda_search_payload.zip"
-}
-
-
-resource "aws_lambda_function" "search" {
-
-  # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-  function_name = local.search_function_name
-  description   = "Facial recognition image analysis and search for indexed faces. invoked by API Gateway."
-  role          = aws_iam_role.lambda.arn
-  publish       = true
-  runtime       = var.lambda_python_runtime
-  memory_size   = var.lambda_memory_size
-  timeout       = var.lambda_timeout
-  handler       = "lambda_search.lambda_handler"
-
-  filename         = data.archive_file.lambda_search.output_path
-  source_code_hash = data.archive_file.lambda_search.output_base64sha256
-  tags             = var.tags
-
-  environment {
-    variables = {
-      DEBUG_MODE             = var.debug_mode
-      MAX_FACES_COUNT        = var.max_faces_count
-      FACE_DETECT_THRESHOLD  = var.face_detect_threshold
-      QUALITY_FILTER         = var.face_detect_quality_filter
-      FACE_DETECT_ATTRIBUTES = var.face_detect_attributes
-      TABLE_ID               = local.table_name
-      REGION                 = var.aws_region
-      COLLECTION_ID          = local.collection_id
-    }
-  }
 }

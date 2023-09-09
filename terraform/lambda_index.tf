@@ -4,33 +4,24 @@
 #
 # date: sep-2023
 #
-# usage:  - implement a Python Lambda function to search the Rekognition index
-#           for an image uploaded using the REST API endpoint.
+# usage:  implement a Python Lambda function to search the Rekognition index
+#         for an image uploaded using the REST API endpoint.
 #------------------------------------------------------------------------------
 locals {
   index_function_name = "${var.shared_resource_identifier}-index"
 }
 
-# see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
-data "archive_file" "lambda_index" {
-  type        = "zip"
-  source_file = "${path.module}/python/lambda_index.py"
-  output_path = "${path.module}/python/lambda_index_payload.zip"
-}
-
-# see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function.html
 resource "aws_lambda_function" "index" {
-
+  # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function.html
   # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-  function_name = local.index_function_name
-  description   = "Facial recognition analysis and indexing of images. Invoked by S3."
-  role          = aws_iam_role.lambda.arn
-  publish       = true
-  runtime       = var.lambda_python_runtime
-  memory_size   = var.lambda_memory_size
-  timeout       = var.lambda_timeout
-  handler       = "lambda_index.lambda_handler"
-
+  function_name    = local.index_function_name
+  description      = "Facial recognition analysis and indexing of images. Invoked by S3."
+  role             = aws_iam_role.lambda.arn
+  publish          = true
+  runtime          = var.lambda_python_runtime
+  memory_size      = var.lambda_memory_size
+  timeout          = var.lambda_timeout
+  handler          = "lambda_index.lambda_handler"
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256
   tags             = var.tags
@@ -47,6 +38,13 @@ resource "aws_lambda_function" "index" {
     }
   }
 }
+# see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
+data "archive_file" "lambda_index" {
+  type        = "zip"
+  source_file = "${path.module}/python/lambda_index.py"
+  output_path = "${path.module}/python/lambda_index_payload.zip"
+}
+
 
 resource "aws_lambda_permission" "s3_permission_to_trigger_lambda" {
   statement_id  = "AllowExecutionFromS3Bucket"
@@ -63,8 +61,8 @@ resource "aws_s3_bucket_notification" "incoming_jpg" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.index.arn
     events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".jpg"
     #filter_prefix       = ""
-    filter_suffix = ".jpg"
   }
 
   depends_on = [

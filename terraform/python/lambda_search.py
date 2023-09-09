@@ -73,6 +73,7 @@ def lambda_handler(event, context):
             }
         }
         print(json.dumps(cloudwatch_dump))
+        print(json.dumps({"event": event}))
 
     def http_response_factory(status_code: int, body: json) -> json:
         """
@@ -117,7 +118,6 @@ def lambda_handler(event, context):
 
         exception: a descendant of Python Exception class
         """
-        print(json.dumps({"event": event}))
         exc_info = sys.exc_info()
         retval = {
             "error": str(exception),
@@ -130,14 +130,12 @@ def lambda_handler(event, context):
     faces = {}  # Rekognition return value
     matched_faces = []  # any indexed faces found in the Rekognition return value
     try:
-        # see https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20
-        # image_raw = event["body"]
+        # see
+        #  - https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20
+        #  - line 39, in _bytes_from_decode_data ValueError: string argument should contain only ASCII characters
+        #  - https://stackoverflow.com/questions/53340627/typeerror-expected-bytes-like-object-not-str
+        #  - alternate syntax: image_raw = ''.join(image_raw).encode('ascii').strip()
         image_raw = str(event["body"]).encode("ascii")
-
-        # line 39, in _bytes_from_decode_data ValueError: string argument should contain only ASCII characters
-        # image_raw = ''.join(image_raw).encode('ascii').strip()
-
-        # https://stackoverflow.com/questions/53340627/typeerror-expected-bytes-like-object-not-str
         image_decoded = base64.b64decode(image_raw)
 
         # https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal

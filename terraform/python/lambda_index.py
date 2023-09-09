@@ -93,6 +93,7 @@ def lambda_handler(event, context):
             }
         }
         print(json.dumps(cloudwatch_dump))
+        print(json.dumps({"event": event}))
 
     def http_response_factory(status_code: int, body: json) -> json:
         """
@@ -137,7 +138,6 @@ def lambda_handler(event, context):
 
         exception: a descendant of Python Exception class
         """
-        print(json.dumps({"event": event}))
         exc_info = sys.exc_info()
         retval = {
             "error": str(exception),
