@@ -2,7 +2,7 @@
 module "dynamodb_table" {
   # see https://registry.terraform.io/modules/terraform-aws-modules/dynamodb-table/aws/latest
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "~> 3.3"
+  version = "~> 4.0"
 
   name                        = local.table_name
   hash_key                    = "FaceId"
