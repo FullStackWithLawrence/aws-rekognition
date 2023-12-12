@@ -10,8 +10,6 @@
 ![Auto Assign](https://github.com/FullStackwithLawrence/aws-rekognition/actions/workflows/auto-assign.yml/badge.svg)[![Source
 code](https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=orange&message=Source%20code)](https://github.com/FullStackWithLawrence/aws-rekognition)
 [![Release Notes](https://img.shields.io/github/release/FullStackWithLawrence/aws-rekognition)](https://github.com/FullStackWithLawrence/aws-rekognition/releases)
-[![PyPI
-releases](https://img.shields.io/pypi/v/aws-rekognition?logo=python&logoColor=white)](https://pypi.org/project/aws-rekognition)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
 
