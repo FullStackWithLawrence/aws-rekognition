@@ -1,3 +1,10 @@
+# 1.0.0 (2023-12-12)
+
+
+### Bug Fixes
+
+* force a new release ([385cf2d](https://github.com/FullStackWithLawrence/aws-rekognition/commit/385cf2d374de90197cb20acd8a8ce4a44816d61d))
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
