@@ -83,8 +83,7 @@ clean:
 # Run Python unit tests
 # -------------------------------------------------------------------------
 test:
-	python -m unittest discover -s aws-rekogition/tests/ && \
-	python -m setup_test
+	python -m unittest discover -s terraform/python/tests/
 
 # -------------------------------------------------------------------------
 # Force a new semantic release to be created in GitHub
