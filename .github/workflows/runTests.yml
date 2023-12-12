@@ -1,0 +1,24 @@
+---
+#------------------------------------------------------------------------------
+# Run all tests
+#------------------------------------------------------------------------------
+name: Manual Unit Tests
+
+on:
+  workflow_dispatch:
+
+env:
+  python-version: "3.11"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Run Python tests
+        uses: ./.github/actions/tests/python
+        with:
+          python-version: "${{ env.python-version}}"

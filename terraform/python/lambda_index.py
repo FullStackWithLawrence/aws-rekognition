@@ -1,42 +1,47 @@
-# ------------------------------------------------------------------------------
-# written by: Lawrence McDaniel
-#             https://lawrencemcdaniel.com/
-#
-# date:       sep-2023
-#
-# Rekognition.index_faces():
-#             https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/index_faces.html
-#
-#             Detects faces in the input image and adds them to the specified collection.
-#             Amazon Rekognition doesn’t save the actual faces that are detected.
-#             Instead, the underlying detection algorithm first detects the faces
-#             in the input image. For each face, the algorithm extracts facial
-#             features into a feature vector, and stores it in the backend database.
-#             Amazon Rekognition uses feature vectors when it performs face match
-#             and search operations using the SearchFaces and SearchFacesByImage operations.
-#
-#             - To get the number of faces in a collection, call DescribeCollection.
-#
-#             - If you provide the optional ExternalImageId for the input image you provided,
-#               Amazon Rekognition associates this ID with all faces that it detects.
-#               When you call the ListFaces operation, the response returns the external ID.
-#
-#             - The input image is passed either as base64-encoded image bytes,
-#               or as a reference to an image in an Amazon S3 bucket.
-# ------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# pylint: disable=R0801,R0911,R0912,R0914,R0915,W0718
+"""
+written by: Lawrence McDaniel
+            https://lawrencemcdaniel.com/
 
-import sys, traceback  # libraries for error management
-import os  # library for interacting with the operating system
-import platform  # library to view informatoin about the server host this Lambda runs on
+date:       sep-2023
+
+Rekognition.index_faces():
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rekognition/client/index_faces.html
+
+Detects faces in the input image and adds them to the specified collection.
+Amazon Rekognition doesn’t save the actual faces that are detected.
+Instead, the underlying detection algorithm first detects the faces
+in the input image. For each face, the algorithm extracts facial
+features into a feature vector, and stores it in the backend database.
+Amazon Rekognition uses feature vectors when it performs face match
+and search operations using the SearchFaces and SearchFacesByImage operations.
+
+- To get the number of faces in a collection, call DescribeCollection.
+
+- If you provide the optional ExternalImageId for the input image you provided,
+    Amazon Rekognition associates this ID with all faces that it detects.
+    When you call the ListFaces operation, the response returns the external ID.
+
+- The input image is passed either as base64-encoded image bytes,
+    or as a reference to an image in an Amazon S3 bucket.
+"""
+
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
-from decimal import (
-    Decimal,
-)  # Python Decimal data type, for type casting JSON return data https://docs.python.org/3/library/decimal.html
-from urllib.parse import (
-    unquote_plus,
-)  # to 'de-escape' string representations of URL values
 import logging  # library for interacting with application log data
+import os  # library for interacting with the operating system
+import platform  # library to view information about the server host this Lambda runs on
+import sys  # libraries for error management
+import traceback
+from decimal import (  # Python Decimal data type, for type casting JSON return data https://docs.python.org/3/library/decimal.html
+    Decimal,
+)
+from urllib.parse import (  # to 'de-escape' string representations of URL values
+    unquote_plus,
+)
+
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
+
 
 # environment variables that were created by Terraform.
 # see:
@@ -44,7 +49,7 @@ import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/
 #   https://us-east-1.console.aws.amazon.com/lambda/home?region=us-east-1#/functions/facialrecognition-index?tab=code
 COLLECTION_ID = os.environ["COLLECTION_ID"]
 TABLE_ID = os.environ["TABLE_ID"]
-MAX_FACES = int(os.getenv("MAX_FACES_COUNT", "10"))
+MAX_FACES_COUNT = int(os.getenv("MAX_FACES_COUNT", "10"))
 FACE_DETECT_ATTRIBUTES = os.getenv("FACE_DETECT_ATTRIBUTES", "DEFAULT")
 QUALITY_FILTER = os.getenv("QUALITY_FILTER", "AUTO")
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() in ("true", "1", "t")
@@ -60,7 +65,8 @@ urllib3_logger = logging.getLogger("urllib3")
 urllib3_logger.setLevel(logging.CRITICAL)
 
 
-def lambda_handler(event, context):
+# pylint: disable=unused-argument
+def lambda_handler(event, context):  # noqa: C901
     """
     Facial recognition analysis and indexing of images. Invoked by S3.
 
@@ -86,7 +92,7 @@ def lambda_handler(event, context):
                 "boto3": boto3.__version__,
                 "COLLECTION_ID": COLLECTION_ID,
                 "TABLE_ID": TABLE_ID,
-                "MAX_FACES": MAX_FACES,
+                "MAX_FACES": MAX_FACES_COUNT,
                 "FACE_DETECT_ATTRIBUTES": FACE_DETECT_ATTRIBUTES,
                 "QUALITY_FILTER": QUALITY_FILTER,
                 "DEBUG_MODE": DEBUG_MODE,
@@ -105,11 +111,7 @@ def lambda_handler(event, context):
         see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
         """
         if status_code < 100 or status_code > 599:
-            raise ValueError(
-                "Invalid HTTP response code received: {status_code}".format(
-                    status_code=status_code
-                )
-            )
+            raise ValueError(f"Invalid HTTP response code received: {status_code}")
 
         if DEBUG_MODE:
             retval = {
@@ -155,28 +157,24 @@ def lambda_handler(event, context):
     # 'event' variable match what we are expecting.
     # ---------------------------
     try:
-        if not "Records" in event:
+        if "Records" not in event:
             raise TypeError("Records object not found in event object")
 
         if records[0]["eventSource"] != "aws:s3":
-            msg = "lambda_index() is intended to be called from aws:s3, but was invoked by {service}".format(
-                service=records[0]["eventSource"]
-            )
+            service = records[0]["eventSource"]
+            msg = f"lambda_index() is intended to be called from aws:s3, but was invoked by {service}"
             raise TypeError(msg)
 
-        if not "bucket" in records[0]["s3"]:
+        if "bucket" not in records[0]["s3"]:
             raise TypeError("bucket not found in event object")
 
         if records[0]["eventName"] != "ObjectCreated:Put":
-            msg = "lambda_index() is intended to be called for ObjectCreated:Put event, but was invoked by {event}".format(
-                event=records[0]["eventName"]
-            )
+            event = records[0]["eventName"]
+            msg = f"lambda_index() is intended to be called for ObjectCreated:Put event, but was invoked by {event}"
             raise TypeError(msg)
 
     except TypeError as e:
-        return http_response_factory(
-            status_code=500, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=500, body=exception_response_factory(e))
 
     # all good. lets process the event!
     # ---------------------------
@@ -187,8 +185,7 @@ def lambda_handler(event, context):
         s3_object_key = unquote_plus(record["s3"]["object"]["key"], encoding="utf-8")
         s3_object = s3_client.Object(s3_bucket_name, s3_object_key)
         s3_object_metadata = {
-            key.replace("x-amz-meta-", ""): s3_object.metadata[key]
-            for key in s3_object.metadata.keys()
+            key.replace("x-amz-meta-", ""): s3_object.metadata[key] for key in s3_object.metadata.keys()
         }
         if DEBUG_MODE:
             print(json.dumps({"event_record": record}))
@@ -199,7 +196,7 @@ def lambda_handler(event, context):
                 Image={"S3Object": {"Bucket": s3_bucket_name, "Name": s3_object_key}},
                 ExternalImageId=s3_object_key,
                 DetectionAttributes=[FACE_DETECT_ATTRIBUTES],
-                MaxFaces=MAX_FACES,
+                MaxFaces=MAX_FACES_COUNT,
                 QualityFilter=QUALITY_FILTER,
             )
             # ----------------------------------------------------------------------
@@ -216,7 +213,7 @@ def lambda_handler(event, context):
 
         # handle anything that went wrong
         # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
-        except rekognition_client.exceptions.InvalidParameterException as e:
+        except rekognition_client.exceptions.InvalidParameterException:
             # If no faces are detected in the image, then index_faces()
             # returns an InvalidParameterException error
             pass
@@ -226,33 +223,23 @@ def lambda_handler(event, context):
             rekognition_client.exceptions.ProvisionedThroughputExceededException,
             rekognition_client.exceptions.ServiceQuotaExceededException,
         ) as e:
-            return http_response_factory(
-                status_code=401, body=exception_response_factory(e)
-            )
+            return http_response_factory(status_code=401, body=exception_response_factory(e))
 
         except rekognition_client.exceptions.AccessDeniedException as e:
-            return http_response_factory(
-                status_code=403, body=exception_response_factory(e)
-            )
+            return http_response_factory(status_code=403, body=exception_response_factory(e))
 
         except rekognition_client.exceptions.ResourceNotFoundException as e:
-            return http_response_factory(
-                status_code=404, body=exception_response_factory(e)
-            )
+            return http_response_factory(status_code=404, body=exception_response_factory(e))
 
         except (
             rekognition_client.exceptions.InvalidS3ObjectException,
             rekognition_client.exceptions.ImageTooLargeException,
             rekognition_client.exceptions.InvalidImageFormatException,
         ) as e:
-            return http_response_factory(
-                status_code=406, body=exception_response_factory(e)
-            )
+            return http_response_factory(status_code=406, body=exception_response_factory(e))
 
         except (rekognition_client.exceptions.InternalServerError, Exception) as e:
-            return http_response_factory(
-                status_code=500, body=exception_response_factory(e)
-            )
+            return http_response_factory(status_code=500, body=exception_response_factory(e))
 
         # success!! return the results
         return http_response_factory(status_code=200, body=faces)

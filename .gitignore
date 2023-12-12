@@ -1,8 +1,35 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+*.zip
+
+# Jupyter Notebook
+.ipynb_checkpoints
+data
+
 .DS_Store
 #  Local .terraform directories
 .terraform/
+.env
+lambda_dist_pkg
+*.zip
+__pycache__
+.pytest_cache
+
+# Python
+venv
+.venv
+.pytest_cache
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.log
 
 # .tfstate files
+.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 
@@ -16,3 +43,9 @@ tardigrade-ci/
 
 # go tests
 tests/go.*
+
+# ReactJS
+client/node_modules/
+node_modules
+
+package-lock.json
