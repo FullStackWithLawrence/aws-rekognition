@@ -67,7 +67,7 @@
     "core-util-is": "^1.0.3",
     "cosmiconfig": "^8.3.6",
     "cross-spawn": "^7.0.3",
-    "crypto-random-string": "^4.0.0",
+    "crypto-random-string": "^5.0.0",
     "debug": "^4.3.4",
     "deep-extend": "^0.6.0",
     "deep-is": "^0.1.4",
