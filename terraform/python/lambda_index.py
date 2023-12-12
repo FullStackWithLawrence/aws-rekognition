@@ -27,6 +27,7 @@ and search operations using the SearchFaces and SearchFacesByImage operations.
     or as a reference to an image in an Amazon S3 bucket.
 """
 
+# python stuff
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 import logging  # library for interacting with application log data
 from decimal import (  # Python Decimal data type, for type casting JSON return data https://docs.python.org/3/library/decimal.html
@@ -36,6 +37,7 @@ from urllib.parse import (  # to 'de-escape' string representations of URL value
     unquote_plus,
 )
 
+# our stuff
 from .common import exception_response_factory, http_response_factory
 from .conf import cloudwatch_dump, settings
 
