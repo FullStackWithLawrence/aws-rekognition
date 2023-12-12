@@ -39,6 +39,7 @@ import json  # library for interacting with JSON data https://www.json.org/json-
 
 from .common import exception_response_factory, http_response_factory
 from .conf import cloudwatch_dump, settings
+from .exceptions import EXCEPTION_MAP
 
 
 # pylint: disable=unused-argument
@@ -105,29 +106,9 @@ def lambda_handler(event, context):  # noqa: C901
         # returns an InvalidParameterException error
         pass
 
-    except (
-        settings.rekognition_client.exceptions.ThrottlingException,
-        settings.rekognition_client.exceptions.ProvisionedThroughputExceededException,
-        settings.rekognition_client.exceptions.ServiceQuotaExceededException,
-    ) as e:
-        return http_response_factory(status_code=401, body=exception_response_factory(e))
-
-    except settings.rekognition_client.exceptions.AccessDeniedException as e:
-        return http_response_factory(status_code=403, body=exception_response_factory(e))
-
-    except settings.rekognition_client.exceptions.ResourceNotFoundException as e:
-        return http_response_factory(status_code=404, body=exception_response_factory(e))
-
-    except (
-        settings.rekognition_client.exceptions.InvalidS3ObjectException,
-        settings.rekognition_client.exceptions.ImageTooLargeException,
-        settings.rekognition_client.exceptions.InvalidImageFormatException,
-    ) as e:
-        return http_response_factory(status_code=406, body=exception_response_factory(e))
-
-    # pylint: disable=broad-except
-    except (settings.rekognition_client.exceptions.InternalServerError, Exception) as e:
-        return http_response_factory(status_code=500, body=exception_response_factory(e))
+    except Exception as e:
+        status_code, _message = EXCEPTION_MAP.get(type(e), (500, "Internal server error"))
+        return http_response_factory(status_code=status_code, body=exception_response_factory(e))
 
     # success!! return the results
     retval = {
