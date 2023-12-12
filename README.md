@@ -1,6 +1,6 @@
 # AWS Rekognition Demo
 
-[![FullStackWithLawrence](https://a11ybadges.com/badge?text=FullStackWithLawrence&badgeColor=orange&logo=youtube&logoColor=282828)](https://www.youtube.com/@FullStackWithLawrence)
+[![FullStackWithLawrence](https://a11ybadges.com/badge?text=FullStackWithLawrence&badgeColor=orange&logo=youtube&logoColor=282828)](https://www.youtube.com/@FullStackWithLawrence)<br>
 [![Python](https://a11ybadges.com/badge?logo=python)](https://www.python.org/)
 [![Amazon AWS](https://a11ybadges.com/badge?logo=amazonaws)](https://aws.amazon.com/)
 [![Terraform](https://a11ybadges.com/badge?logo=terraform)](https://www.terraform.io/)<br>
