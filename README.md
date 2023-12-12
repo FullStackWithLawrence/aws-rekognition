@@ -1,9 +1,17 @@
-[![Source code](https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code)](https://github.com/FullStackWithLawrence/aws-rekognition)
-[![Documentation](https://img.shields.io/static/v1?&label=Documentation&style=flat-square&color=000000&message=Documentation)](https://github.com/FullStackWithLawrence/aws-rekognition)
-[![AGPL License](https://img.shields.io/github/license/overhangio/tutor.svg?style=flat-square)](https://www.gnu.org/licenses/agpl-3.0.en.html)
-[![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
-
 # AWS Rekognition Demo
+
+[![FullStackWithLawrence](https://a11ybadges.com/badge?text=FullStackWithLawrence&badgeColor=orange&logo=youtube&logoColor=282828)](https://www.youtube.com/@FullStackWithLawrence)<br>
+[![Python](https://a11ybadges.com/badge?logo=python)](https://www.python.org/)
+[![Amazon AWS](https://a11ybadges.com/badge?logo=amazonaws)](https://aws.amazon.com/)
+[![Terraform](https://a11ybadges.com/badge?logo=terraform)](https://www.terraform.io/)<br>
+[![12-Factor](https://img.shields.io/badge/12--Factor-Compliant-green.svg)](./doc/Twelve_Factor_Methodology.md)
+[![Unit Tests](https://github.com/FullStackWithLawrence/aws-rekognition/actions/workflows/tests.yml/badge.svg)](https://github.com/FullStackWithLawrence/aws-rekognition/actions)
+![GHA pushMain Status](https://img.shields.io/github/actions/workflow/status/FullStackWithLawrence/aws-rekognition/pushMain.yml?branch=main)
+![Auto Assign](https://github.com/FullStackwithLawrence/aws-rekognition/actions/workflows/auto-assign.yml/badge.svg)[![Source
+code](https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=orange&message=Source%20code)](https://github.com/FullStackWithLawrence/aws-rekognition)
+[![Release Notes](https://img.shields.io/github/release/FullStackWithLawrence/aws-rekognition)](https://github.com/FullStackWithLawrence/aws-rekognition/releases)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
 
 A facial recognition microservice implemented as a REST API.
 
