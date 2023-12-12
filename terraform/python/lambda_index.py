@@ -39,7 +39,7 @@ from urllib.parse import (  # to 'de-escape' string representations of URL value
 
 # our stuff
 from .common import exception_response_factory, http_response_factory
-from .conf import cloudwatch_dump, settings
+from .conf import settings
 from .exceptions import EXCEPTION_MAP
 
 
@@ -67,7 +67,7 @@ def lambda_handler(event, context):  # noqa: C901
     detecting and forwarding these downstream to API Gateway.
     """
     if settings.debug_mode:
-        print(json.dumps(cloudwatch_dump))
+        print(json.dumps(settings.cloudwatch_dump))
         print(json.dumps({"event": event}))
 
     records = event["Records"]

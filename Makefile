@@ -15,14 +15,14 @@ env:
 	ifneq ("$(wildcard .env)","")
 		include .env
 	else
-		$(shell echo -e "MAX_FACES_COUNT=10" >> .env)
-		$(shell echo -e "FACE_DETECT_THRESHOLD=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "FACE_DETECT_ATTRIBUTES=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "QUALITY_FILTER=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "TABLE_ID=gcp-starter" >> .env)
-		$(shell echo -e "REGION=us-east-1" >> .env)
-		$(shell echo -e "COLLECTION_ID=gcp-starter" >> .env)
-		$(shell echo -e "DEBUG_MODE=True" >> .env)
+		$(shell echo -e "FACE_DETECT_MAX_FACES_COUNT=10" >> .env)
+		$(shell echo -e "FACE_DETECT_THRESHOLD=10" >> .env)
+		$(shell echo -e "FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
+		$(shell echo -e "QUALITY_FILTER=AUTO" >> .env)
+		$(shell echo -e "TABLE_ID=facialrecognition" >> .env)
+		$(shell echo -e "AWS_REGION=us-east-1" >> .env)
+		$(shell echo -e "COLLECTION_ID=facialrecognition-collection" >> .env)
+		$(shell echo -e "DEBUG_MODE=False" >> .env)
 	endif
 
 # Default target executed when no arguments are given to make.

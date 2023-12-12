@@ -20,7 +20,6 @@ from .exceptions import RekognitionConfigurationError, RekognitionValueError
 # Default values
 # -----------------------------------------------------------------------------
 DEFAULT_AWS_REGION = "us-east-1"
-DEFAULT_AWS_PROFILE = "default"
 DEFAULT_DEBUG_MODE = False
 DEFAULT_TABLE_ID = "facialrecognition"
 DEFAULT_COLLECTION_ID = DEFAULT_TABLE_ID + "-collection"
@@ -38,7 +37,6 @@ class Settings(BaseModel):
     """Settings for Lambda functions"""
 
     debug_mode: bool = Field(DEFAULT_DEBUG_MODE, env="DEBUG_MODE")
-    aws_profile: str = Field(DEFAULT_AWS_PROFILE, env="AWS_PROFILE")
     aws_regions: List[str] = Field(AWS_REGIONS, description="The list of AWS regions")
     aws_region: str = Field(DEFAULT_AWS_REGION, env="AWS_REGION")
     table_id: str = Field(DEFAULT_TABLE_ID, env="TABLE_ID")
@@ -56,6 +54,22 @@ class Settings(BaseModel):
     dynamodb_client = boto3.resource("dynamodb")
     dynamodb_table = dynamodb_client.Table(table_id)
     rekognition_client = boto3.client("rekognition")
+
+    # use the boto3 library to initialize clients for the AWS services which we'll interact
+    cloudwatch_dump = {
+        "environment": {
+            "os": os.name,
+            "system": platform.system(),
+            "release": platform.release(),
+            "boto3": boto3.__version__,
+            "COLLECTION_ID": collection_id,
+            "TABLE_ID": table_id,
+            "MAX_FACES": face_detect_max_faces_count,
+            "FACE_DETECT_ATTRIBUTES": face_detect_attributes,
+            "QUALITY_FILTER": face_detect_quality_filter,
+            "DEBUG_MODE": debug_mode,
+        }
+    }
 
     class Config:
         """Pydantic configuration"""
@@ -77,29 +91,12 @@ try:
 except ValidationError as e:
     raise RekognitionConfigurationError("Invalid configuration: " + str(e)) from e
 
-# use the boto3 library to initialize clients for the AWS services which we'll interact
-cloudwatch_dump = {
-    "environment": {
-        "os": os.name,
-        "system": platform.system(),
-        "release": platform.release(),
-        "boto3": boto3.__version__,
-        "COLLECTION_ID": settings.collection_id,
-        "TABLE_ID": settings.table_id,
-        "MAX_FACES": settings.face_detect_max_faces_count,
-        "FACE_DETECT_ATTRIBUTES": settings.face_detect_attributes,
-        "QUALITY_FILTER": settings.face_detect_quality_filter,
-        "DEBUG_MODE": settings.debug_mode,
-    }
-}
-
 logger = logging.getLogger(__name__)
-logger.debug("DEFAULT_DEBUG_MODE: %s", settings.debug_mode)
-logger.debug("DEFAULT_AWS_PROFILE: %s", settings.aws_profile)
-logger.debug("DEFAULT_AWS_REGION: %s", settings.aws_region)
-logger.debug("DEFAULT_TABLE_ID: %s", settings.table_id)
-logger.debug("DEFAULT_COLLECTION_ID: %s", settings.collection_id)
-logger.debug("DEFAULT_FACE_DETECT_MAX_FACES_COUNT: %s", settings.face_detect_max_faces_count)
-logger.debug("DEFAULT_FACE_DETECT_ATTRIBUTES: %s", settings.face_detect_attributes)
-logger.debug("DEFAULT_FACE_DETECT_QUALITY_FILTER: %s", settings.face_detect_quality_filter)
-logger.debug("DEFAULT_FACE_DETECT_THRESHOLD: %s", settings.face_detect_threshold)
+logger.debug("DEBUG_MODE: %s", settings.debug_mode)
+logger.debug("AWS_REGION: %s", settings.aws_region)
+logger.debug("TABLE_ID: %s", settings.table_id)
+logger.debug("COLLECTION_ID: %s", settings.collection_id)
+logger.debug("FACE_DETECT_MAX_FACES_COUNT: %s", settings.face_detect_max_faces_count)
+logger.debug("FACE_DETECT_ATTRIBUTES: %s", settings.face_detect_attributes)
+logger.debug("FACE_DETECT_QUALITY_FILTER: %s", settings.face_detect_quality_filter)
+logger.debug("FACE_DETECT_THRESHOLD: %s", settings.face_detect_threshold)

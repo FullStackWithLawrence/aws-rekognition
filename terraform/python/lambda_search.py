@@ -38,7 +38,7 @@ import base64  # library with base63 encoding/decoding functions
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 
 from .common import exception_response_factory, http_response_factory
-from .conf import cloudwatch_dump, settings
+from .conf import settings
 from .exceptions import EXCEPTION_MAP
 
 
@@ -48,7 +48,7 @@ def lambda_handler(event, context):  # noqa: C901
     Facial recognition image analysis and search for indexed faces. invoked by API Gateway.
     """
     if settings.debug_mode:
-        print(json.dumps(cloudwatch_dump))
+        print(json.dumps(settings.cloudwatch_dump))
         print(json.dumps({"event": event}))
 
     # all good, lets process the event!
