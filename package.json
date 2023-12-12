@@ -134,7 +134,7 @@
     "graphemer": "^1.4.0",
     "handlebars": "^4.7.8",
     "has-bigints": "^1.0.2",
-    "has-flag": "^3.0.0",
+    "has-flag": "^5.0.1",
     "has-property-descriptors": "^1.0.1",
     "has-proto": "^1.0.1",
     "has-symbols": "^1.0.3",
