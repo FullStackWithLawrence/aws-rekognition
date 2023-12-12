@@ -30,7 +30,6 @@ As a convenience, this repo includes a set of test data that has already been ba
 
 4. Search for indexed faces by uploading images to the `search` endpoint. Results are returned in JSON format. See [sample output](./doc/rekognition_search_output.json).
 
-
 ## Architecture
 
 As of Sep-2023 AWS has introduced a large and still-growing [list of AI/ML services](https://aws.amazon.com/getting-started/decision-guides/machine-learning-on-aws-how-to-choose/) that seamlessly interoperate with other infrastructure and services in the AWS ecosystem. This solution is based fundamentally on AWS Rekognition, one of AWS' two vision services.
@@ -97,10 +96,10 @@ This is a [Terraform](https://www.terraform.io/) based installation methodology 
 
 The service stack consists of the following:
 
-* a AWS S3 bucket and DynamoDB table for managing Terraform state
-* [AWS S3 bucket](https://aws.amazon.com/s3/) for storing train and test image sets.
-* [DynamoDB Table](https://aws.amazon.com/dynamodb/) for persisting Rekognition service results
-* [AWS IAM Role](https://aws.amazon.com/iam/) for managing service-level role-based security for this service
+- a AWS S3 bucket and DynamoDB table for managing Terraform state
+- [AWS S3 bucket](https://aws.amazon.com/s3/) for storing train and test image sets.
+- [DynamoDB Table](https://aws.amazon.com/dynamodb/) for persisting Rekognition service results
+- [AWS IAM Role](https://aws.amazon.com/iam/) for managing service-level role-based security for this service
 
 **WARNINGS**:
 
@@ -112,12 +111,12 @@ The service stack consists of the following:
 
 Quickstart for Linux & macOS operating systems.
 
-**Prerequisite:** Obtain an [AWS IAM User](https://aws.amazon.com/iam/) with administrator priviledges, access key and secret key.
+**Prerequisite:** Obtain an [AWS IAM User](https://aws.amazon.com/iam/) with administrator privileges, access key and secret key.
 
 Ensure that your environment includes the latest stable releases of the following software packages:
 
-* [aws cli](https://aws.amazon.com/cli/)
-* [terraform](https://www.terraform.io/)
+- [aws cli](https://aws.amazon.com/cli/)
+- [terraform](https://www.terraform.io/)
 
 ### Install required software packages using Homebrew
 
@@ -144,7 +143,6 @@ aws configure
 ```
 
 This will interactively prompt for your AWS IAM user access key, secret key and preferred region.
-
 
 ### Setup Terraform
 
@@ -208,7 +206,7 @@ vim terraform/terraform.tf
     profile        = "default"
     encrypt        = false
   }
-````
+```
 
 ### Step 4. Configure your environment by setting Terraform global variable values
 
@@ -224,13 +222,12 @@ aws_region           = "us-east-1"
 aws_profile          = "default"
 ```
 
-
 ### Step 3. Run the following command to initialize and build the solution
 
 The Terraform modules in this repo rely extensively on calls to other third party Terraform modules published and maintained by [AWS](https://registry.terraform.io/namespaces/terraform-aws-modules). These modules will be downloaded by Terraform so that these can be executed locally from your computer. Noteworth examples of such third party modules include:
 
-* [terraform-aws-modules/s3](https://registry.terraform.io/modules/terraform-aws-modules/s3-bucket/aws/latest)
-* [terraform-aws-modules/dynamodb](https://registry.terraform.io/modules/terraform-aws-modules/dynamodb-table/aws/latest)
+- [terraform-aws-modules/s3](https://registry.terraform.io/modules/terraform-aws-modules/s3-bucket/aws/latest)
+- [terraform-aws-modules/dynamodb](https://registry.terraform.io/modules/terraform-aws-modules/dynamodb-table/aws/latest)
 
 ```console
 cd terraform
@@ -304,7 +301,7 @@ Search images
 
 ## Original Sources
 
-Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Several of these are well-presented, and they provide additional instruction and explanetory theory that I've ommited, so you might want to give these a look.
+Much of the code in this repository was scaffolded from these examples that I found via Google and Youtube searches. Several of these are well-presented, and they provide additional instruction and explanetory theory that I've omitted, so you might want to give these a look.
 
 - [YouTube - Create your own Face Recognition Service with AWS Rekognition, by Tech Raj](https://www.youtube.com/watch?v=oHSesteFK5c)
 - [Personnel Recognition with AWS Rekognition — Part I](https://aws.plainenglish.io/personnel-recognition-with-aws-rekognition-part-i-c4530f9b3c74)

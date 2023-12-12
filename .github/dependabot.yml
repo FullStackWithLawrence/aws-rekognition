@@ -1,7 +1,41 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "lpm0073"
+    reviewers:
+      - "lpm0073"
   - package-ecosystem: terraform
     directory: "/terraform"
     schedule:
-      interval: daily
+      interval: weekly
     open-pull-requests-limit: 10
+    assignees:
+      - "lpm0073"
+    reviewers:
+      - "lpm0073"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "javascript"
+    assignees:
+      - "FullStackWithLawrence"
+    reviewers:
+      - "FullStackWithLawrence"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "python"
+    assignees:
+      - "lpm0073"
+    reviewers:
+      - "lpm0073"

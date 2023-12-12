@@ -1,4 +1,6 @@
-# ------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# pylint: disable=R0801,R0911,R0912,R0914,R0915,W0718
+"""
 # written by: Lawrence McDaniel
 #             https://lawrencemcdaniel.com/
 #
@@ -30,20 +32,25 @@
 #
 # GISTS:
 # - https://gist.github.com/alexcasalboni/0f21a1889f09760f8981b643326730ff
-# ------------------------------------------------------------------------------
-import sys, traceback  # libraries for error management
-import os  # library for interacting with the operating system
-import platform  # library to view informatoin about the server host this Lambda runs on
-import json  # library for interacting with JSON data https://www.json.org/json-en.html
+"""
+
 import base64  # library with base63 encoding/decoding functions
+import json  # library for interacting with JSON data https://www.json.org/json-en.html
+import os  # library for interacting with the operating system
+import platform  # library to view information about the server host this Lambda runs on
+import sys  # libraries for error management
+import traceback
+
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
-MAX_FACES = int(os.environ["MAX_FACES_COUNT"])
-THRESHOLD = float(os.environ["FACE_DETECT_THRESHOLD"])
-QUALITY_FILTER = os.environ["QUALITY_FILTER"]
-TABLE_ID = os.environ["TABLE_ID"]
-AWS_REGION = os.environ["REGION"]
+
 COLLECTION_ID = os.environ["COLLECTION_ID"]
+TABLE_ID = os.environ["TABLE_ID"]
+MAX_FACES = int(os.getenv("MAX_FACES_COUNT", "10"))
+FACE_DETECT_ATTRIBUTES = os.getenv("FACE_DETECT_ATTRIBUTES", "DEFAULT")
+QUALITY_FILTER = os.getenv("QUALITY_FILTER", "AUTO")
+THRESHOLD = float(os.environ["FACE_DETECT_THRESHOLD"])
+AWS_REGION = os.environ["AWS_REGION"]
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() in ("true", "1", "t")
 
 rekognition_client = boto3.client("rekognition", AWS_REGION)
@@ -52,7 +59,8 @@ dynamodb_client = boto3.resource("dynamodb")
 dynamodb_table = dynamodb_client.Table(TABLE_ID)
 
 
-def lambda_handler(event, context):
+# pylint: disable=unused-argument
+def lambda_handler(event, context):  # noqa: C901
     """
     Facial recognition image analysis and search for indexed faces. invoked by API Gateway.
     """
@@ -85,11 +93,7 @@ def lambda_handler(event, context):
         see https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
         """
         if status_code < 100 or status_code > 599:
-            raise ValueError(
-                "Invalid HTTP response code received: {status_code}".format(
-                    status_code=status_code
-                )
-            )
+            raise ValueError(f"Invalid HTTP response code received: {status_code}")
 
         if DEBUG_MODE:
             retval = {
@@ -176,7 +180,7 @@ def lambda_handler(event, context):
 
     # handle anything that went wrong
     # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
-    except rekognition_client.exceptions.InvalidParameterException as e:
+    except rekognition_client.exceptions.InvalidParameterException:
         # If no faces are detected in the image, then index_faces()
         # returns an InvalidParameterException error
         pass
@@ -186,33 +190,24 @@ def lambda_handler(event, context):
         rekognition_client.exceptions.ProvisionedThroughputExceededException,
         rekognition_client.exceptions.ServiceQuotaExceededException,
     ) as e:
-        return http_response_factory(
-            status_code=401, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=401, body=exception_response_factory(e))
 
     except rekognition_client.exceptions.AccessDeniedException as e:
-        return http_response_factory(
-            status_code=403, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=403, body=exception_response_factory(e))
 
     except rekognition_client.exceptions.ResourceNotFoundException as e:
-        return http_response_factory(
-            status_code=404, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=404, body=exception_response_factory(e))
 
     except (
         rekognition_client.exceptions.InvalidS3ObjectException,
         rekognition_client.exceptions.ImageTooLargeException,
         rekognition_client.exceptions.InvalidImageFormatException,
     ) as e:
-        return http_response_factory(
-            status_code=406, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=406, body=exception_response_factory(e))
 
+    # pylint: disable=broad-except
     except (rekognition_client.exceptions.InternalServerError, Exception) as e:
-        return http_response_factory(
-            status_code=500, body=exception_response_factory(e)
-        )
+        return http_response_factory(status_code=500, body=exception_response_factory(e))
 
     # success!! return the results
     retval = {
