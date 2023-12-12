@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=R0801,R0911,R0912,R0914,R0915,W0718
+# pylint: disable=R0911,R0912,W0718,R0801
 """
 # written by: Lawrence McDaniel
 #             https://lawrencemcdaniel.com/
