@@ -7,7 +7,7 @@ import logging
 # python stuff
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
-from typing import List
+from typing import ClassVar, List
 
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
@@ -19,14 +19,18 @@ from .exceptions import RekognitionConfigurationError, RekognitionValueError
 
 # Default values
 # -----------------------------------------------------------------------------
-DEFAULT_AWS_REGION = "us-east-1"
-DEFAULT_DEBUG_MODE = False
-DEFAULT_TABLE_ID = "facialrecognition"
-DEFAULT_COLLECTION_ID = DEFAULT_TABLE_ID + "-collection"
-DEFAULT_FACE_DETECT_MAX_FACES_COUNT = 10
-DEFAULT_FACE_DETECT_THRESHOLD = 10
-DEFAULT_FACE_DETECT_ATTRIBUTES = "DEFAULT"
-DEFAULT_FACE_DETECT_QUALITY_FILTER = "AUTO"
+class SettingsDefaults:
+    """Default values for Settings"""
+
+    AWS_REGION = "us-east-1"
+    DEBUG_MODE = False
+    TABLE_ID = "facialrecognition"
+    COLLECTION_ID = TABLE_ID + "-collection"
+    FACE_DETECT_MAX_FACES_COUNT = 10
+    FACE_DETECT_THRESHOLD = 10
+    FACE_DETECT_ATTRIBUTES = "DEFAULT"
+    FACE_DETECT_QUALITY_FILTER = "AUTO"
+
 
 ec2 = boto3.Session().client("ec2")
 regions = ec2.describe_regions()
@@ -36,27 +40,29 @@ AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
 class Settings(BaseModel):
     """Settings for Lambda functions"""
 
-    debug_mode: bool = Field(DEFAULT_DEBUG_MODE, env="DEBUG_MODE")
+    debug_mode: bool = Field(SettingsDefaults.DEBUG_MODE, env="DEBUG_MODE")
     aws_regions: List[str] = Field(AWS_REGIONS, description="The list of AWS regions")
-    aws_region: str = Field(DEFAULT_AWS_REGION, env="AWS_REGION")
-    table_id: str = Field(DEFAULT_TABLE_ID, env="TABLE_ID")
-    collection_id: str = Field(DEFAULT_COLLECTION_ID, env="COLLECTION_ID")
+    aws_region: str = Field(SettingsDefaults.AWS_REGION, env="AWS_REGION")
+    table_id: str = Field(SettingsDefaults.TABLE_ID, env="TABLE_ID")
+    collection_id: str = Field(SettingsDefaults.COLLECTION_ID, env="COLLECTION_ID")
 
     face_detect_max_faces_count: int = Field(
-        DEFAULT_FACE_DETECT_MAX_FACES_COUNT, gt=0, env="FACE_DETECT_MAX_FACES_COUNT"
+        SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT, gt=0, env="FACE_DETECT_MAX_FACES_COUNT"
     )
-    face_detect_attributes: str = Field(DEFAULT_FACE_DETECT_ATTRIBUTES, env="FACE_DETECT_ATTRIBUTES")
-    face_detect_quality_filter: str = Field(DEFAULT_FACE_DETECT_QUALITY_FILTER, env="FACE_DETECT_QUALITY_FILTER")
-    face_detect_threshold: int = Field(DEFAULT_FACE_DETECT_THRESHOLD, gt=0, env="FACE_DETECT_THRESHOLD")
+    face_detect_attributes: str = Field(SettingsDefaults.FACE_DETECT_ATTRIBUTES, env="FACE_DETECT_ATTRIBUTES")
+    face_detect_quality_filter: str = Field(
+        SettingsDefaults.FACE_DETECT_QUALITY_FILTER, env="FACE_DETECT_QUALITY_FILTER"
+    )
+    face_detect_threshold: int = Field(SettingsDefaults.FACE_DETECT_THRESHOLD, gt=0, env="FACE_DETECT_THRESHOLD")
 
     # unvalidated settings
-    s3_client = boto3.resource("s3")
-    dynamodb_client = boto3.resource("dynamodb")
-    dynamodb_table = dynamodb_client.Table(table_id)
-    rekognition_client = boto3.client("rekognition")
+    s3_client: ClassVar = boto3.resource("s3")
+    dynamodb_client: ClassVar = boto3.resource("dynamodb")
+    dynamodb_table: ClassVar = dynamodb_client.Table(table_id)
+    rekognition_client: ClassVar = boto3.client("rekognition")
 
     # use the boto3 library to initialize clients for the AWS services which we'll interact
-    cloudwatch_dump = {
+    cloudwatch_dump: ClassVar = {
         "environment": {
             "os": os.name,
             "system": platform.system(),
@@ -74,7 +80,7 @@ class Settings(BaseModel):
     class Config:
         """Pydantic configuration"""
 
-        allow_mutation = False
+        frozen = True
 
     @validator("aws_region")
     # pylint: disable=no-self-argument,unused-argument

@@ -83,7 +83,7 @@ clean:
 # Run Python unit tests
 # -------------------------------------------------------------------------
 test:
-	python -m unittest discover -s terraform/python/tests/
+	python -m unittest discover -s terraform/python/rekognition_api/tests/
 
 # -------------------------------------------------------------------------
 # Force a new semantic release to be created in GitHub
