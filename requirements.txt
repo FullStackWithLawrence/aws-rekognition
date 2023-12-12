@@ -19,4 +19,5 @@ codespell==2.2.6
 
 # project dependencies
 # ------------
+pydantic==2.5.2
 boto3==1.33.12
