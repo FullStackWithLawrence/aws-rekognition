@@ -36,7 +36,10 @@ analyze:
 # -------------------------------------------------------------------------
 init:
 	make clean && \
-	npm install && npm init @eslint/config && \
+	npm install eslint --save-dev && \
+	npm install eslint-plugin-import --save-dev && \
+	npm install eslint-config-google --save-dev && \
+	npm install && \
 	python3.11 -m venv venv && \
 	$(ACTIVATE_VENV) && \
 	pip install --upgrade pip && \
