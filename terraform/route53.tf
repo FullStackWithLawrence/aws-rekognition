@@ -11,7 +11,7 @@
 #------------------------------------------------------------------------------
 
 # see https://registry.terraform.io/providers/-/aws/4.51.0/docs/resources/api_gateway_domain_name
-# resource "aws_api_gateway_domain_name" "facialrecognition" {
+# resource "aws_api_gateway_domain_name" "rekognition" {
 #   domain_name     = local.api_gateway_subdomain
 #   certificate_arn = module.acm.acm_certificate_arn
 #   tags            = var.tags
@@ -23,8 +23,8 @@
 #   type    = "A"
 
 #   alias {
-#     name                   = aws_api_gateway_domain_name.facialrecognition.cloudfront_domain_name
-#     zone_id                = aws_api_gateway_domain_name.facialrecognition.cloudfront_zone_id
+#     name                   = aws_api_gateway_domain_name.rekognition.cloudfront_domain_name
+#     zone_id                = aws_api_gateway_domain_name.rekognition.cloudfront_zone_id
 #     evaluate_target_health = false
 #   }
 # }

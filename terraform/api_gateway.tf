@@ -16,6 +16,10 @@ locals {
   api_name                 = "${var.shared_resource_identifier}-api"
   apigateway_iam_role_name = "${var.shared_resource_identifier}-apigateway"
   iam_role_policy_name     = "${var.shared_resource_identifier}-apigateway"
+  iam_policy_apigateway = templatefile("${path.module}/json/iam_policy_apigateway.json.tpl", {
+    aws_account_id = data.aws_caller_identity.current.account_id
+    bucket_name    = module.s3_bucket.s3_bucket_id
+  })
 }
 
 # WARNING: You need a pre-existing Route53 Hosted Zone
@@ -32,7 +36,7 @@ data "aws_caller_identity" "current" {}
 ###############################################################################
 
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_rest_api
-resource "aws_api_gateway_rest_api" "facialrecognition" {
+resource "aws_api_gateway_rest_api" "rekognition" {
   name        = local.api_name
   description = "Facial recognition micro service"
 
@@ -48,21 +52,21 @@ resource "aws_api_gateway_rest_api" "facialrecognition" {
   }
   tags = var.tags
 }
-resource "aws_api_gateway_api_key" "facialrecognition" {
+resource "aws_api_gateway_api_key" "rekognition" {
   name = var.shared_resource_identifier
   tags = var.tags
 }
 
 
-resource "aws_api_gateway_deployment" "facialrecognition" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+resource "aws_api_gateway_deployment" "rekognition" {
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   depends_on = [
     aws_api_gateway_integration.index_put,
     aws_api_gateway_integration.search
   ]
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.facialrecognition.body,
+      aws_api_gateway_rest_api.rekognition.body,
       aws_api_gateway_integration.index_put.id,
       aws_api_gateway_integration.search.id
     ]))
@@ -72,17 +76,17 @@ resource "aws_api_gateway_deployment" "facialrecognition" {
   }
 }
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_stage
-resource "aws_api_gateway_stage" "facialrecognition" {
-  deployment_id      = aws_api_gateway_deployment.facialrecognition.id
+resource "aws_api_gateway_stage" "rekognition" {
+  deployment_id      = aws_api_gateway_deployment.rekognition.id
   cache_cluster_size = "0.5"
-  rest_api_id        = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id        = aws_api_gateway_rest_api.rekognition.id
   stage_name         = var.stage
   tags               = var.tags
 }
 
-resource "aws_api_gateway_method_settings" "facialrecognition" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
-  stage_name  = aws_api_gateway_stage.facialrecognition.stage_name
+resource "aws_api_gateway_method_settings" "rekognition" {
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
+  stage_name  = aws_api_gateway_stage.rekognition.stage_name
   method_path = "*/*"
 
   settings {
@@ -93,12 +97,12 @@ resource "aws_api_gateway_method_settings" "facialrecognition" {
     throttling_rate_limit  = var.throttle_settings_rate_limit
   }
 }
-resource "aws_api_gateway_usage_plan" "facialrecognition" {
+resource "aws_api_gateway_usage_plan" "rekognition" {
   name        = var.shared_resource_identifier
   description = "Default usage plan"
   api_stages {
-    api_id = aws_api_gateway_rest_api.facialrecognition.id
-    stage  = aws_api_gateway_stage.facialrecognition.stage_name
+    api_id = aws_api_gateway_rest_api.rekognition.id
+    stage  = aws_api_gateway_stage.rekognition.stage_name
   }
   quota_settings {
     limit  = var.quota_settings_limit
@@ -111,10 +115,10 @@ resource "aws_api_gateway_usage_plan" "facialrecognition" {
   }
   tags = var.tags
 }
-resource "aws_api_gateway_usage_plan_key" "facialrecognition" {
-  key_id        = aws_api_gateway_api_key.facialrecognition.id
+resource "aws_api_gateway_usage_plan_key" "rekognition" {
+  key_id        = aws_api_gateway_api_key.rekognition.id
   key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.facialrecognition.id
+  usage_plan_id = aws_api_gateway_usage_plan.rekognition.id
 }
 
 
@@ -131,16 +135,10 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_apigateway" {
   role       = aws_iam_role.apigateway.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
-data "template_file" "iam_policy_apigateway" {
-  template = file("${path.module}/json/iam_policy_apigateway.json.tpl")
-  vars = {
-    aws_account_id = var.aws_account_id
-    bucket_name    = module.s3_bucket.s3_bucket_id
-  }
-}
+
 
 resource "aws_iam_role_policy" "iam_policy_apigateway" {
   name   = local.iam_role_policy_name
   role   = aws_iam_role.apigateway.id
-  policy = data.template_file.iam_policy_apigateway.rendered
+  policy = local.iam_policy_apigateway
 }

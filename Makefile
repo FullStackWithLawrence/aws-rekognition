@@ -11,6 +11,9 @@ else
     ACTIVATE_VENV = source venv/bin/activate
 endif
 
+# Default target executed when no arguments are given to make.
+all: help
+
 env:
 	ifneq ("$(wildcard .env)","")
 		include .env
@@ -19,14 +22,11 @@ env:
 		$(shell echo -e "FACE_DETECT_THRESHOLD=10" >> .env)
 		$(shell echo -e "FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
 		$(shell echo -e "FACE_DETECT_QUALITY_FILTER=AUTO" >> .env)
-		$(shell echo -e "TABLE_ID=facialrecognition" >> .env)
+		$(shell echo -e "TABLE_ID=rekognition" >> .env)
 		$(shell echo -e "AWS_REGION=us-east-1" >> .env)
-		$(shell echo -e "COLLECTION_ID=facialrecognition-collection" >> .env)
+		$(shell echo -e "COLLECTION_ID=rekognition-collection" >> .env)
 		$(shell echo -e "DEBUG_MODE=False" >> .env)
 	endif
-
-# Default target executed when no arguments are given to make.
-all: help
 
 analyze:
 	cloc . --exclude-ext=svg,json,zip --vcs=git
@@ -99,7 +99,8 @@ update:
 	make init
 
 build:
-	@echo "Not implemented"
+	cd terraform && \
+	terraform init
 
 # -------------------------------------------------------------------------
 # Generate help menu

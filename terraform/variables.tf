@@ -40,7 +40,7 @@ variable "root_domain" {
 variable "shared_resource_identifier" {
   description = "A common identifier/prefix for resources created for this demo"
   type        = string
-  default     = "facialrecognition"
+  default     = "rekognition"
 }
 
 variable "stage" {

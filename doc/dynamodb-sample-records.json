@@ -32,7 +32,7 @@
       "S": "f293e331-9b5e-3447-9bde-c5b0eb179bab"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Lawrence3.jpg"
@@ -71,7 +71,7 @@
       "S": "fb881647-55e3-3471-affc-1c496c78a830"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Justin-Trudeau-Barack-Obama-Lawrence.jpg"
@@ -110,7 +110,7 @@
       "S": "73cdbe47-ba9f-3b65-bdc9-cb66fae8553b"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Mike.jpg"
@@ -149,7 +149,7 @@
       "S": "30dca1a3-309c-3c2e-bd52-94dcc53d4981"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Lawrence.jpg"
@@ -188,7 +188,7 @@
       "S": "708b44a6-bd78-3071-a7b2-c3b2566d6aab"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Lawrence19.jpg"
@@ -227,7 +227,7 @@
       "S": "323819a1-35fb-3a0a-92a3-c7d1a646a4f4"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Mike-Meyers.jpg"
@@ -266,7 +266,7 @@
       "S": "a6b91e44-7444-3116-9925-6678969ef8cd"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "smiling-lady.jpg"
@@ -305,7 +305,7 @@
       "S": "fb881647-55e3-3471-affc-1c496c78a830"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Justin-Trudeau-Barack-Obama-Lawrence.jpg"
@@ -344,7 +344,7 @@
       "S": "73cdbe47-ba9f-3b65-bdc9-cb66fae8553b"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Mike.jpg"
@@ -383,7 +383,7 @@
       "S": "339ebed9-cc36-3c36-9418-c5cd0a741181"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Justin-Trudeau-Barack-Obama.jpg"
@@ -422,7 +422,7 @@
       "S": "30dca1a3-309c-3c2e-bd52-94dcc53d4981"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Lawrence.jpg"
@@ -461,7 +461,7 @@
       "S": "30dca1a3-309c-3c2e-bd52-94dcc53d4981"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Lawrence.jpg"
@@ -500,7 +500,7 @@
       "S": "339ebed9-cc36-3c36-9418-c5cd0a741181"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Justin-Trudeau-Barack-Obama.jpg"
@@ -539,7 +539,7 @@
       "S": "d1d0410d-01b8-322a-b79b-974b70eae5a5"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Lawrence4.jpg"
@@ -578,7 +578,7 @@
       "S": "a6b91e44-7444-3116-9925-6678969ef8cd"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "smiling-lady.jpg"
@@ -617,7 +617,7 @@
       "S": "a47b3040-b530-3366-a4af-978e0ba9511d"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Reeves.jpg"
@@ -656,7 +656,7 @@
       "S": "8d44141e-cfce-3f8a-b5b5-c11db1a67fb3"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Lawrence2.jpg"
@@ -695,7 +695,7 @@
       "S": "504b1852-6134-367f-b0a7-4517f03ec4c8"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Avril-Lavigne.jpg"
@@ -734,7 +734,7 @@
       "S": "fb881647-55e3-3471-affc-1c496c78a830"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Justin-Trudeau-Barack-Obama-Lawrence.jpg"
@@ -773,7 +773,7 @@
       "S": "9beb247e-29f8-3f15-ad84-5cde8665dbba"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Jim-Carrey.jpg"
@@ -812,7 +812,7 @@
       "S": "73cdbe47-ba9f-3b65-bdc9-cb66fae8553b"
     },
     "bucket": {
-      "S": "090511222473-facialrecognition-3abd44992e4547989178b7f539837125"
+      "S": "090511222473-rekognition-3abd44992e4547989178b7f539837125"
     },
     "key": {
       "S": "Keanu-Avril-Mike.jpg"

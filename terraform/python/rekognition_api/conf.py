@@ -31,7 +31,7 @@ class SettingsDefaults:
 
     AWS_REGION = "us-east-1"
     DEBUG_MODE = False
-    TABLE_ID = "facialrecognition"
+    TABLE_ID = "rekognition"
     COLLECTION_ID = TABLE_ID + "-collection"
     FACE_DETECT_MAX_FACES_COUNT = 10
     FACE_DETECT_THRESHOLD = 10
