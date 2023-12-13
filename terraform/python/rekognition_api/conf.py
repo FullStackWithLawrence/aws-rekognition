@@ -21,7 +21,10 @@ from pydantic import Field, ValidationError, validator
 from pydantic_settings import BaseSettings
 
 # our stuff
-from .exceptions import RekognitionConfigurationError, RekognitionValueError
+from rekognition_api.exceptions import (
+    RekognitionConfigurationError,
+    RekognitionValueError,
+)
 
 
 # Default values

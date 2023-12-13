@@ -8,7 +8,7 @@
 #         for an image uploaded using the REST API endpoint.
 #------------------------------------------------------------------------------
 locals {
-  index_function_name = "${var.shared_resource_identifier}-index"
+  index_function_name = "${var.shared_resource_identifier}_api"
 }
 
 resource "aws_lambda_function" "index" {
@@ -21,7 +21,7 @@ resource "aws_lambda_function" "index" {
   runtime          = var.lambda_python_runtime
   memory_size      = var.lambda_memory_size
   timeout          = var.lambda_timeout
-  handler          = "lambda_index.lambda_handler"
+  handler          = "rekognition_api.lambda_index.lambda_handler"
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256
   tags             = var.tags

@@ -4,7 +4,7 @@ import json
 import sys
 import traceback
 
-from .conf import settings
+from rekognition_api.conf import settings
 
 
 def http_response_factory(status_code: int, body: json) -> json:
