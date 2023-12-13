@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=wrong-import-position
 """Simple test bank."""
+
+# python stuff
 import os
 import sys
 import unittest
+from unittest.mock import patch
 
+# 3rd party stuff
 from dotenv import load_dotenv
+from pydantic_core import ValidationError as PydanticValidationError
 
 
 PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 sys.path.append(PYTHON_ROOT)  # noqa: E402
 
+# our stuff
 from rekognition_api.conf import Settings, SettingsDefaults  # noqa: E402
+from rekognition_api.exceptions import RekognitionValueError  # noqa: E402
 
 
 class TestConfiguration(unittest.TestCase):
@@ -27,7 +34,7 @@ class TestConfiguration(unittest.TestCase):
         """Return the path to the .env file."""
         return os.path.join(self.here, filename)
 
-    def test_defaults(self):
+    def test_conf_defaults(self):
         """Test that settings == SettingsDefaults when no .env is in use."""
         os.environ.clear()
         mock_settings = Settings()
@@ -74,3 +81,24 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.face_detect_quality_filter, "TEST_AUTO")
         self.assertEqual(mock_settings.face_detect_threshold, 100)
         self.assertEqual(mock_settings.debug_mode, True)
+
+    @patch.dict(os.environ, {"AWS_REGION": "invalid-region"})
+    def test_invalid_aws_region_code(self):
+        """Test that Pydantic raises a validation error for environment variable with non-existent aws region code."""
+
+        with self.assertRaises(RekognitionValueError):
+            Settings()
+
+    @patch.dict(os.environ, {"FACE_DETECT_MAX_FACES_COUNT": "-1"})
+    def test_invalid_max_faces_count(self):
+        """Test that Pydantic raises a validation error for environment variable w negative integer values."""
+
+        with self.assertRaises(PydanticValidationError):
+            Settings()
+
+    @patch.dict(os.environ, {"FACE_DETECT_THRESHOLD": "-1"})
+    def test_invalid_threshold(self):
+        """Test that Pydantic raises a validation error for environment variable w negative integer values."""
+
+        with self.assertRaises(PydanticValidationError):
+            Settings()
