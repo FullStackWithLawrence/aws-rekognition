@@ -34,3 +34,11 @@ class RekognitionValueError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+
+class RekognitionIlligalInvocationError(Exception):
+    """Exception raised when the service is called by an unknown service."""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
