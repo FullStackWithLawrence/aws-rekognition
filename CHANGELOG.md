@@ -1,3 +1,14 @@
+## [0.1.2](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.1.1...v0.1.2) (2023-12-13)
+
+
+### Bug Fixes
+
+* add tests for .env file handling in conf.py ([b9eac51](https://github.com/FullStackWithLawrence/aws-rekognition/commit/b9eac5196683fc875941eca58a844d126b0ec51e))
+* add unit test to configure Settings with constructor ([f818fe5](https://github.com/FullStackWithLawrence/aws-rekognition/commit/f818fe54d7f273faea3458014d6bf3c80556d468))
+* add unit tests for read-only and negative attributes ([9c840a1](https://github.com/FullStackWithLawrence/aws-rekognition/commit/9c840a1a767081947cab1308cd29bfcfdaf46c02))
+* add unit tests of pydantic range checking ([f9ec717](https://github.com/FullStackWithLawrence/aws-rekognition/commit/f9ec717af6b93b3fc1ddce51ed4b2dd9e8c33f4c))
+* scaffold lambda test banks ([fe40ea2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/fe40ea27ec59ff8cb137bbedc9d427222f2dbe11))
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
