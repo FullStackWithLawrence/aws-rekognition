@@ -54,7 +54,7 @@ Indexed images are persisted to S3, essantially as an archive as well as for fut
 
 This solution passes large image files around to and from various large opaque backend services. Take note that using Postman to transport these image files from your local computer to AWS requires that we first [base64-encode](https://en.wikipedia.org/wiki/Base64) the file. Base64 encoding schemes are commonly used to encode binary data, like image files, for storage or transfer over media that can only deal with ASCII text.
 
-This repo includes a utility script [base64encode.sh](./base64encode.sh) that you can use to encode your test images prior to uploading these with Postman.
+This repo includes a utility script [base64encode.sh](../base64encode.sh) that you can use to encode your test images prior to uploading these with Postman.
 
 ## Original Sources
 
