@@ -41,7 +41,7 @@ resource "aws_lambda_function" "index" {
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_index" {
   type        = "zip"
-  source_file = "${path.module}/python/lambda_index.py"
+  source_dir  = "${path.module}/python/rekognition_api/"
   output_path = "${path.module}/python/lambda_index_payload.zip"
 }
 

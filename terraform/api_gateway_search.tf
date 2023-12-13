@@ -12,11 +12,11 @@
 ###############################################################################
 resource "aws_api_gateway_resource" "search" {
   path_part   = "search"
-  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  parent_id   = aws_api_gateway_rest_api.rekognition.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
 }
 resource "aws_api_gateway_method" "search" {
-  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id      = aws_api_gateway_rest_api.rekognition.id
   resource_id      = aws_api_gateway_resource.search.id
   http_method      = "ANY"
   authorization    = "NONE"
@@ -24,7 +24,7 @@ resource "aws_api_gateway_method" "search" {
 }
 
 resource "aws_api_gateway_integration" "search" {
-  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id             = aws_api_gateway_rest_api.rekognition.id
   resource_id             = aws_api_gateway_resource.search.id
   http_method             = aws_api_gateway_method.search.http_method
   integration_http_method = "POST"
@@ -38,12 +38,12 @@ resource "aws_lambda_permission" "search" {
   principal     = "apigateway.amazonaws.com"
 
   # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
-  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.facialrecognition.id}/*/${aws_api_gateway_method.search.http_method}${aws_api_gateway_resource.search.path}"
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.rekognition.id}/*/${aws_api_gateway_method.search.http_method}${aws_api_gateway_resource.search.path}"
 
 }
 
 resource "aws_api_gateway_method_response" "search_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   resource_id = aws_api_gateway_resource.search.id
   http_method = aws_api_gateway_method.search.http_method
   status_code = "200"
