@@ -78,7 +78,7 @@ terraform apply
 
 ## Documentation
 
-Please see this [detailed technical summary](./doc/REKOGNITION.md) of the architecture strategy for this solution.
+Please see this [detailed technical summary](./doc/README.md) of the architecture strategy for this solution.
 
 ## Examples of Code Management Best Practices
 
