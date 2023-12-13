@@ -72,7 +72,7 @@ terraform apply
 - [AWS account](https://aws.amazon.com/)
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Terraform](https://www.terraform.io/).
-  _If you're new to Terraform then see [Getting Started With AWS and Terraform](./doc/terraform-getting-started.md)_
+  _If you're new to Terraform then see [Getting Started With AWS and Terraform](./doc/TERRAFORM.md)_
 - [Python 3.11](https://www.python.org/downloads/): for creating virtual environment used for building AWS Lambda Layer, and locally by pre-commit linters and code formatters.
 - [NodeJS](https://nodejs.org/en/download): used with NPM for local ReactJS developer environment, and for configuring/testing Semantic Release.
 
@@ -82,7 +82,7 @@ Please see this [detailed technical summary](./doc/REKOGNITION.md) of the archit
 
 ## Examples of Code Management Best Practices
 
-This microservice fully conforms to [12-Factor methodology](./doc/Twelve_Factor_Methodology.md). Moreover, this repo is used as an instrutional tool as well as by multiple videos in my [YouTube Channel](https://youtube.com/@FullStackWithLawrence), including various tutorials about good coding practices and good code management. Of note:
+This microservice fully conforms to [12-Factor methodology](./doc/Twelve_Factor_Methodology.md). Moreover, this repo is used as an instrutional tool for university courses as well as by multiple videos in my [YouTube Channel](https://youtube.com/@FullStackWithLawrence), including various tutorials about good coding practices and good code management. Of note:
 
 ### Automations
 
