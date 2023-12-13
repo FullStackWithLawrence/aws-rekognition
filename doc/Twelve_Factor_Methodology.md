@@ -1,6 +1,6 @@
 # 12-Factor Methodology
 
-This project conforms to [12-factor methodology](https://12factor.net/). We want to make this project more accessible to students and learners as an instructional tool while not adding undue code review workloads to anyone with merge authority for this project. To this end we've added several pre-commit code linting and code style tools as well as a quasi-standardized set of GitHub Actions CI/CD automations that manage pull requests and semantic releases.
+This project conforms to [12-factor methodology](https://12factor.net/). The 12-Factor methodology is a set of best practices for building modern, scalable, maintainable software-as-a-service apps. These principles were first presented by engineers at Heroku, a cloud platform as a service (PaaS) company. Following are the salient points of how this project adopts these best practices.
 
 - 1. **Codebase**: [✅] One codebase tracked in revision control, many deploys
 - 2. **Dependencies**: [✅] Explicitly declare and isolate dependencies. We're using Terraform's built-in package lock, Python's requirements.txt, and Node's package.json to declare dependencies.
