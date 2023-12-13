@@ -33,7 +33,7 @@ resource "aws_route53_record" "api" {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "~> 4.3"
+  version = "~> 5.0"
 
   # un-comment this if you choose a region other than us-east-1
   # providers = {
