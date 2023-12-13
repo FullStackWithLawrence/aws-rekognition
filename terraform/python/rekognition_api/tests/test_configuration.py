@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=wrong-import-position
-"""Simple test bank."""
+"""Test configuration Settings class."""
 
 # python stuff
 import os
@@ -22,7 +22,7 @@ from rekognition_api.exceptions import RekognitionValueError  # noqa: E402
 
 
 class TestConfiguration(unittest.TestCase):
-    """Test configuration.""" ""
+    """Test configuration."""
 
     # Get the directory of the current script
     here = os.path.dirname(os.path.abspath(__file__))
@@ -162,3 +162,37 @@ class TestConfiguration(unittest.TestCase):
 
         with self.assertRaises(PydanticValidationError):
             mock_settings.face_detect_threshold = 25
+
+    def test_cloudwatch_dump(self):
+        """Test that cloudwatch_dump is a dict."""
+
+        mock_settings = Settings()
+        self.assertIsInstance(mock_settings.cloudwatch_dump, dict)
+
+    def test_cloudwatch_dump_keys(self):
+        """Test that cloudwatch_dump contains the expected keys."""
+
+        environment = Settings().cloudwatch_dump["environment"]
+        self.assertIn("os", environment)
+        self.assertIn("system", environment)
+        self.assertIn("release", environment)
+        self.assertIn("boto3", environment)
+        self.assertIn("COLLECTION_ID", environment)
+        self.assertIn("TABLE_ID", environment)
+        self.assertIn("MAX_FACES", environment)
+        self.assertIn("FACE_DETECT_ATTRIBUTES", environment)
+        self.assertIn("QUALITY_FILTER", environment)
+        self.assertIn("DEBUG_MODE", environment)
+
+    def test_cloudwatch_values(self):
+        """Test that cloudwatch_dump contains the expected values."""
+
+        mock_settings = Settings()
+        environment = mock_settings.cloudwatch_dump["environment"]
+
+        self.assertEqual(environment["COLLECTION_ID"], mock_settings.collection_id)
+        self.assertEqual(environment["TABLE_ID"], mock_settings.table_id)
+        self.assertEqual(environment["MAX_FACES"], mock_settings.face_detect_max_faces_count)
+        self.assertEqual(environment["FACE_DETECT_ATTRIBUTES"], mock_settings.face_detect_attributes)
+        self.assertEqual(environment["QUALITY_FILTER"], mock_settings.face_detect_quality_filter)
+        self.assertEqual(environment["DEBUG_MODE"], mock_settings.debug_mode)

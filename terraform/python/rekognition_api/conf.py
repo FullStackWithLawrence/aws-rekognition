@@ -114,20 +114,23 @@ class Settings(BaseSettings):
     rekognition_client: ClassVar = boto3.client("rekognition")
 
     # use the boto3 library to initialize clients for the AWS services which we'll interact
-    cloudwatch_dump: ClassVar = {
-        "environment": {
-            "os": os.name,
-            "system": platform.system(),
-            "release": platform.release(),
-            "boto3": boto3.__version__,
-            "COLLECTION_ID": collection_id,
-            "TABLE_ID": table_id,
-            "MAX_FACES": face_detect_max_faces_count,
-            "FACE_DETECT_ATTRIBUTES": face_detect_attributes,
-            "QUALITY_FILTER": face_detect_quality_filter,
-            "DEBUG_MODE": debug_mode,
+    @property
+    def cloudwatch_dump(self):
+        """Dump settings to CloudWatch"""
+        return {
+            "environment": {
+                "os": os.name,
+                "system": platform.system(),
+                "release": platform.release(),
+                "boto3": boto3.__version__,
+                "COLLECTION_ID": self.collection_id,
+                "TABLE_ID": self.table_id,
+                "MAX_FACES": self.face_detect_max_faces_count,
+                "FACE_DETECT_ATTRIBUTES": self.face_detect_attributes,
+                "QUALITY_FILTER": self.face_detect_quality_filter,
+                "DEBUG_MODE": self.debug_mode,
+            }
         }
-    }
 
     class Config:
         """Pydantic configuration"""
