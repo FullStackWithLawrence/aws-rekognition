@@ -22,14 +22,6 @@ runs:
       id: checkout
       uses: actions/checkout@v4
 
-    - name: Cache Python dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -39,6 +31,14 @@ runs:
       shell: bash
       run: |
         echo "SITE_PACKAGES_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')" >> $GITHUB_ENV
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip
 
     - name: Install pip
       shell: bash
