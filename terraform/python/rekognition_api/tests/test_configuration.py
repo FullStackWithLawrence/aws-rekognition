@@ -125,3 +125,40 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.face_detect_quality_filter, "TEST_AUTO")
         self.assertEqual(mock_settings.face_detect_threshold, 102)
         self.assertEqual(mock_settings.debug_mode, True)
+
+    def test_configure_neg_int_with_class_constructor(self):
+        """test that we cannot set negative int values with the class constructor"""
+
+        with self.assertRaises(PydanticValidationError):
+            Settings(face_detect_max_faces_count=-1)
+
+        with self.assertRaises(PydanticValidationError):
+            Settings(face_detect_threshold=-1)
+
+    def test_readonly_settings(self):
+        """test that we can't set readonly values with the class constructor"""
+
+        mock_settings = Settings(aws_region="eu-west-1")
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.aws_region = "us-west-1"
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.table_id = "TEST_facialrecognition"
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.collection_id = "TEST_facialrecognition-collection"
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.face_detect_attributes = "TEST_DEFAULT"
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.face_detect_quality_filter = "TEST_AUTO"
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.debug_mode = True
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.face_detect_max_faces_count = 25
+
+        with self.assertRaises(PydanticValidationError):
+            mock_settings.face_detect_threshold = 25
