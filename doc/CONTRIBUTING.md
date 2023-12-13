@@ -65,7 +65,7 @@ Note that this project leverages Dependabot for managing version numbers of all 
 
 ```console
 git pull
-cd api/terraform
+cd terraform
 terraform init
 terraform plan
 terraform apply
