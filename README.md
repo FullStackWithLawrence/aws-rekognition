@@ -17,6 +17,11 @@ A facial recognition microservice built with AWS API Gateway, S3 and Python Lamb
 
 ## Usage
 
+1. Upload images that contain faces, and this microservice will index and database the facial recognition data in a fast, lightweight, searchable format.
+2. Search for facial matches by uploading images to domain.com. Results are returns in JSON format.
+
+## Quickstart Setup
+
 1. Configure Terraform for your AWS account. Set these three values in [terraform.tfvars](./terraform/terraform.tfvars):
 
 ```terraform
