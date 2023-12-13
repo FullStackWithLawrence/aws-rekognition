@@ -4,7 +4,7 @@ This microservice fully conforms to [12-Factor methodology](./doc/Twelve_Factor_
 
 ## Automations
 
-We leverage automations using Github Actions, third party services, make, bash and anything else that might become freely available to the project in future. As a community-supported code project, automations are important for minimizing the effort required by our committers to keep this code shippable. But it's also an important component of our strategy for maintaining high quality standards. Automations give us the ability to more work, more consistently, and with less effort.
+We leverage automations using Github Actions, third party services, make, bash and anything else that might become freely available to the project in future. As a community-supported code project, automations are important for minimizing the effort required by our committers to keep this code shippable. But it's also an important component of our strategy for maintaining high quality standards. Automations give us the ability to do more work, more consistently, and with less effort.
 
 Of note:
 
