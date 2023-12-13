@@ -2,7 +2,7 @@
 
 As of Sep-2023 AWS has introduced a large and still-growing [list of AI/ML services](https://aws.amazon.com/getting-started/decision-guides/machine-learning-on-aws-how-to-choose/) that seamlessly interoperate with other infrastructure and services in the AWS ecosystem. This solution is based fundamentally on AWS Rekognition, one of AWS' two vision services.
 
-![AWS ML Stack](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/aws-ml-stack.png "AWS ML Stack")
+![AWS ML Stack](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/aws-ml-stack.png "AWS ML Stack")
 
 Additionally, this solution leverages the following AWS serverless services:
 
@@ -18,15 +18,15 @@ Additionally, this solution leverages the following AWS serverless services:
 
 ## Facial Recognition Index Workflow
 
-Deploys a URL endpoint for uploading an Image file to S3. S3 is configured to invoke a Lambda function on 'put' events. The Lambda function sends the image file to Rekognition, which will analyze the contents for any facial features found, returning a [JSON file of this format](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/rekognition_index_faces.json). Individual facial features are persistened in DynamoDB, and are searchable by Rekognition 'faceprint'.
+Deploys a URL endpoint for uploading an Image file to S3. S3 is configured to invoke a Lambda function on 'put' events. The Lambda function sends the image file to Rekognition, which will analyze the contents for any facial features found, returning a [JSON file of this format](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/rekognition_index_faces.json). Individual facial features are persistened in DynamoDB, and are searchable by Rekognition 'faceprint'.
 
-![Facial Recognition Index Workflow](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/diagram-index.png "Facial Recognition Index Workflow")
+![Facial Recognition Index Workflow](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/diagram-index.png "Facial Recognition Index Workflow")
 
 ## Facial Recognition Search Workflow
 
-Deploys a URL endpoint for uploading an image file to be analyzed by Rekognition. The 'faceprint' of the dominant face in the image is searched against all indexed faces in DynamoDB. Usually, this will be the largest face in the image, but the algorithm also considers other factors, including facial angle to the camera. Returns a [JSON file of this format](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/rekogition_search_faces_by_image.json).
+Deploys a URL endpoint for uploading an image file to be analyzed by Rekognition. The 'faceprint' of the dominant face in the image is searched against all indexed faces in DynamoDB. Usually, this will be the largest face in the image, but the algorithm also considers other factors, including facial angle to the camera. Returns a [JSON file of this format](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/rekogition_search_faces_by_image.json).
 
-![Facial Recognition Search Workflow](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/diagram-search.png "Facial Recognition Search Workflow")
+![Facial Recognition Search Workflow](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/diagram-search.png "Facial Recognition Search Workflow")
 
 ## Trouble Shooting and Logging
 
@@ -34,21 +34,21 @@ The terraform scripts will automatically create a collection of CloudWatch Log G
 
 I refined the contents and formatting of each log group to suit my own needs while building this solution, and in particular while coding the Python Lambda functions.
 
-![CloudWatch Logs](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/cloudwatch-1.png "CloudWatch Logs")
-![CloudWatch Logs](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/cloudwatch-2.png "CloudWatch Logs")
+![CloudWatch Logs](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/cloudwatch-1.png "CloudWatch Logs")
+![CloudWatch Logs](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/cloudwatch-2.png "CloudWatch Logs")
 
 ## Working With DynamoDB
 
-Index faces are persisted to a DynamoDB table as per the two screen shots below. The AWS DynamoDB console includes a useful query tool named [PartiQL](https://partiql.org/) which you can use to inspect your Rekognition output. See this [sample DynamoDB Rekognition output file](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/dynamodb-sample-records.json).
+Index faces are persisted to a DynamoDB table as per the two screen shots below. The AWS DynamoDB console includes a useful query tool named [PartiQL](https://partiql.org/) which you can use to inspect your Rekognition output. See this [sample DynamoDB Rekognition output file](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/dynamodb-sample-records.json).
 
-![DynamoDB console](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/dynamodb-1.png "DynamoDB console")
-![DynamoDB query](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/dynamodb-2.png "DynamoDB query")
+![DynamoDB console](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/dynamodb-1.png "DynamoDB console")
+![DynamoDB query](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/dynamodb-2.png "DynamoDB query")
 
 ## Working With S3
 
 Indexed images are persisted to S3, essantially as an archive as well as for future development of additional features such as an endpoint to download indexed images and their corresponding Rekognition faceprint output.
 
-![S3 Console](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/s3-1.png "S3 Console")
+![S3 Console](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/s3-1.png "S3 Console")
 
 ## Working With Image Data in Postman, AWS Route53 and AWS Rekognition
 

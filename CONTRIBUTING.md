@@ -20,7 +20,7 @@ As a 1-person operation this project depends heavily on GitHub Actions to automa
 
 A typical pull request will look like the following:
 
-![Automated pull request](./doc/automated-pr.png)
+![Automated pull request](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/automated-pr.png)
 
 ### pre-commit setup
 
@@ -37,7 +37,7 @@ pre-commit run --all-files
 
 Output should look similar to the following:
 
-![pre-commit output](./doc/pre-commit.png)
+![pre-commit output](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/pre-commit.png)
 
 ### Github Secrets setup
 
@@ -45,7 +45,7 @@ The GitHub Actions automated processes depend on several credentials which are s
 
 On the other hand, if you've forked this repo and are working on your own independent project, then you'll need to initialize each of these yourself.
 
-![Github Secrets](./doc/github-secrets.png)
+![Github Secrets](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/github-secrets.png)
 
 ## Python Setup
 
@@ -61,7 +61,7 @@ source venv/bin/activate
 
 ## Terraform Setup
 
-Please refer to this [Terraform setup guide](./doc/TERRAFORM.md) for detailed instructions.
+Please refer to this [Terraform setup guide](https://github.com/FullStackWithLawrence/aws-rekognition/blob/next/doc/img/TERRAFORM.md) for detailed instructions.
 
 Note that this project leverages Dependabot for managing version numbers of all Terraform modules that are used in this project. Versions should always be up to date at the moment that you clone the repo. It therefore should never be necessary for you to manually bump module version numbers.
 
