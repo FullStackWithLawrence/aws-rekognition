@@ -82,7 +82,7 @@ Please see this [detailed technical summary](./doc/REKOGNITION.md) of the archit
 
 ## Examples of Code Management Best Practices
 
-This repo is referenced by multiple YouTube videos, including various tutorials about good coding practices and good code management. Of note:
+This microservice fully conforms to [12-Factor methodology](./doc/Twelve_Factor_Methodology.md). Moreover, this repo is used as an instrutional tool as well as by multiple videos in my [YouTube Channel](https://youtube.com/@FullStackWithLawrence), including various tutorials about good coding practices and good code management. Of note:
 
 ### Automations
 
