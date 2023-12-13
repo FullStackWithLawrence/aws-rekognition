@@ -9,7 +9,7 @@ import sys
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+PYTHON_ROOT = os.path.dirname(HERE)
 sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 
@@ -19,14 +19,6 @@ def noop():
 
 def get_test_file(filename: str):
     """Load a mock lambda_index event."""
-    event = None
-    try:
-        path1 = os.path.join(PYTHON_ROOT, "data", filename)
-        with open(path1, "r", encoding="utf-8") as file:
-            event = json.load(file)
-    except FileNotFoundError:
-        path2 = os.path.join(HERE, "data", filename)
-        with open(path2, "r", encoding="utf-8") as file:
-            event = json.load(file)
-
-    return event
+    path = os.path.join(HERE, "mock_data", filename)
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
