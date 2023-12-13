@@ -28,24 +28,16 @@ resource "aws_iam_role_policy_attachment" "lambda" {
 # ----------------------------------------------------------------------
 # FIX NOTE: these permissions are too broad.
 # ----------------------------------------------------------------------
-resource "aws_iam_role_policy_attachment" "lambda_AWSLambdaBasicExecutionRole" {
-  role       = aws_iam_role.lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_AmazonS3FullAccess" {
-  role       = aws_iam_role.lambda.id
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_CloudWatchFullAccess" {
-  role       = aws_iam_role.lambda.id
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
-}
 
 resource "aws_iam_role_policy_attachment" "lambda_AWSLambdaExecute" {
   role       = aws_iam_role.lambda.id
   policy_arn = "arn:aws:iam::aws:policy/AWSLambdaExecute"
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_AmazonS3ObjectLambdaExecutionRolePolicy" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonDynamoDBFullAccess" {
