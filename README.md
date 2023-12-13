@@ -58,7 +58,7 @@ terraform apply
 
 ## API Key features
 
-- Highly secure. Your OpenAI API key is stored in a local .env file, and is kept safe during development, build and deployment to production.
+- Highly secure. This project follows best practices for handling AWS credentials. The API runs over https using AWS managed SSL/TLS encryption certificates. The API uses an api key. User data is persisted to a non-public AWS S3 bucket.
 - Excellent [CloudWatch](https://aws.amazon.com/cloudwatch/) logs for Lambda as well as API Gateway
 - Low-cost [AWS serverless](https://aws.amazon.com/serverless/) implementation using [AWS API Gateway](https://aws.amazon.com/api-gateway/) and [AWS Lambda](https://aws.amazon.com/lambda/); free or nearly free in most cases
 - Robust, performant and infinitely scalable
@@ -136,7 +136,7 @@ We welcome contributions! There are a variety of ways for you to get involved, r
 
 For developers, please see:
 
-- the [Developer Setup Guide](./CONTRIBUTING.md)
-- and these [commit comment guidelines](./doc/SEMANTIC_VERSIONING.md) 😬😬😬 for managing CI rules for automated semantic versioning.
+- the [Developer Setup Guide](./doc/CONTRIBUTING.md)
+- and these [commit comment guidelines](./doc/SEMANTIC_VERSIONING.md) 😬😬😬 for managing CI rules for automated semantic releases.
 
 You can also contact [Lawrence McDaniel](https://lawrencemcdaniel.com/contact) directly.
