@@ -10,7 +10,7 @@
 #         - implement role-based security for both Lambda functions.
 #------------------------------------------------------------------------------
 locals {
-  search_function_name = "${var.shared_resource_identifier}_api"
+  search_function_name = "${var.shared_resource_identifier}_search"
 }
 
 resource "aws_lambda_function" "search" {
@@ -26,6 +26,7 @@ resource "aws_lambda_function" "search" {
   handler          = "rekognition_api.lambda_search.lambda_handler"
   filename         = data.archive_file.lambda_search.output_path
   source_code_hash = data.archive_file.lambda_search.output_base64sha256
+  layers           = [aws_lambda_layer_version.rekognition.arn]
   tags             = var.tags
 
   environment {
@@ -58,6 +59,6 @@ resource "aws_cloudwatch_log_group" "search" {
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_search" {
   type        = "zip"
-  source_dir  = "${path.module}/python/rekognition_api/"
-  output_path = "${path.module}/python/lambda_search_payload.zip"
+  source_dir  = "${path.module}/python/"
+  output_path = "${path.module}/build/lambda_search_payload.zip"
 }

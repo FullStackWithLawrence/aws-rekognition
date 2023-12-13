@@ -1,0 +1,12 @@
+# -----------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com
+#
+# usage:      Shared Python requirements for AWS Lambda functions.
+#             Create a virtual environment in the root of this repository
+#             named `venv`. Terraform modules will look for and include these
+#             requirements in the zip package for this layer.
+# -----------------------------------------------------------------------------
+python-dotenv==1.0.0
+pydantic==2.5.2
+pydantic-settings==2.1.0

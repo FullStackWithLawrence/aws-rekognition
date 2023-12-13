@@ -8,7 +8,7 @@
 #         for an image uploaded using the REST API endpoint.
 #------------------------------------------------------------------------------
 locals {
-  index_function_name = "${var.shared_resource_identifier}_api"
+  index_function_name = "${var.shared_resource_identifier}_index"
 }
 
 resource "aws_lambda_function" "index" {
@@ -24,6 +24,7 @@ resource "aws_lambda_function" "index" {
   handler          = "rekognition_api.lambda_index.lambda_handler"
   filename         = data.archive_file.lambda_index.output_path
   source_code_hash = data.archive_file.lambda_index.output_base64sha256
+  layers           = [aws_lambda_layer_version.rekognition.arn]
   tags             = var.tags
 
   environment {
@@ -41,8 +42,8 @@ resource "aws_lambda_function" "index" {
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_index" {
   type        = "zip"
-  source_dir  = "${path.module}/python/rekognition_api/"
-  output_path = "${path.module}/python/lambda_index_payload.zip"
+  source_dir  = "${path.module}/python/"
+  output_path = "${path.module}/build/lambda_index_payload.zip"
 }
 
 
