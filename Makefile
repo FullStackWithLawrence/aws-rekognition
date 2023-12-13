@@ -11,22 +11,22 @@ else
     ACTIVATE_VENV = source venv/bin/activate
 endif
 
+# Default target executed when no arguments are given to make.
+all: help
+
 env:
 	ifneq ("$(wildcard .env)","")
 		include .env
 	else
-		$(shell echo -e "MAX_FACES_COUNT=10" >> .env)
-		$(shell echo -e "FACE_DETECT_THRESHOLD=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "FACE_DETECT_ATTRIBUTES=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "QUALITY_FILTER=PLEASE-ADD-ME" >> .env)
-		$(shell echo -e "TABLE_ID=gcp-starter" >> .env)
-		$(shell echo -e "REGION=us-east-1" >> .env)
-		$(shell echo -e "COLLECTION_ID=gcp-starter" >> .env)
-		$(shell echo -e "DEBUG_MODE=True" >> .env)
+		$(shell echo -e "FACE_DETECT_MAX_FACES_COUNT=10" >> .env)
+		$(shell echo -e "FACE_DETECT_THRESHOLD=10" >> .env)
+		$(shell echo -e "FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
+		$(shell echo -e "FACE_DETECT_QUALITY_FILTER=AUTO" >> .env)
+		$(shell echo -e "TABLE_ID=rekognition" >> .env)
+		$(shell echo -e "AWS_REGION=us-east-1" >> .env)
+		$(shell echo -e "COLLECTION_ID=rekognition-collection" >> .env)
+		$(shell echo -e "DEBUG_MODE=False" >> .env)
 	endif
-
-# Default target executed when no arguments are given to make.
-all: help
 
 analyze:
 	cloc . --exclude-ext=svg,json,zip --vcs=git
@@ -83,7 +83,7 @@ clean:
 # Run Python unit tests
 # -------------------------------------------------------------------------
 test:
-	python -m unittest discover -s terraform/python/tests/
+	python -m unittest discover -s terraform/python/rekognition_api/tests/
 
 # -------------------------------------------------------------------------
 # Force a new semantic release to be created in GitHub
@@ -99,7 +99,8 @@ update:
 	make init
 
 build:
-	@echo "Not implemented"
+	cd terraform && \
+	terraform init
 
 # -------------------------------------------------------------------------
 # Generate help menu

@@ -16,7 +16,7 @@ aws_profile    = "lawrence"
 tags = {
   "terraform" = "true",
   "project"   = "Facial Recognition microservice"
-  "contact"   = "Lawrence McDaniel - lawrence@domain.com"
+  "contact"   = "Lawrence McDaniel - lpm0073@gmail.com"
 }
 
 ###############################################################################
@@ -44,8 +44,9 @@ face_detect_quality_filter = "AUTO"
 ###############################################################################
 # APIGateway parameters
 ###############################################################################
+create_custom_domain_name  = true
 root_domain                = "lawrencemcdaniel.com"
-shared_resource_identifier = "facialrecognition"
+shared_resource_identifier = "rekognition"
 stage                      = "v1"
 
 # Maximum number of requests that can be made in a given time period.

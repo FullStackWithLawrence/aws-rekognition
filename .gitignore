@@ -32,7 +32,7 @@ venv
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.*
-
+.terraform.lock.hcl
 
 # ignore this file
 !tfmodule-template.tf

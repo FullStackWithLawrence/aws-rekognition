@@ -20,11 +20,11 @@ output "api_gateway_deployment_stage" {
   value = var.stage
 }
 output "api_gateway_api_key" {
-  value = nonsensitive(aws_api_gateway_api_key.facialrecognition.value)
+  value = nonsensitive(aws_api_gateway_api_key.rekognition.value)
 }
 
 output "api_apigateway_url" {
-  value = aws_api_gateway_stage.facialrecognition.invoke_url
+  value = aws_api_gateway_stage.rekognition.invoke_url
 }
 
 output "lambda_index" {

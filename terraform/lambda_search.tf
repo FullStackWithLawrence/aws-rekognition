@@ -58,6 +58,6 @@ resource "aws_cloudwatch_log_group" "search" {
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_search" {
   type        = "zip"
-  source_file = "${path.module}/python/lambda_search.py"
+  source_dir  = "${path.module}/python/rekognition_api/"
   output_path = "${path.module}/python/lambda_search_payload.zip"
 }

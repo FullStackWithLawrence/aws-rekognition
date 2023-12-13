@@ -1,6 +1,10 @@
 locals {
   lambda_role_name   = "${var.shared_resource_identifier}-lambda"
   lambda_policy_name = "${var.shared_resource_identifier}-lambda"
+  iam_policy_lambda = templatefile("${path.module}/json/iam_policy_lambda.json.tpl", {
+    s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
+    dynamodb_table_arn = module.dynamodb_table.dynamodb_table_arn
+  })
 }
 
 resource "aws_iam_role" "lambda" {
@@ -9,17 +13,10 @@ resource "aws_iam_role" "lambda" {
   tags               = var.tags
 }
 
-data "template_file" "iam_policy_lambda" {
-  template = file("${path.module}/json/iam_policy_lambda.json.tpl")
-  vars = {
-    s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
-    dynamodb_table_arn = module.dynamodb_table.dynamodb_table_arn
-  }
-}
 resource "aws_iam_policy" "lambda" {
   name        = local.lambda_policy_name
   description = "generic IAM policy"
-  policy      = data.template_file.iam_policy_lambda.rendered
+  policy      = local.iam_policy_lambda
 }
 
 

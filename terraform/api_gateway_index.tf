@@ -10,21 +10,21 @@
 # see https://medium.com/@ekantmate/webhook-for-s3-bucket-by-terraform-rest-api-in-api-gateway-to-proxy-amazon-s3-15e24ff174e7
 ###############################################################################
 resource "aws_api_gateway_resource" "index_root" {
-  parent_id   = aws_api_gateway_rest_api.facialrecognition.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  parent_id   = aws_api_gateway_rest_api.rekognition.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   path_part   = "index"
 }
 
 # see https://stackoverflow.com/questions/39040739/in-terraform-how-do-you-specify-an-api-gateway-endpoint-with-a-variable-in-the
 resource "aws_api_gateway_resource" "index" {
   parent_id   = aws_api_gateway_resource.index_root.id
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   path_part   = "{filename}"
 }
 
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
 resource "aws_api_gateway_method" "index_put" {
-  rest_api_id      = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id      = aws_api_gateway_rest_api.rekognition.id
   resource_id      = aws_api_gateway_resource.index.id
   http_method      = "PUT"
   authorization    = "NONE"
@@ -35,7 +35,7 @@ resource "aws_api_gateway_method" "index_put" {
 }
 
 resource "aws_api_gateway_integration" "index_put" {
-  rest_api_id             = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id             = aws_api_gateway_rest_api.rekognition.id
   resource_id             = aws_api_gateway_resource.index.id
   http_method             = aws_api_gateway_method.index_put.http_method
   integration_http_method = "PUT"
@@ -53,7 +53,7 @@ resource "aws_api_gateway_integration" "index_put" {
 }
 
 resource "aws_api_gateway_method_response" "index_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   resource_id = aws_api_gateway_resource.index.id
   http_method = aws_api_gateway_method.index_put.http_method
   status_code = "200"
@@ -64,7 +64,7 @@ resource "aws_api_gateway_method_response" "index_response_200" {
 }
 
 resource "aws_api_gateway_integration_response" "index_put" {
-  rest_api_id = aws_api_gateway_rest_api.facialrecognition.id
+  rest_api_id = aws_api_gateway_rest_api.rekognition.id
   resource_id = aws_api_gateway_resource.index.id
   http_method = aws_api_gateway_method.index_put.http_method
   status_code = aws_api_gateway_method_response.index_response_200.status_code
