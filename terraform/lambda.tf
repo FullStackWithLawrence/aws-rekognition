@@ -28,6 +28,11 @@ resource "aws_iam_role_policy_attachment" "lambda" {
 # ----------------------------------------------------------------------
 # FIX NOTE: these permissions are too broad.
 # ----------------------------------------------------------------------
+resource "aws_iam_role_policy_attachment" "lambda_AWSLambdaBasicExecutionRole" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_AmazonS3FullAccess" {
   role       = aws_iam_role.lambda.id
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
