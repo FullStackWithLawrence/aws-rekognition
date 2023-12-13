@@ -13,12 +13,27 @@ code](https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&c
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
 
-A facial recognition microservice built with AWS API Gateway, S3 and Python Lambda.
+A facial recognition microservice built with AWS Rekognition, DynamoDB, S3, API Gateway and Lambda.
 
 ## Usage
 
-1. Upload images that contain faces, and this microservice will index and database the facial recognition data in a fast, lightweight, searchable format.
-2. Search for facial matches by uploading images to domain.com. Results are returns in JSON format.
+Index and store a face print:
+
+```console
+curl --location --globoff --request PUT 'https://api.rekognition.yourdomain.com/v1/index/Image-With-a-Face.jpg' \
+--header 'x-api-key: YOUR-API-KEY' \
+--header 'Content-Type: text/plain' \
+--data '@'
+```
+
+Search an image for known faces:
+
+```console
+curl --location --globoff --request PUT 'https://api.rekognition.yourdomain.com/v1/search/' \
+--header 'x-api-key: YOUR-API-KEY' \
+--header 'Content-Type: text/plain' \
+--data '@/Users/mcdaniel/Desktop/aws-rekognition/test-data/Different-Image-With-Same-Face.jpg'
+```
 
 ## Quickstart Setup
 
