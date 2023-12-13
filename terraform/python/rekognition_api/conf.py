@@ -7,11 +7,12 @@ import logging
 # python stuff
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
-from typing import ClassVar, List
+from typing import ClassVar, List, Optional
 
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import Field, ValidationError, validator
+from pydantic_settings import BaseSettings
 
 # our stuff
 from .exceptions import RekognitionConfigurationError, RekognitionValueError
@@ -37,23 +38,68 @@ regions = ec2.describe_regions()
 AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
 
 
-class Settings(BaseModel):
+def empty_str_to_bool_default(v: str, default: bool) -> bool:
+    """Convert empty string to default boolean value"""
+    if v in [None, ""]:
+        return default
+    return v.lower() in ["true", "1", "t", "y", "yes"]
+
+
+def empty_str_to_int_default(v: str, default: int) -> int:
+    """Convert empty string to default integer value"""
+    if v in [None, ""]:
+        return default
+    try:
+        return int(v)
+    except ValueError:
+        return default
+
+
+class Settings(BaseSettings):
     """Settings for Lambda functions"""
 
-    debug_mode: bool = Field(SettingsDefaults.DEBUG_MODE, env="DEBUG_MODE")
-    aws_regions: List[str] = Field(AWS_REGIONS, description="The list of AWS regions")
-    aws_region: str = Field(SettingsDefaults.AWS_REGION, env="AWS_REGION")
-    table_id: str = Field(SettingsDefaults.TABLE_ID, env="TABLE_ID")
-    collection_id: str = Field(SettingsDefaults.COLLECTION_ID, env="COLLECTION_ID")
+    debug_mode: Optional[bool] = Field(
+        SettingsDefaults.DEBUG_MODE,
+        env="DEBUG_MODE",
+        pre=True,
+        getter=lambda v: empty_str_to_bool_default(v, SettingsDefaults.DEBUG_MODE),
+    )
+    aws_regions: Optional[List[str]] = Field(AWS_REGIONS, description="The list of AWS regions")
+    aws_region: Optional[str] = Field(
+        SettingsDefaults.AWS_REGION,
+        env="AWS_REGION",
+    )
+    table_id: Optional[str] = Field(
+        SettingsDefaults.TABLE_ID,
+        env="TABLE_ID",
+    )
+    collection_id: Optional[str] = Field(
+        SettingsDefaults.COLLECTION_ID,
+        env="COLLECTION_ID",
+    )
 
-    face_detect_max_faces_count: int = Field(
-        SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT, gt=0, env="FACE_DETECT_MAX_FACES_COUNT"
+    face_detect_attributes: Optional[str] = Field(
+        SettingsDefaults.FACE_DETECT_ATTRIBUTES,
+        env="FACE_DETECT_ATTRIBUTES",
     )
-    face_detect_attributes: str = Field(SettingsDefaults.FACE_DETECT_ATTRIBUTES, env="FACE_DETECT_ATTRIBUTES")
-    face_detect_quality_filter: str = Field(
-        SettingsDefaults.FACE_DETECT_QUALITY_FILTER, env="FACE_DETECT_QUALITY_FILTER"
+    face_detect_quality_filter: Optional[str] = Field(
+        SettingsDefaults.FACE_DETECT_QUALITY_FILTER,
+        env="FACE_DETECT_QUALITY_FILTER",
     )
-    face_detect_threshold: int = Field(SettingsDefaults.FACE_DETECT_THRESHOLD, gt=0, env="FACE_DETECT_THRESHOLD")
+    face_detect_max_faces_count: Optional[int] = Field(
+        SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT,
+        gt=0,
+        env="FACE_DETECT_MAX_FACES_COUNT",
+        pre=True,
+        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT),
+    )
+    face_detect_threshold: Optional[int] = Field(
+        SettingsDefaults.FACE_DETECT_THRESHOLD,
+        gt=0,
+        env="FACE_DETECT_THRESHOLD",
+        pre=True,
+        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.FACE_DETECT_THRESHOLD),
+    )
 
     # unvalidated settings
     s3_client: ClassVar = boto3.resource("s3")
@@ -82,13 +128,61 @@ class Settings(BaseModel):
 
         frozen = True
 
-    @validator("aws_region")
+    @validator("aws_region", pre=True)
     # pylint: disable=no-self-argument,unused-argument
     def validate_aws_region(cls, v, values, **kwargs):
         """Validate aws_region"""
+        if v in [None, ""]:
+            return SettingsDefaults.AWS_REGION
         if "aws_regions" in values and v not in values["aws_regions"]:
             raise RekognitionValueError(f"aws_region {v} not in aws_regions")
         return v
+
+    @validator("table_id", pre=True)
+    def validate_table_id(cls, v):
+        """Validate table_id"""
+        if v in [None, ""]:
+            return SettingsDefaults.TABLE_ID
+        return v
+
+    @validator("collection_id", pre=True)
+    def validate_collection_id(cls, v):
+        """Validate collection_id"""
+        if v in [None, ""]:
+            return SettingsDefaults.COLLECTION_ID
+        return v
+
+    @validator("face_detect_attributes", pre=True)
+    def validate_face_detect_attributes(cls, v):
+        """Validate face_detect_attributes"""
+        if v in [None, ""]:
+            return SettingsDefaults.FACE_DETECT_ATTRIBUTES
+        return v
+
+    @validator("debug_mode", pre=True)
+    def parse_debug_mode(cls, v):
+        """Parse debug_mode"""
+        if isinstance(v, bool):
+            return v
+        if v in [None, ""]:
+            return SettingsDefaults.DEBUG_MODE
+        return v.lower() in ["true", "1", "t", "y", "yes"]
+
+    @validator("face_detect_max_faces_count", pre=True)
+    def check_face_detect_max_faces_count(cls, v):
+        """Check face_detect_max_faces_count"""
+        if v in [None, ""]:
+            return SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT
+        return int(v)
+
+    @validator("face_detect_threshold", pre=True)
+    def check_face_detect_threshold(cls, v):
+        """Check face_detect_threshold"""
+        if isinstance(v, int):
+            return v
+        if v in [None, ""]:
+            return SettingsDefaults.FACE_DETECT_THRESHOLD
+        return int(v)
 
 
 settings = None

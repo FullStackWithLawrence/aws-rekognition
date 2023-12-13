@@ -18,7 +18,7 @@ env:
 		$(shell echo -e "FACE_DETECT_MAX_FACES_COUNT=10" >> .env)
 		$(shell echo -e "FACE_DETECT_THRESHOLD=10" >> .env)
 		$(shell echo -e "FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
-		$(shell echo -e "QUALITY_FILTER=AUTO" >> .env)
+		$(shell echo -e "FACE_DETECT_QUALITY_FILTER=AUTO" >> .env)
 		$(shell echo -e "TABLE_ID=facialrecognition" >> .env)
 		$(shell echo -e "AWS_REGION=us-east-1" >> .env)
 		$(shell echo -e "COLLECTION_ID=facialrecognition-collection" >> .env)
