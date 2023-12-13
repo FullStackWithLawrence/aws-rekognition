@@ -15,7 +15,7 @@ As a 1-person operation this project depends heavily on GitHub Actions to automa
 
 - Code linting checks, during both pre-commit as well as triggered on pushes to the main branch
 - Unit tests for Python, React and Terraform
-- Semantic Version releases
+- Semantic releases
 - version bumps from npm, PyPi and Terraform Registry
 
 A typical pull request will look like the following:
@@ -41,7 +41,7 @@ Output should look similar to the following:
 
 ### Github Secrets setup
 
-The GitHub Actions automated processes depend on several credentials which are stored inside of Github Secrets. When creating pull requests, the GitHub Actions will use these secrets, [github.com/FullStackWithLawrence/aws-openai/settings/secrets/actions](https://github.com/FullStackWithLawrence/aws-openai/settings/secrets/actions), so there's nothing special for you to do.
+The GitHub Actions automated processes depend on several credentials which are stored inside of Github Secrets. When creating pull requests, the GitHub Actions will use these secrets, [github.com/FullStackWithLawrence/aws-rekognition/settings/secrets/actions](https://github.com/FullStackWithLawrence/aws-rekognition/settings/secrets/actions), so there's nothing special for you to do.
 
 On the other hand, if you've forked this repo and are working on your own independent project, then you'll need to initialize each of these yourself.
 
