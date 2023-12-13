@@ -4,6 +4,10 @@ This microservice fully conforms to [12-Factor methodology](./doc/Twelve_Factor_
 
 ## Automations
 
+We leverage automations using Github Actions, third party services, make, bash and anything else that might become freely available to the project in future. As a community-supported code project, automations are important for minimizing the effort required by our committers to keep this code shippable. But it's also an important component of our strategy for maintaining high quality standards. Automations give us the ability to more work, more consistently, and with less effort.
+
+Of note:
+
 - [Automated Pull Requests](https://github.com/FullStackWithLawrence/aws-rekognition/pulls?q=is%3Apr+is%3Aclosed): Github Actions are triggered on pull requests to run any of several different kinds of technology-specific unit tests depending on the contents of the commits included in the PR.
 - [python-dotenv](https://pypi.org/project/python-dotenv/) for storing sensitive data for local development
 - [.gitignore](./.gitignore) ensures that no sensitive nor useless data accidentally gets pushed to GitHub.
