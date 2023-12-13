@@ -59,8 +59,9 @@ terraform apply
 ## API Key features
 
 - Highly secure. This project follows best practices for handling AWS credentials. The API runs over https using AWS managed SSL/TLS encryption certificates. The API uses an api key. User data is persisted to a non-public AWS S3 bucket. This api fully implements [CORS (Cross-origin resource sharing)](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
+- Cost effective. In most cases the running cost of this API remains within AWS' free usage tier for most/all services.
 - [CloudWatch](https://aws.amazon.com/cloudwatch/) logs for Lambda as well as API Gateway.
-- [AWS serverless](https://aws.amazon.com/serverless/) implementation using [AWS API Gateway](https://aws.amazon.com/api-gateway/) [AWS DynamoDB](https://aws.amazon.com/dynamodb/), and [AWS Lambda](https://aws.amazon.com/lambda/); free or nearly free in most cases.
+- [AWS serverless](https://aws.amazon.com/serverless/) implementation using [AWS API Gateway](https://aws.amazon.com/api-gateway/), [AWS DynamoDB](https://aws.amazon.com/dynamodb/), and [AWS Lambda](https://aws.amazon.com/lambda/).
 - Robust, performant and infinitely scalable.
 - AWS API Gateway usage policy and managed api key.
 - Preconfigured [Postman](https://www.postman.com/) files for testing.
