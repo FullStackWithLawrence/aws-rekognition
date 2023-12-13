@@ -37,7 +37,9 @@ curl --location --globoff --request PUT 'https://api.rekognition.yourdomain.com/
 
 ## Quickstart Setup
 
-1. Configure Terraform for your AWS account. Set these three values in [terraform.tfvars](./terraform/terraform.tfvars):
+This is a fully automated build process using Terraform. The build typically takes around 60 seconds to complete. If you are new to Terraform then please review this [Getting Started Guide](./doc/TERRAFORM.md) first.
+
+Configure Terraform for your AWS account. Set these three values in [terraform.tfvars](./terraform/terraform.tfvars):
 
 ```terraform
 account_id           = "012345678912"   # your 12-digit AWS account number
@@ -45,29 +47,22 @@ aws_region           = "us-east-1"      # an AWS data center
 aws_profile          = "default"        # for aws cli credentials
 ```
 
-2. base64 encode your image files
+Build and configure AWS cloud infrastructure:
 
-As a convenience, this repo includes a set of test data that has already been base64-encoded for you, located here: [test-data](./test-data/). It also includes this [base64encode.sh](./base64encode.sh) script that you can use to encode your own images, as per these examples.
-
-```shell
-./base64encode ImageWithFaces1.jpg
-./base64encode ImageWithMoreFaces2.jpg
+```terraform
+cd terraform
+terraform init
+terraform plan
+terraform apply
 ```
-
-3. Index faces by uploading images to the `index` endpoint.
-
-4. Search for indexed faces by uploading images to the `search` endpoint. Results are returned in JSON format. See [sample output](./doc/rekognition_search_output.json).
 
 ## API Key features
 
 - Highly secure. Your OpenAI API key is stored in a local .env file, and is kept safe during development, build and deployment to production.
-- Implements excellent [CloudWatch](https://aws.amazon.com/cloudwatch/) logs for Lambda as well as API Gateway
-- Fully automated and [parameterized](./api/terraform/terraform.tfvars) Terraform build
-- well documented code plus supplemental [documentation resources](./doc/) as well as detailed documentation on each [URL endpoint](./doc/examples/README.md).
+- Excellent [CloudWatch](https://aws.amazon.com/cloudwatch/) logs for Lambda as well as API Gateway
 - Low-cost [AWS serverless](https://aws.amazon.com/serverless/) implementation using [AWS API Gateway](https://aws.amazon.com/api-gateway/) and [AWS Lambda](https://aws.amazon.com/lambda/); free or nearly free in most cases
 - Robust, performant and infinitely scalable
-- Fast build time; usually less than 60 seconds to fully implement
-- Deploy https to a custom domain
+- Deploys to a custom domain over https
 - Preconfigured [Postman](https://www.postman.com/) files for testing
 - includes AWS API Gateway usage policy and api key
 - Full CORS configuration
@@ -83,7 +78,7 @@ As a convenience, this repo includes a set of test data that has already been ba
 
 ## Documentation
 
-Please see this [detailed technical summary](./doc/REKOGNITION.md) of the architecture strategy for this solution. If you are new to Terraform and/or AWS then please read this [Getting Started Guide](./doc/TERRAFORM.md).
+Please see this [detailed technical summary](./doc/REKOGNITION.md) of the architecture strategy for this solution.
 
 ## Examples of Code Management Best Practices
 
