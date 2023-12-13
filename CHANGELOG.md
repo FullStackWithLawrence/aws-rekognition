@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.0...v0.2.1) (2023-12-13)
+
+
+### Bug Fixes
+
+* hard code aws region ([0f10894](https://github.com/FullStackWithLawrence/aws-rekognition/commit/0f108941b59ee8047e23f345d3b52f3f542e781c))
+
 # [0.2.0](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.1.2...v0.2.0) (2023-12-13)
 
 
