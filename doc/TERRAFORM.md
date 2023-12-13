@@ -145,14 +145,14 @@ terraform init
 ```
 
 Screen output should resemble the following:
-![Terraform init](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/terraform-init.png "Terraform init")
+![Terraform init](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/terraform-init.png "Terraform init")
 
 ```console
 terraform plan
 ```
 
 Screen output should resemble the following:
-![Terraform plan](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/terraform-plan.png "Terraform plan")
+![Terraform plan](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/terraform-plan.png "Terraform plan")
 
 To deploy the service run the following
 
@@ -160,7 +160,7 @@ To deploy the service run the following
 terraform apply
 ```
 
-![Terraform apply](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/terraform-apply2.png "Terraform apply")
+![Terraform apply](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/terraform-apply2.png "Terraform apply")
 
 ## III. Uninstall
 
@@ -199,12 +199,12 @@ aws s3 rb s3://$AWS_S3_BUCKET --force
 
 For your convenience there's a preconfigured ['postman_collection'](./aws-rekognition.postman_collection.json) file added to the root directly of this repo. Regardless of whether you use this template, you'll need to provide the following three pieces of information from the Terraform output:
 
-![Postman Configuration](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/postman-config.png "Postman Configuration")
+![Postman Configuration](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/postman-config.png "Postman Configuration")
 
 Upload images
 
-![Postman Index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/postman-index.png "Postman Index")
+![Postman Index](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/postman-index.png "Postman Index")
 
 Search images
 
-![Postman Search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/next/doc/img/postman-search.png "Postman Search")
+![Postman Search](https://raw.githubusercontent.com/lpm0073/aws-rekognition/main/doc/img/postman-search.png "Postman Search")
