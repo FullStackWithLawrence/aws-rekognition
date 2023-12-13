@@ -44,6 +44,7 @@ face_detect_quality_filter = "AUTO"
 ###############################################################################
 # APIGateway parameters
 ###############################################################################
+create_custom_domain_name  = true
 root_domain                = "lawrencemcdaniel.com"
 shared_resource_identifier = "rekognition"
 stage                      = "v1"

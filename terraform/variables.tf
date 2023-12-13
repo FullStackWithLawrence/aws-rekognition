@@ -32,6 +32,12 @@ variable "tags" {
 }
 
 
+variable "create_custom_domain_name" {
+  description = "Create a custom domain name for the API Gateway endpoint"
+  type        = bool
+  default     = false
+
+}
 variable "root_domain" {
   description = "a valid Internet domain name which you directly control using AWS Route53 in this account"
   type        = string
