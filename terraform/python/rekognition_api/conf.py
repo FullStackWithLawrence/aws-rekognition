@@ -21,7 +21,10 @@ from pydantic import Field, ValidationError, validator
 from pydantic_settings import BaseSettings
 
 # our stuff
-from .exceptions import RekognitionConfigurationError, RekognitionValueError
+from rekognition_api.exceptions import (
+    RekognitionConfigurationError,
+    RekognitionValueError,
+)
 
 
 # Default values
@@ -107,11 +110,25 @@ class Settings(BaseSettings):
         getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.FACE_DETECT_THRESHOLD),
     )
 
-    # unvalidated settings
-    s3_client: ClassVar = boto3.resource("s3")
-    dynamodb_client: ClassVar = boto3.resource("dynamodb")
-    dynamodb_table: ClassVar = dynamodb_client.Table(table_id)
-    rekognition_client: ClassVar = boto3.client("rekognition")
+    @property
+    def s3_client(self):
+        """S3 client"""
+        return boto3.resource("s3")
+
+    @property
+    def dynamodb_client(self):
+        """DynamoDB client"""
+        return boto3.resource("dynamodb")
+
+    @property
+    def rekognition_client(self):
+        """Rekognition client"""
+        return boto3.client("rekognition")
+
+    @property
+    def dynamodb_table(self):
+        """DynamoDB table"""
+        return self.dynamodb_client.Table(self.table_id)
 
     # use the boto3 library to initialize clients for the AWS services which we'll interact
     @property

@@ -37,9 +37,9 @@
 import base64  # library with base63 encoding/decoding functions
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 
-from .common import exception_response_factory, http_response_factory
-from .conf import settings
-from .exceptions import EXCEPTION_MAP
+from rekognition_api.common import exception_response_factory, http_response_factory
+from rekognition_api.conf import settings
+from rekognition_api.exceptions import EXCEPTION_MAP
 
 
 # pylint: disable=unused-argument

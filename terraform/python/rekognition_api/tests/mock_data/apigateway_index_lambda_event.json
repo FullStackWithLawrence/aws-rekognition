@@ -1,95 +1,40 @@
 {
   "event": {
-    "resource": "/search/{filename}",
-    "path": "/search/Lawrence4a.jpg",
-    "httpMethod": "PUT",
-    "headers": {
-      "Accept": "*/*",
-      "Accept-Encoding": "gzip, deflate, br",
-      "CloudFront-Forwarded-Proto": "https",
-      "CloudFront-Is-Desktop-Viewer": "true",
-      "CloudFront-Is-Mobile-Viewer": "false",
-      "CloudFront-Is-SmartTV-Viewer": "false",
-      "CloudFront-Is-Tablet-Viewer": "false",
-      "CloudFront-Viewer-ASN": "17072",
-      "CloudFront-Viewer-Country": "MX",
-      "Content-Type": "text/plain",
-      "Host": "44478mmtkg.execute-api.us-east-1.amazonaws.com",
-      "Postman-Token": "12784428-f519-48c2-9d27-83c74af1df23",
-      "User-Agent": "PostmanRuntime/7.32.3",
-      "Via": "1.1 ca31d0bb7c95405e2a3f70f912def572.cloudfront.net (CloudFront)",
-      "X-Amz-Cf-Id": "jqTZWdobBH3DK2NX9YaHLh3t41TJCjeAeKHqR-ujdPhO9dS8JMWiJw==",
-      "X-Amzn-Trace-Id": "Root=1-64f8d3c6-0e89b922326159fc139d1778",
-      "x-api-key": "NZPnpK6OedanfqZW9bz801QHniYKUTaB8yGeRa4t",
-      "X-Forwarded-For": "187.190.198.47, 18.68.19.23",
-      "X-Forwarded-Port": "443",
-      "X-Forwarded-Proto": "https"
-    },
-    "multiValueHeaders": {
-      "Accept": ["*/*"],
-      "Accept-Encoding": ["gzip, deflate, br"],
-      "CloudFront-Forwarded-Proto": ["https"],
-      "CloudFront-Is-Desktop-Viewer": ["true"],
-      "CloudFront-Is-Mobile-Viewer": ["false"],
-      "CloudFront-Is-SmartTV-Viewer": ["false"],
-      "CloudFront-Is-Tablet-Viewer": ["false"],
-      "CloudFront-Viewer-ASN": ["17072"],
-      "CloudFront-Viewer-Country": ["MX"],
-      "Content-Type": ["text/plain"],
-      "Host": ["44478mmtkg.execute-api.us-east-1.amazonaws.com"],
-      "Postman-Token": ["12784428-f519-48c2-9d27-83c74af1df23"],
-      "User-Agent": ["PostmanRuntime/7.32.3"],
-      "Via": [
-        "1.1 ca31d0bb7c95405e2a3f70f912def572.cloudfront.net (CloudFront)"
-      ],
-      "X-Amz-Cf-Id": [
-        "jqTZWdobBH3DK2NX9YaHLh3t41TJCjeAeKHqR-ujdPhO9dS8JMWiJw=="
-      ],
-      "X-Amzn-Trace-Id": ["Root=1-64f8d3c6-0e89b922326159fc139d1778"],
-      "x-api-key": ["NZPnpK6OedanfqZW9bz801QHniYKUTaB8yGeRa4t"],
-      "X-Forwarded-For": ["187.190.198.47, 18.68.19.23"],
-      "X-Forwarded-Port": ["443"],
-      "X-Forwarded-Proto": ["https"]
-    },
-    "queryStringParameters": null,
-    "multiValueQueryStringParameters": null,
-    "pathParameters": {
-      "filename": "Lawrence4a.jpg"
-    },
-    "stageVariables": null,
-    "requestContext": {
-      "resourceId": "ugz9kd",
-      "resourcePath": "/search/{filename}",
-      "httpMethod": "PUT",
-      "extendedRequestId": "K2YHIHWpoAMF4gQ=",
-      "requestTime": "06/Sep/2023:19:32:22 +0000",
-      "path": "/v1/search/Lawrence4a.jpg",
-      "accountId": "090511222473",
-      "protocol": "HTTP/1.1",
-      "stage": "v1",
-      "domainPrefix": "44478mmtkg",
-      "requestTimeEpoch": 1694028742970,
-      "requestId": "e69153a2-2e58-48a0-8e4b-8c6980923db0",
-      "identity": {
-        "cognitoIdentityPoolId": null,
-        "cognitoIdentityId": null,
-        "apiKey": "NZPnpK6OedanfqZW9bz801QHniYKUTaB8yGeRa4t",
-        "principalOrgId": null,
-        "cognitoAuthenticationType": null,
-        "userArn": null,
-        "apiKeyId": "25c7kjkc33",
-        "userAgent": "PostmanRuntime/7.32.3",
-        "accountId": null,
-        "caller": null,
-        "sourceIp": "187.190.198.47",
-        "accessKey": null,
-        "cognitoAuthenticationProvider": null,
-        "user": null
-      },
-      "domainName": "44478mmtkg.execute-api.us-east-1.amazonaws.com",
-      "apiId": "44478mmtkg"
-    },
-    "body": null,
-    "isBase64Encoded": false
+    "Records": [
+      {
+        "eventVersion": "2.1",
+        "eventSource": "aws:s3",
+        "awsRegion": "us-east-1",
+        "eventTime": "2023-12-13T20:52:38.891Z",
+        "eventName": "ObjectCreated:Put",
+        "userIdentity": {
+          "principalId": "AWS:AROARKEXDU3E64TIYPAYH:BackplaneAssumeRoleSession"
+        },
+        "requestParameters": {
+          "sourceIPAddress": "44.210.64.80"
+        },
+        "responseElements": {
+          "x-amz-request-id": "16JS14Q4XNDTHWK4",
+          "x-amz-id-2": "bXS5u99NXOxDsV5FouyQWv1QKWbYI2rb3pMyDTnXDYla00IT8jxPK7+VDKDu1bkbxC+XoW4kbMMjAPIxQmMnmR37+Tvh3D/9"
+        },
+        "s3": {
+          "s3SchemaVersion": "1.0",
+          "configurationId": "tf-s3-lambda-20231213140006617000000009",
+          "bucket": {
+            "name": "090511222473-rekognition-f799c26b853b1d12e9092e66413f4492",
+            "ownerIdentity": {
+              "principalId": "A3NTRY8BU6N8RZ"
+            },
+            "arn": "arn:aws:s3:::090511222473-rekognition-f799c26b853b1d12e9092e66413f4492"
+          },
+          "object": {
+            "key": "Keanu-Reeves.jpg",
+            "size": 879589,
+            "eTag": "c9230f7b3889b61da34a4e0057ccb6d8",
+            "sequencer": "00657A1996C279C087"
+          }
+        }
+      }
+    ]
   }
 }

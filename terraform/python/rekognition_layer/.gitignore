@@ -1,0 +1,4 @@
+*.zip
+venv
+.egg-info/
+archive
