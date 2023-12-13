@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 sys.path.append(PYTHON_ROOT)  # noqa: E402
 
-
 from rekognition_api.conf import Settings, SettingsDefaults  # noqa: E402
 
 
