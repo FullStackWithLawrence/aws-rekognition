@@ -21,11 +21,9 @@ sys.path.append(PYTHON_ROOT)  # noqa: E402
 class TestLambdaIndex(unittest.TestCase):
     """Test Index Lambda function."""
 
-    # Get the directory of the current script
-    here = os.path.dirname(os.path.abspath(__file__))
-
     # load a mock lambda_index event
-    with open(HERE + "/data/apigateway_index_lambda_event.json", "r", encoding="utf-8") as file:
+    file_path = os.path.join(HERE, "data", "apigateway_search_lambda_event.json")
+    with open(file_path, "r", encoding="utf-8") as file:
         event = json.load(file)
 
     def setUp(self):
