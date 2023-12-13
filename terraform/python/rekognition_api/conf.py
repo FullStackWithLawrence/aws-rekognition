@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-member
-"""Configuration for Lambda functions"""
+"""
+Configuration for Lambda functions.
+
+This module is used to configure the Lambda functions. It uses the pydantic_settings
+library to validate the configuration values. The configuration values are read from
+environment variables, or alternatively these can be set when instantiating Settings().
+"""
 
 import logging
 

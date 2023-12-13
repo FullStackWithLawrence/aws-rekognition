@@ -102,3 +102,26 @@ class TestConfiguration(unittest.TestCase):
 
         with self.assertRaises(PydanticValidationError):
             Settings()
+
+    def test_configure_with_class_constructor(self):
+        """test that we can set values with the class constructor"""
+
+        mock_settings = Settings(
+            aws_region="eu-west-1",
+            table_id="TEST_facialrecognition",
+            collection_id="TEST_facialrecognition-collection",
+            face_detect_max_faces_count=101,
+            face_detect_attributes="TEST_DEFAULT",
+            face_detect_quality_filter="TEST_AUTO",
+            face_detect_threshold=102,
+            debug_mode=True,
+        )
+
+        self.assertEqual(mock_settings.aws_region, "eu-west-1")
+        self.assertEqual(mock_settings.table_id, "TEST_facialrecognition")
+        self.assertEqual(mock_settings.collection_id, "TEST_facialrecognition-collection")
+        self.assertEqual(mock_settings.face_detect_max_faces_count, 101)
+        self.assertEqual(mock_settings.face_detect_attributes, "TEST_DEFAULT")
+        self.assertEqual(mock_settings.face_detect_quality_filter, "TEST_AUTO")
+        self.assertEqual(mock_settings.face_detect_threshold, 102)
+        self.assertEqual(mock_settings.debug_mode, True)
