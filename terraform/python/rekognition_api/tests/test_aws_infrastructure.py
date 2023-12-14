@@ -56,8 +56,9 @@ class TestAWSInfrastructture(unittest.TestCase):
         self.shared_resource_identifier = os.getenv(
             key="SHARED_RESOURCE_IDENTIFIER", default=TFVARS["shared_resource_identifier"]
         )
+        self.create_custom_domain_name = self.get_create_custom_domain_name()
         self.root_domain = os.getenv(key="ROOT_DOMAIN", default=TFVARS["root_domain"])
-        self.domain = os.getenv(key="DOMAIN") or "api." + self.shared_resource_identifier + "." + self.root_domain
+        self.domain = self.get_api_domain()
         self.s3_bucket_name = (
             os.getenv(key="S3_BUCKET_NAME") or self.aws_account_id + "-" + self.shared_resource_identifier
         )
@@ -68,6 +69,31 @@ class TestAWSInfrastructture(unittest.TestCase):
         self.s3_client = self.aws_session.client("s3")
         self.dynamodb = self.aws_session.client("dynamodb")
         self.api_client = self.aws_session.client("apigateway")
+
+    def get_create_custom_domain_name(self) -> bool:
+        """Return the CREATE_CUSTOM_DOMAIN_NAME value."""
+        create_custom_domain_name = os.getenv(
+            key="CREATE_CUSTOM_DOMAIN_NAME", default=TFVARS["create_custom_domain_name"]
+        )
+        if isinstance(create_custom_domain_name, bool):
+            return create_custom_domain_name
+
+        if isinstance(create_custom_domain_name, str):
+            return create_custom_domain_name.lower() in ["true", "1", "yes"]
+
+        return False
+
+    def get_api_domain(self):
+        """Return the API domain."""
+        if self.create_custom_domain_name:
+            return os.getenv(key="DOMAIN") or "api." + self.shared_resource_identifier + "." + self.root_domain
+
+        response = self.api_client.get_rest_apis()
+        for item in response["items"]:
+            if item["name"] == self.api_gateway_name:
+                api_id = item["id"]
+                return f"{api_id}.execute-api.{self.aws_region}.amazonaws.com"
+        return None
 
     def get_session(self):
         """Return a new AWS session."""
