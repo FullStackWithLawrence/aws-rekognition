@@ -24,12 +24,17 @@ from unittest.mock import patch
 
 # 3rd party stuff
 import boto3
+import requests
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 
+HERE = os.path.abspath(os.path.dirname(__file__))
 PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 sys.path.append(PYTHON_ROOT)  # noqa: E402
+
+# our stuff
+from rekognition_api.tests.test_setup import get_test_image  # noqa: E402
 
 
 # pylint: disable=too-many-instance-attributes
@@ -182,3 +187,21 @@ class TestAWSInfrastructture(unittest.TestCase):
         api_key = self.get_api_keys()
         self.assertIsInstance(api_key, str, "API key does not exist.")
         self.assertGreaterEqual(len(api_key), 15, "API key is too short.")
+
+    def test_index_endpoint(self):
+        """Test that the index endpoint works.
+        curl --location --request PUT 'https://api.rekognition.lawrencemcdaniel.com/index/Keanu-Reeves.jpg' \
+        --header 'x-api-key: i3djUnmCAC2HhVdUH5w00akFsAwxa6f6553brnZv' \
+        --header 'Content-Type: text/plain' \
+        --data '@/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Keanu-Reeves.jpg'
+        """
+        filename = "Keanu-Reeves.jpg"
+        api_key = self.get_api_keys()
+        url = f"https://{self.domain}/index/{filename}"
+        headers = {
+            "x-api-key": f"{api_key}",
+            "Content-Type": "text/plain",
+        }
+        data = get_test_image(filename)
+        response = requests.put(url, headers=headers, data=data, timeout=5)
+        self.assertEqual(response.status_code, 200)
