@@ -1,18 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=wrong-import-position
-"""Test configuration Settings class.
-
-curl --location --request PUT 'https://api.rekognition.lawrencemcdaniel.com/index/Keanu-Reeves.jpg' \
---header 'x-api-key: i3djUnmCAC2HhVdUH5w00akFsAwxa6f6553brnZv' \
---header 'Content-Type: text/plain' \
---data '@/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Keanu-Reeves.jpg'
-
-curl --location --request PUT 'https://api.rekognition.lawrencemcdaniel.com/search/' \
---header 'x-api-key: i3djUnmCAC2HhVdUH5w00akFsAwxa6f6553brnZv' \
---header 'Content-Type: text/plain' \
---data '@/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Keanu-Avril-Mike.jpg'
-
-"""
+"""Test configuration Settings class."""
 
 # python stuff
 import json
@@ -20,24 +8,32 @@ import os
 import socket
 import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 # 3rd party stuff
 import boto3
+import hcl2
 import requests
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-sys.path.append(PYTHON_ROOT)  # noqa: E402
+PYTHON_ROOT = os.path.dirname(os.path.dirname(HERE))
+TERRAFORM_ROOT = str(Path(PYTHON_ROOT).parent)
+TERRAFORM_TFVARS = os.path.join(TERRAFORM_ROOT, "terraform.tfvars")
 
 # our stuff
+sys.path.append(PYTHON_ROOT)  # noqa: E402
 from rekognition_api.tests.test_setup import get_test_image  # noqa: E402
 
 
-# pylint: disable=too-many-instance-attributes
+with open(TERRAFORM_TFVARS, "r", encoding="utf-8") as f:
+    TFVARS = hcl2.load(f)
+
+
+# pylint: disable=too-many-instance-attributes,too-many-public-methods
 class TestAWSInfrastructture(unittest.TestCase):
     """Test AWS infrastructure."""
 
@@ -54,19 +50,28 @@ class TestAWSInfrastructture(unittest.TestCase):
         load_dotenv(env_path)
 
         # environment variables
-        self.api_key = os.getenv(key="API_KEY")
-        self.domain = os.getenv(key="DOMAIN")
-        self.s3_bucket_name = os.getenv(key="S3_BUCKET_NAME")
-        self.aws_profile = os.getenv(key="AWS_PROFILE")
-        self.aws_region = os.getenv(key="AWS_REGION")
-        self.common_resource_name = os.getenv(key="DYNAMODB_TABLE_NAME")
-        self.api_gateway_name = os.getenv(key="API_GATEWAY_NAME")
+        self.aws_account_id = os.getenv(key="AWS_ACCOUNT_ID", default=TFVARS["aws_account_id"])
+        self.aws_region = os.getenv(key="AWS_REGION", default=TFVARS["aws_region"])
+        self.aws_profile = os.getenv(key="AWS_PROFILE", default=TFVARS["aws_profile"])
+        self.shared_resource_identifier = os.getenv(
+            key="SHARED_RESOURCE_IDENTIFIER", default=TFVARS["shared_resource_identifier"]
+        )
+        self.root_domain = os.getenv(key="ROOT_DOMAIN", default=TFVARS["root_domain"])
+        self.domain = os.getenv(key="DOMAIN") or "api." + self.shared_resource_identifier + "." + self.root_domain
+        self.s3_bucket_name = (
+            os.getenv(key="S3_BUCKET_NAME") or self.aws_account_id + "-" + self.shared_resource_identifier
+        )
+        self.api_gateway_name = self.shared_resource_identifier + "-api"
 
         # aws resources
         self.aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
         self.s3_client = self.aws_session.client("s3")
         self.dynamodb = self.aws_session.client("dynamodb")
         self.api_client = self.aws_session.client("apigateway")
+
+    def get_url(self, path):
+        """Return the url for the given path."""
+        return f"https://{self.domain}{path}"
 
     def aws_connection_works(self):
         """Test that the AWS connection works."""
@@ -87,9 +92,12 @@ class TestAWSInfrastructture(unittest.TestCase):
 
     def bucket_exists(self):
         """Test that the S3 bucket exists."""
+        bucket_prefix = self.s3_bucket_name
         try:
-            self.s3_client.head_bucket(Bucket=self.s3_bucket_name)
-            return True
+            for bucket in self.s3_client.list_buckets()["Buckets"]:
+                if bucket["Name"].startswith(bucket_prefix):
+                    return True
+            return False
         except ClientError:
             return False
 
@@ -140,7 +148,7 @@ class TestAWSInfrastructture(unittest.TestCase):
         """Test that the API Gateway exists."""
         response = self.api_client.get_api_keys(includeValues=True)
         for item in response["items"]:
-            if item["name"] == self.common_resource_name:
+            if item["name"] == self.shared_resource_identifier:
                 return item["value"]
         return False
 
@@ -159,8 +167,8 @@ class TestAWSInfrastructture(unittest.TestCase):
     def test_dynamodb_table_exists(self):
         """Test that the DynamoDB table exists."""
         self.assertTrue(
-            self.dynamodb_table_exists(self.common_resource_name),
-            f"DynamoDB table {self.common_resource_name} does not exist.",
+            self.dynamodb_table_exists(self.shared_resource_identifier),
+            f"DynamoDB table {self.shared_resource_identifier} does not exist.",
         )
 
     def test_api_exists(self):
@@ -189,15 +197,10 @@ class TestAWSInfrastructture(unittest.TestCase):
         self.assertGreaterEqual(len(api_key), 15, "API key is too short.")
 
     def test_index_endpoint(self):
-        """Test that the index endpoint works.
-        curl --location --request PUT 'https://api.rekognition.lawrencemcdaniel.com/index/Keanu-Reeves.jpg' \
-        --header 'x-api-key: i3djUnmCAC2HhVdUH5w00akFsAwxa6f6553brnZv' \
-        --header 'Content-Type: text/plain' \
-        --data '@/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Keanu-Reeves.jpg'
-        """
+        """Test that the index endpoint works."""
         filename = "Keanu-Reeves.jpg"
         api_key = self.get_api_keys()
-        url = f"https://{self.domain}/index/{filename}"
+        url = self.get_url("/index/{filename}")
         headers = {
             "x-api-key": f"{api_key}",
             "Content-Type": "text/plain",
@@ -205,3 +208,19 @@ class TestAWSInfrastructture(unittest.TestCase):
         data = get_test_image(filename)
         response = requests.put(url, headers=headers, data=data, timeout=5)
         self.assertEqual(response.status_code, 200)
+
+    def test_search_endpoint(self):
+        """Test that the search endpoint works."""
+        filename = "Keanu-Avril-Mike.jpg"
+        api_key = self.get_api_keys()
+        url = self.get_url("/search")
+        headers = {
+            "x-api-key": f"{api_key}",
+            "Content-Type": "text/plain",
+        }
+        data = get_test_image(filename)
+        response = requests.put(url, headers=headers, data=data, timeout=5)
+        self.assertEqual(response.status_code, 200)
+        response = response.json()
+        matched_faces = response["matchedFaces"]
+        assert "Keanu reeves" in matched_faces, "Keanu reeves not found in matched_faces"
