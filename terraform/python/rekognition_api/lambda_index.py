@@ -25,6 +25,21 @@ and search operations using the SearchFaces and SearchFacesByImage operations.
 
 - The input image is passed either as base64-encoded image bytes,
     or as a reference to an image in an Amazon S3 bucket.
+
+Facial recognition analysis and indexing of images. Invoked by S3.
+
+AWS Lambda to process image files uploaded to S3.
+1.) analyze image file with Rekognition.index_faces() to generate
+    'faceprints' of all faces found in the image
+
+2.) index each 'faceprint' by persisting it to DynamoDB
+
+returns: a JSON HTTP response object.
+
+Note that this Lambda is invoked by an S3 'put' event, and as of sep-2023
+the response goes undetected by S3. I'm hopeful that the http response
+object might become useful in the future if for example, S3 begins
+detecting and forwarding these downstream to API Gateway.
 """
 
 # python stuff
@@ -38,7 +53,11 @@ from urllib.parse import (  # to 'de-escape' string representations of URL value
 )
 
 # our stuff
-from rekognition_api.common import exception_response_factory, http_response_factory
+from rekognition_api.common import (
+    cloudwatch_handler,
+    exception_response_factory,
+    http_response_factory,
+)
 from rekognition_api.conf import settings
 from rekognition_api.exceptions import EXCEPTION_MAP, RekognitionIlligalInvocationError
 
@@ -48,37 +67,29 @@ urllib3_logger = logging.getLogger("urllib3")
 urllib3_logger.setLevel(logging.CRITICAL)
 
 
-# pylint: disable=unused-argument
-def lambda_handler(event, context):  # noqa: C901
+def get_records(event):
+    """returns the event records"""
+    return event["Records"]
+
+
+def get_bucket_name(event):
+    """returns the bucket name from the event record"""
+    records = get_records(event)
+    return records[0]["s3"]["bucket"]["name"]
+
+
+def validate_event(event):
     """
-    Facial recognition analysis and indexing of images. Invoked by S3.
+    This Lambda is supposed to be invoked by S3 'ObjectCreated:Put' events.
+    however, nothing prevents it from being invoked for any other reason.
 
-    AWS Lambda to process image files uploaded to S3.
-    1.) analyze image file with Rekognition.index_faces() to generate
-        'faceprints' of all faces found in the image
-
-    2.) index each 'faceprint' by persisting it to DynamoDB
-
-    returns: a JSON HTTP response object.
-
-    Note that this Lambda is invoked by an S3 'put' event, and as of sep-2023
-    the response goes undetected by S3. I'm hopeful that the http response
-    object might become useful in the future if for example, S3 begins
-    detecting and forwarding these downstream to API Gateway.
+    So, we add some basic business rule enforcement to ensure that the contents of the
+    'event' variable match what we are expecting.
+    ---------------------------
     """
-    if settings.debug_mode:
-        print(json.dumps(settings.cloudwatch_dump))
-        print(json.dumps({"event": event}))
-
-    records = event["Records"]
-
-    # this Lambda is supposed to be invoked by S3 'ObjectCreated:Put' events.
-    # however, nothing prevents it from being invoked for any other reason.
-    #
-    # So, we add some basic business rule enforcement to ensure that the contents of the
-    # 'event' variable match what we are expecting.
-    # ---------------------------
     try:
+        records = event["Records"]
+
         if "Records" not in event:
             raise TypeError("Records object not found in event object")
 
@@ -97,52 +108,80 @@ def lambda_handler(event, context):  # noqa: C901
 
     except (TypeError, RekognitionIlligalInvocationError) as e:
         return http_response_factory(status_code=500, body=exception_response_factory(e))
+    return True
 
-    # all good. lets process the event!
-    # ---------------------------
-    s3_bucket_name = records[0]["s3"]["bucket"]["name"]
+
+def unpack_s3_object(event, record):
+    """extracts the s3 object key, object, and object metadata from the event record"""
+    s3_bucket_name = get_bucket_name(event)
+    s3_object_key = unquote_plus(record["s3"]["object"]["key"], encoding="utf-8")
+    s3_object = settings.s3_client.Object(s3_bucket_name, s3_object_key)
+    s3_object_metadata = {key.replace("x-amz-meta-", ""): s3_object.metadata[key] for key in s3_object.metadata.keys()}
+    return s3_object_key, s3_object_metadata
+
+
+def get_faces(event, record):
+    """returns a list of faces found in the image"""
+    s3_bucket_name = get_bucket_name(event)
+    s3_object_key, _ = unpack_s3_object(event, record)
+
+    faces = {"FaceRecords": []}
+    try:
+        faces = settings.rekognition_client.index_faces(
+            CollectionId=settings.collection_id,
+            Image={"S3Object": {"Bucket": s3_bucket_name, "Name": s3_object_key}},
+            ExternalImageId=s3_object_key,
+            DetectionAttributes=[settings.face_detect_attributes],
+            MaxFaces=settings.face_detect_max_faces_count,
+            QualityFilter=settings.face_detect_quality_filter,
+        )
+
+    # handle anything that went wrong
+    # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
+    except settings.rekognition_client.exceptions.InvalidParameterException:
+        # If no faces are detected in the image, then index_faces()
+        # returns an InvalidParameterException error
+        pass
+
+    except Exception as e:
+        status_code, _message = EXCEPTION_MAP.get(type(e), (500, "Internal server error"))
+        return http_response_factory(status_code=status_code, body=exception_response_factory(e))
+
+    return faces
+
+
+def persist_faceprints(event, record, faces):
+    """
+    Iterate the FaceRecords list, adding each face to DynamoDB table.
+    Note: see the return JSON structure in doc/rekognition_index_faces.json
+    """
+    s3_bucket_name = get_bucket_name(event)
+    s3_object_key, s3_object_metadata = unpack_s3_object(event, record)
+
+    for face in faces["FaceRecords"]:
+        face = face["Face"]
+        face["bucket"] = s3_bucket_name
+        face["key"] = s3_object_key
+        face["metadata"] = s3_object_metadata
+        face = json.loads(json.dumps(face), parse_float=Decimal)
+        settings.dynamodb_table.put_item(Item=face)
+
+
+def log_event_record(record):
+    """log the event record"""
+    if settings.debug_mode:
+        print(json.dumps({"event_record": record}))
+
+
+# pylint: disable=unused-argument
+def lambda_handler(event, context):  # noqa: C901
+    """Lambda entry point"""
+
+    cloudwatch_handler(event)
+    validate_event(event)
+    records = get_records(event)
     for record in records:
-        faces = {"FaceRecords": []}
-
-        s3_object_key = unquote_plus(record["s3"]["object"]["key"], encoding="utf-8")
-        s3_object = settings.s3_client.Object(s3_bucket_name, s3_object_key)
-        s3_object_metadata = {
-            key.replace("x-amz-meta-", ""): s3_object.metadata[key] for key in s3_object.metadata.keys()
-        }
-        if settings.debug_mode:
-            print(json.dumps({"event_record": record}))
-        try:
-            # analyze the image.
-            faces = settings.rekognition_client.index_faces(
-                CollectionId=settings.collection_id,
-                Image={"S3Object": {"Bucket": s3_bucket_name, "Name": s3_object_key}},
-                ExternalImageId=s3_object_key,
-                DetectionAttributes=[settings.face_detect_attributes],
-                MaxFaces=settings.face_detect_max_faces_count,
-                QualityFilter=settings.face_detect_quality_filter,
-            )
-            # ----------------------------------------------------------------------
-            # iterate the FaceRecords list, adding each face to DynamoDB table.
-            # Note: see the return JSON structure in doc/rekognition_index_faces.json
-            # ----------------------------------------------------------------------
-            for face in faces["FaceRecords"]:
-                face = face["Face"]
-                face["bucket"] = s3_bucket_name
-                face["key"] = s3_object_key
-                face["metadata"] = s3_object_metadata
-                face = json.loads(json.dumps(face), parse_float=Decimal)
-                settings.dynamodb_table.put_item(Item=face)
-
-        # handle anything that went wrong
-        # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
-        except settings.rekognition_client.exceptions.InvalidParameterException:
-            # If no faces are detected in the image, then index_faces()
-            # returns an InvalidParameterException error
-            pass
-
-        except Exception as e:
-            status_code, _message = EXCEPTION_MAP.get(type(e), (500, "Internal server error"))
-            return http_response_factory(status_code=status_code, body=exception_response_factory(e))
-
-        # success!! return the results
+        log_event_record(record)
+        faces = get_faces(event, record)
+        persist_faceprints(event, record, faces)
         return http_response_factory(status_code=200, body=faces)

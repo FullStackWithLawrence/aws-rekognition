@@ -1,15 +1,14 @@
-# [0.2.0](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.1.2...v0.2.0) (2023-12-13)
-
-
-### Features
-
-* add Lambda Layer with Pydantic and dotenv ([612adb2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/612adb2aed909f506560f00c2a4d34eb38bcbc4c))
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [0.2.0](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.1.2...v0.2.0) (2023-12-13)
+
+### Features
+
+- add Lambda Layer with Pydantic and dotenv ([612adb2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/612adb2aed909f506560f00c2a4d34eb38bcbc4c))
 
 ## [0.1.2](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.1.1...v0.1.2) (2023-12-13)
 
