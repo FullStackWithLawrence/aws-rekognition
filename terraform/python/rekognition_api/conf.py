@@ -32,6 +32,7 @@ from rekognition_api.exceptions import (
 class SettingsDefaults:
     """Default values for Settings"""
 
+    AWS_PROFILE = None
     AWS_REGION = "us-east-1"
     DEBUG_MODE = False
     TABLE_ID = "rekognition"
@@ -67,11 +68,17 @@ def empty_str_to_int_default(v: str, default: int) -> int:
 class Settings(BaseSettings):
     """Settings for Lambda functions"""
 
+    _aws_session: boto3.Session = None
+
     debug_mode: Optional[bool] = Field(
         SettingsDefaults.DEBUG_MODE,
         env="DEBUG_MODE",
         pre=True,
         getter=lambda v: empty_str_to_bool_default(v, SettingsDefaults.DEBUG_MODE),
+    )
+    aws_profile: Optional[str] = Field(
+        SettingsDefaults.AWS_PROFILE,
+        env="AWS_PROFILE",
     )
     aws_regions: Optional[List[str]] = Field(AWS_REGIONS, description="The list of AWS regions")
     aws_region: Optional[str] = Field(
@@ -111,19 +118,29 @@ class Settings(BaseSettings):
     )
 
     @property
+    def aws_session(self):
+        """AWS session"""
+        if not self._aws_session:
+            if self.aws_profile:
+                self._aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+            else:
+                self._aws_session = boto3.Session(region_name=self.aws_region)
+        return self._aws_session
+
+    @property
     def s3_client(self):
         """S3 client"""
-        return boto3.resource("s3")
+        return self.aws_session.client("s3")
 
     @property
     def dynamodb_client(self):
         """DynamoDB client"""
-        return boto3.resource("dynamodb")
+        return self.aws_session.client("dynamodb")
 
     @property
     def rekognition_client(self):
         """Rekognition client"""
-        return boto3.client("rekognition")
+        return self.aws_session.client("rekognition")
 
     @property
     def dynamodb_table(self):
@@ -153,6 +170,14 @@ class Settings(BaseSettings):
         """Pydantic configuration"""
 
         frozen = True
+
+    @validator("aws_profile", pre=True)
+    # pylint: disable=no-self-argument,unused-argument
+    def validate_aws_profile(cls, v, values, **kwargs):
+        """Validate aws_profile"""
+        if v in [None, ""]:
+            return SettingsDefaults.AWS_PROFILE
+        return v
 
     @validator("aws_region", pre=True)
     # pylint: disable=no-self-argument,unused-argument

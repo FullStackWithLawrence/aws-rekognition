@@ -106,7 +106,7 @@ def validate_event(event):
             msg = f"lambda_index() is intended to be called for ObjectCreated:Put event, but was invoked by {event}"
             raise RekognitionIlligalInvocationError(msg)
 
-    except (TypeError, RekognitionIlligalInvocationError) as e:
+    except (KeyError, TypeError, RekognitionIlligalInvocationError) as e:
         return http_response_factory(status_code=500, body=exception_response_factory(e))
     return True
 
