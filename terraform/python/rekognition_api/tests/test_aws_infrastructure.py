@@ -26,6 +26,7 @@ TERRAFORM_TFVARS = os.path.join(TERRAFORM_ROOT, "terraform.tfvars")
 
 # our stuff
 sys.path.append(PYTHON_ROOT)  # noqa: E402
+from rekognition_api.conf import settings  # noqa: E402
 from rekognition_api.tests.test_setup import get_test_image  # noqa: E402
 
 
@@ -183,6 +184,21 @@ class TestAWSInfrastructture(unittest.TestCase):
             if item["name"] == self.shared_resource_identifier:
                 return item["value"]
         return False
+
+    def rekognition_collection_exists(self):
+        """Test that the Rekognition collection exists."""
+        rekognition_client = self.aws_session.client("rekognition")
+        response = rekognition_client.list_collections()
+        for collection in response["CollectionIds"]:
+            if collection == settings.collection_id:
+                return True
+        return False
+
+    def test_rekognition_collection_exists(self):
+        """Test that the Rekognition collection exists."""
+        self.assertTrue(
+            self.rekognition_collection_exists(), f"Rekognition collection {settings.collection_id} does not exist."
+        )
 
     def test_aws_connection_works(self):
         """Test that the AWS connection works."""
