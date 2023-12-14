@@ -54,7 +54,7 @@ class TestAWSInfrastructture(unittest.TestCase):
         self.s3_bucket_name = os.getenv(key="S3_BUCKET_NAME")
         self.aws_profile = os.getenv(key="AWS_PROFILE")
         self.aws_region = os.getenv(key="AWS_REGION")
-        self.dynamodb_table_name = os.getenv(key="DYNAMODB_TABLE_NAME")
+        self.common_resource_name = os.getenv(key="DYNAMODB_TABLE_NAME")
         self.api_gateway_name = os.getenv(key="API_GATEWAY_NAME")
 
         # aws resources
@@ -92,10 +92,8 @@ class TestAWSInfrastructture(unittest.TestCase):
         """Test that the DynamoDB table exists."""
         try:
             response = self.dynamodb.describe_table(TableName=table_name)
-            # If the table exists, the status will be 'ACTIVE'
             return response["Table"]["TableStatus"] == "ACTIVE"
         except boto3.exceptions.botocore.exceptions.ClientError as e:
-            # If the table does not exist, an exception will be thrown
             if e.response["Error"]["Code"] == "ResourceNotFoundException":
                 return False
             raise
@@ -133,6 +131,14 @@ class TestAWSInfrastructture(unittest.TestCase):
 
         return False
 
+    def get_api_keys(self) -> str:
+        """Test that the API Gateway exists."""
+        response = self.api_client.get_api_keys(includeValues=True)
+        for item in response["items"]:
+            if item["name"] == self.common_resource_name:
+                return item["value"]
+        return False
+
     def test_aws_connection_works(self):
         """Test that the AWS connection works."""
         self.assertTrue(self.aws_connection_works(), "AWS connection failed.")
@@ -148,8 +154,8 @@ class TestAWSInfrastructture(unittest.TestCase):
     def test_dynamodb_table_exists(self):
         """Test that the DynamoDB table exists."""
         self.assertTrue(
-            self.dynamodb_table_exists(self.dynamodb_table_name),
-            f"DynamoDB table {self.dynamodb_table_name} does not exist.",
+            self.dynamodb_table_exists(self.common_resource_name),
+            f"DynamoDB table {self.common_resource_name} does not exist.",
         )
 
     def test_api_exists(self):
@@ -170,3 +176,9 @@ class TestAWSInfrastructture(unittest.TestCase):
             self.api_resource_and_method_exists("/search", "ANY"),
             "API Gateway search (ANY) resource does not exist.",
         )
+
+    def test_api_key_exists(self):
+        """Test that an API key exists."""
+        api_key = self.get_api_keys()
+        self.assertIsInstance(api_key, str, "API key does not exist.")
+        self.assertGreaterEqual(len(api_key), 15, "API key is too short.")
