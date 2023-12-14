@@ -22,3 +22,10 @@ def get_test_file(filename: str):
     path = os.path.join(HERE, "mock_data", filename)
     with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
+
+
+def get_test_image(filename: str):
+    """Load a mock lambda_index event."""
+    path = os.path.join(HERE, "mock_data", "img", filename)
+    with open(path, "rb") as file:
+        return file.read()

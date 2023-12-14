@@ -37,9 +37,69 @@
 import base64  # library with base63 encoding/decoding functions
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 
-from rekognition_api.common import exception_response_factory, http_response_factory
+from rekognition_api.common import (
+    cloudwatch_handler,
+    exception_response_factory,
+    http_response_factory,
+)
 from rekognition_api.conf import settings
 from rekognition_api.exceptions import EXCEPTION_MAP
+
+
+def get_image_from_event(event):
+    """extract and decode the raw image data from the event"""
+    # see
+    #  - https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20
+    #  - line 39, in _bytes_from_decode_data ValueError: string argument should contain only ASCII characters
+    #  - https://stackoverflow.com/questions/53340627/typeerror-expected-bytes-like-object-not-str
+    #  - alternate syntax: image_raw = ''.join(image_raw).encode('ascii').strip()
+    image_raw = str(event["body"]).encode("ascii")
+    image_decoded = base64.b64decode(image_raw)
+
+    # https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal
+    # Image: base64-encoded bytes or an S3 object.
+    # Image={
+    #     'Bytes': b'bytes',
+    #     'S3Object': {
+    #         'Bucket': 'string',
+    #         'Name': 'string',
+    #         'Version': 'string'
+    #     }
+    # },
+    return {"Bytes": image_decoded}
+
+
+def get_faces(image):
+    """return a list of faces found in the image"""
+    return settings.rekognition_client.search_faces_by_image(
+        Image=image,
+        CollectionId=settings.collection_id,
+        MaxFaces=settings.face_detect_max_faces_count,
+        FaceMatchThreshold=settings.face_detect_threshold,
+        QualityFilter=settings.face_detect_quality_filter,
+    )
+
+
+def get_matched_faces(faces):
+    """return a list of matched faces"""
+    matched_faces = []  # any indexed faces found in the Rekognition return value
+    # ----------------------------------------------------------------------
+    # return structure: doc/rekogition_search_faces_by_image.json
+    # ----------------------------------------------------------------------
+    for face in faces["FaceMatches"]:
+        item = settings.dynamodb_table.get_item(Key={"FaceId": face["Face"]["FaceId"]})
+        if "Item" in item:
+            matched = (
+                str(item["Item"]["ExternalImageId"])
+                .replace("-", " ")
+                .replace("_", " ")
+                .replace(".jpg", "")
+                .replace(".png", "")
+                .capitalize()
+            )
+            matched_faces.append(matched)
+
+    return matched_faces
 
 
 # pylint: disable=unused-argument
@@ -47,57 +107,16 @@ def lambda_handler(event, context):  # noqa: C901
     """
     Facial recognition image analysis and search for indexed faces. invoked by API Gateway.
     """
-    if settings.debug_mode:
-        print(json.dumps(settings.cloudwatch_dump))
-        print(json.dumps({"event": event}))
-
-    # all good, lets process the event!
-    faces = {}  # Rekognition return value
-    matched_faces = []  # any indexed faces found in the Rekognition return value
+    cloudwatch_handler(event)
     try:
-        # see
-        #  - https://stackoverflow.com/questions/9942594/unicodeencodeerror-ascii-codec-cant-encode-character-u-xa0-in-position-20
-        #  - line 39, in _bytes_from_decode_data ValueError: string argument should contain only ASCII characters
-        #  - https://stackoverflow.com/questions/53340627/typeerror-expected-bytes-like-object-not-str
-        #  - alternate syntax: image_raw = ''.join(image_raw).encode('ascii').strip()
-        image_raw = str(event["body"]).encode("ascii")
-        image_decoded = base64.b64decode(image_raw)
+        image = get_image_from_event(event)
+        faces = get_faces(image)
+        matched_faces = get_matched_faces(faces)
 
-        # https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal
-        # Image: base64-encoded bytes or an S3 object.
-        # Image={
-        #     'Bytes': b'bytes',
-        #     'S3Object': {
-        #         'Bucket': 'string',
-        #         'Name': 'string',
-        #         'Version': 'string'
-        #     }
-        # },
-        image = {"Bytes": image_decoded}
-
-        faces = settings.rekognition_client.search_faces_by_image(
-            Image=image,
-            CollectionId=settings.collection_id,
-            MaxFaces=settings.face_detect_max_faces_count,
-            FaceMatchThreshold=settings.face_detect_threshold,
-            QualityFilter=settings.face_detect_quality_filter,
-        )
-
-        # ----------------------------------------------------------------------
-        # return structure: doc/rekogition_search_faces_by_image.json
-        # ----------------------------------------------------------------------
-        for face in faces["FaceMatches"]:
-            item = settings.dynamodb_table.get_item(Key={"FaceId": face["Face"]["FaceId"]})
-            if "Item" in item:
-                matched = (
-                    str(item["Item"]["ExternalImageId"])
-                    .replace("-", " ")
-                    .replace("_", " ")
-                    .replace(".jpg", "")
-                    .replace(".png", "")
-                    .capitalize()
-                )
-                matched_faces.append(matched)
+        retval = {
+            "faces": faces,  # all of the faces that Rekognition found in the image
+            "matchedFaces": matched_faces,  # any indexed faces found in DynamoDB
+        }
 
     # handle anything that went wrong
     # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
@@ -110,9 +129,4 @@ def lambda_handler(event, context):  # noqa: C901
         status_code, _message = EXCEPTION_MAP.get(type(e), (500, "Internal server error"))
         return http_response_factory(status_code=status_code, body=exception_response_factory(e))
 
-    # success!! return the results
-    retval = {
-        "faces": faces,  # all of the faces that Rekognition found in the image
-        "matchedFaces": matched_faces,  # any indexed faces found in DynamoDB
-    }
     return http_response_factory(status_code=200, body=retval)
