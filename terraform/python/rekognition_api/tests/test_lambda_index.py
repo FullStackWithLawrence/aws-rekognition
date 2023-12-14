@@ -24,7 +24,8 @@ class TestLambdaIndex(unittest.TestCase):
     """Test Index Lambda function."""
 
     # load a mock lambda_index event
-    event = get_test_file("apigateway_search_lambda_event.json")
+    event = get_test_file("json/apigateway_index_lambda_event.json")
+    response = get_test_file("json/apigateway_index_lambda_response.json")
 
     def setUp(self):
         """Set up test fixtures."""

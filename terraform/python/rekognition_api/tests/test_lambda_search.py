@@ -23,7 +23,10 @@ class TestLambdaIndex(unittest.TestCase):
     """Test Search Lambda function."""
 
     # load a mock lambda_index event
-    event = get_test_file("apigateway_search_lambda_event.json")
+    event = get_test_file("json/apigateway_search_lambda_event.json")
+    response = get_test_file("json/apigateway_search_lambda_response.json")
+    dynamodb_records = get_test_file("json/dynamodb-sample-records.json")
+    rekognition_search_output = get_test_file("json/rekognition_search_output.json")
 
     def setUp(self):
         """Set up test fixtures."""
