@@ -200,7 +200,7 @@ class TestAWSInfrastructture(unittest.TestCase):
         """Test that the index endpoint works."""
         filename = "Keanu-Reeves.jpg"
         api_key = self.get_api_keys()
-        url = self.get_url("/index/{filename}")
+        url = self.get_url(f"/index/{filename}")
         headers = {
             "x-api-key": f"{api_key}",
             "Content-Type": "text/plain",
