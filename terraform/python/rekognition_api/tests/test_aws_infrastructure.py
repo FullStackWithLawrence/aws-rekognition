@@ -52,7 +52,7 @@ class TestAWSInfrastructture(unittest.TestCase):
         # environment variables
         self.aws_account_id = os.getenv(key="AWS_ACCOUNT_ID", default=TFVARS["aws_account_id"])
         self.aws_region = os.getenv(key="AWS_REGION", default=TFVARS["aws_region"])
-        self.aws_profile = os.getenv(key="AWS_PROFILE", default=TFVARS["aws_profile"])
+        self.aws_profile = os.getenv(key="AWS_PROFILE", default=None)
         self.shared_resource_identifier = os.getenv(
             key="SHARED_RESOURCE_IDENTIFIER", default=TFVARS["shared_resource_identifier"]
         )
@@ -64,10 +64,16 @@ class TestAWSInfrastructture(unittest.TestCase):
         self.api_gateway_name = self.shared_resource_identifier + "-api"
 
         # aws resources
-        self.aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+        self.aws_session = self.get_session()
         self.s3_client = self.aws_session.client("s3")
         self.dynamodb = self.aws_session.client("dynamodb")
         self.api_client = self.aws_session.client("apigateway")
+
+    def get_session(self):
+        """Return a new AWS session."""
+        if self.aws_profile:
+            return boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+        return boto3.Session(region_name=self.aws_region)
 
     def get_url(self, path):
         """Return the url for the given path."""
