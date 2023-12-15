@@ -39,10 +39,17 @@ resource "aws_lambda_function" "index" {
     }
   }
 }
+
+resource "null_resource" "build_lambda_index" {
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/build/python/; cp -r ${path.module}/python/rekonition_api/*.py ${path.module}/build/python/"
+  }
+}
+
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_index" {
   type        = "zip"
-  source_dir  = "${path.module}/python/"
+  source_dir  = "${path.module}/build/python/"
   output_path = "${path.module}/build/lambda_index_payload.zip"
 }
 
