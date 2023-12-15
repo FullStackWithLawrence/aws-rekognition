@@ -40,9 +40,18 @@ resource "aws_lambda_function" "index" {
   }
 }
 
+# ------------------------------------------------------------------
+# note: this preps the Python code for deployment to Lambda
+# for both lambdas. we need to do this because the Python code
+# is in a subdirectory of the terraform project.
+# ------------------------------------------------------------------
 resource "null_resource" "build_lambda_index" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/build/python/; cp -r ${path.module}/python/rekonition_api/*.py ${path.module}/build/python/"
+    command = "rm -rf ${path.module}/build/*.zip; rm -rf ${path.module}/build/python; mkdir -p ${path.module}/build/python/rekognition_api; cp ${path.module}/python/rekognition_api/*.py ${path.module}/build/python/rekognition_api"
   }
 }
 
@@ -51,6 +60,8 @@ data "archive_file" "lambda_index" {
   type        = "zip"
   source_dir  = "${path.module}/build/python/"
   output_path = "${path.module}/build/lambda_index_payload.zip"
+
+  depends_on = [null_resource.build_lambda_index]
 }
 
 

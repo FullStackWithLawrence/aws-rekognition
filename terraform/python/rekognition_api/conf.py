@@ -130,12 +130,12 @@ class Settings(BaseSettings):
     @property
     def s3_client(self):
         """S3 client"""
-        return self.aws_session.client("s3")
+        return self.aws_session.resource("s3")
 
     @property
     def dynamodb_client(self):
         """DynamoDB client"""
-        return self.aws_session.client("dynamodb")
+        return self.aws_session.resource("dynamodb")
 
     @property
     def rekognition_client(self):
