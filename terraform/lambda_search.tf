@@ -56,9 +56,15 @@ resource "aws_cloudwatch_log_group" "search" {
 ###############################################################################
 # Lambda Search
 ###############################################################################
+resource "null_resource" "build_lambda_search" {
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/build/python/; cp -r ${path.module}/python/rekonition_api/*.py ${path.module}/build/python/"
+  }
+}
+
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_search" {
   type        = "zip"
-  source_dir  = "${path.module}/python/"
+  source_dir  = "${path.module}/build/python/"
   output_path = "${path.module}/build/lambda_search_payload.zip"
 }
