@@ -44,7 +44,7 @@
     "balanced-match": "^1.0.2",
     "before-after-hook": "^2.2.3",
     "bottleneck": "^2.19.5",
-    "brace-expansion": "^1.1.11",
+    "brace-expansion": "^3.0.0",
     "braces": "^3.0.2",
     "call-bind": "^1.0.5",
     "callsites": "^3.1.0",
