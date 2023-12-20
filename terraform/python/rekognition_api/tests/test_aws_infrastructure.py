@@ -194,6 +194,10 @@ class TestAWSInfrastructture(unittest.TestCase):
                 return True
         return False
 
+    # -------------------------------------------------------------------------
+    # Tests
+    # -------------------------------------------------------------------------
+
     def test_rekognition_collection_exists(self):
         """Test that the Rekognition collection exists."""
         self.assertTrue(
