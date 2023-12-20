@@ -6,6 +6,13 @@ Configuration for Lambda functions.
 This module is used to configure the Lambda functions. It uses the pydantic_settings
 library to validate the configuration values. The configuration values are read from
 environment variables, or alternatively these can be set when instantiating Settings().
+
+The configuration values are validated using pydantic. If the configuration values are
+invalid, then a RekognitionConfigurationError is raised.
+
+The configuration values are dumped to a dict using the dump property. This is used
+to display the configuration values in the /info endpoint.
+
 """
 
 import importlib.util
@@ -135,16 +142,34 @@ class Settings(BaseSettings):
 
     def __init__(self, **data: Any):
         super().__init__(**data)
+        if bool(os.environ.get("AWS_DEPLOYED", False)):
+            # If we're running inside AWS Lambda, then we don't need to set the AWS credentials.
+            self._aws_access_key_id_source: str = "overridden by IAM role-based security"
+            self._aws_secret_access_key_source: str = "overridden by IAM role-based security"
+            self._aws_session = boto3.Session()
+            self._initialized = True
+            return
+
         aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
         if len(aws_profile) > 0:
             logger.debug("Using AWS_PROFILE: %s", aws_profile)
             self._aws_access_key_id_source = "aws_profile"
             self._aws_secret_access_key_source = "aws_profile"
-        else:
-            if "AWS_ACCESS_KEY_ID" in os.environ:
-                self._aws_access_key_id_source = "environ"
-            if "AWS_SECRET_ACCESS_KEY" in os.environ:
-                self._aws_secret_access_key_source = "environ"
+            self._initialized = True
+            return
+
+        if "aws_access_key_id" in data or "aws_secret_access_key" in data:
+            if "aws_access_key_id" in data:
+                self._aws_access_key_id_source = "constructor"
+            if "aws_secret_access_key" in data:
+                self._aws_secret_access_key_source = "constructor"
+            self._initialized = True
+            return
+
+        if "AWS_ACCESS_KEY_ID" in os.environ:
+            self._aws_access_key_id_source = "environ"
+        if "AWS_SECRET_ACCESS_KEY" in os.environ:
+            self._aws_secret_access_key_source = "environ"
         self._initialized = True
 
     debug_mode: Optional[bool] = Field(
@@ -226,17 +251,19 @@ class Settings(BaseSettings):
         """AWS session"""
         if not self._aws_session:
             if self.aws_profile:
+                logger.debug("creating new aws_session with aws_profile: %s", self.aws_profile)
                 self._aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
-            else:
-                if self.aws_access_key_id_source == "unset" or self.aws_secret_access_key_source == "unset":
-                    raise RekognitionConfigurationError(
-                        "aws_access_key_id and aws_secret_access_key must be set when aws_profile is not set."
-                    )
+                return self._aws_session
+            if self.aws_access_key_id.get_secret_value() is not None and self.aws_secret_access_key is not None:
+                logger.debug("creating new aws_session with aws keypair: %s", self.aws_access_key_id_source)
                 self._aws_session = boto3.Session(
                     region_name=self.aws_region,
                     aws_access_key_id=self.aws_access_key_id.get_secret_value(),
                     aws_secret_access_key=self.aws_secret_access_key.get_secret_value(),
                 )
+                return self._aws_session
+            logger.debug("creating new aws_session without aws credentials")
+            self._aws_session = boto3.Session(region_name=self.aws_region)
         return self._aws_session
 
     @property
@@ -362,8 +389,7 @@ class Settings(BaseSettings):
         return v
 
     @field_validator("aws_profile")
-    # pylint: disable=no-self-argument,unused-argument
-    def validate_aws_profile(cls, v, values, **kwargs) -> str:
+    def validate_aws_profile(cls, v) -> str:
         """Validate aws_profile"""
         if v in [None, ""]:
             return SettingsDefaults.AWS_PROFILE
@@ -379,8 +405,6 @@ class Settings(BaseSettings):
         if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
             logger.warning("aws_access_key_id is ignored when aws_profile is set")
             return SettingsDefaults.AWS_ACCESS_KEY_ID
-        if cls.aws_access_key_id_source == "unset":
-            cls._aws_access_key_id_source = "constructor"
         return v
 
     @field_validator("aws_secret_access_key")
@@ -393,8 +417,6 @@ class Settings(BaseSettings):
         if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
             logger.warning("aws_secret_access_key is ignored when aws_profile is set")
             return SettingsDefaults.AWS_SECRET_ACCESS_KEY
-        if cls.aws_secret_access_key_source == "unset":
-            cls._aws_secret_access_key_source = "constructor"
         return v
 
     @field_validator("aws_region")
