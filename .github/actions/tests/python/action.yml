@@ -61,5 +61,4 @@ runs:
     - name: Run Tests
       shell: bash
       run: |
-        cd models && pytest -v -s tests/
-        python -m setup_test
+        make test
