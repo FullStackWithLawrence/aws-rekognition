@@ -24,13 +24,13 @@ env:
 	ifneq ("$(wildcard .env)","")
 		include .env
 	else
-		$(shell echo -e "FACE_DETECT_MAX_FACES_COUNT=10" >> .env)
-		$(shell echo -e "FACE_DETECT_THRESHOLD=10" >> .env)
-		$(shell echo -e "FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
-		$(shell echo -e "FACE_DETECT_QUALITY_FILTER=AUTO" >> .env)
-		$(shell echo -e "TABLE_ID=rekognition" >> .env)
+		$(shell echo -e "AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT=10" >> .env)
+		$(shell echo -e "AWS_REKOGNITION_FACE_DETECT_THRESHOLD=10" >> .env)
+		$(shell echo -e "AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES=DEFAULT" >> .env)
+		$(shell echo -e "AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER=AUTO" >> .env)
+		$(shell echo -e "AWS_DYNAMODB_TABLE_ID=rekognition" >> .env)
 		$(shell echo -e "AWS_REGION=us-east-1" >> .env)
-		$(shell echo -e "COLLECTION_ID=rekognition-collection" >> .env)
+		$(shell echo -e "AWS_REKOGNITION_COLLECTION_ID=rekognition-collection" >> .env)
 		$(shell echo -e "DEBUG_MODE=False" >> .env)
 	endif
 

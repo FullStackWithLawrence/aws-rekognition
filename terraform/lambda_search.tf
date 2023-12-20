@@ -31,14 +31,14 @@ resource "aws_lambda_function" "search" {
 
   environment {
     variables = {
-      DEBUG_MODE             = var.debug_mode
-      MAX_FACES_COUNT        = var.max_faces_count
-      FACE_DETECT_THRESHOLD  = var.face_detect_threshold
-      QUALITY_FILTER         = var.face_detect_quality_filter
-      FACE_DETECT_ATTRIBUTES = var.face_detect_attributes
-      TABLE_ID               = local.table_name
-      REGION                 = var.aws_region
-      COLLECTION_ID          = local.collection_id
+      DEBUG_MODE                             = var.debug_mode
+      MAX_FACES_COUNT                        = var.aws_rekognition_max_faces_count
+      AWS_REKOGNITION_FACE_DETECT_THRESHOLD  = var.aws_rekognition_face_detect_threshold
+      QUALITY_FILTER                         = var.aws_rekognition_face_detect_quality_filter
+      AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES = var.aws_rekognition_face_detect_attributes
+      AWS_DYNAMODB_TABLE_ID                  = local.table_name
+      REGION                                 = var.aws_region
+      AWS_REKOGNITION_COLLECTION_ID          = local.aws_rekognition_collection_id
     }
   }
 }

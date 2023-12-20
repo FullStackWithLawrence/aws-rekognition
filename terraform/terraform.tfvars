@@ -36,10 +36,10 @@ log_retention_days = 3
 ###############################################################################
 # Rekognition index_faces() optional parameters
 ###############################################################################
-max_faces_count            = 10
-face_detect_threshold      = 10
-face_detect_attributes     = "DEFAULT"
-face_detect_quality_filter = "AUTO"
+aws_rekognition_max_faces_count            = 10
+aws_rekognition_face_detect_threshold      = 10
+aws_rekognition_face_detect_attributes     = "DEFAULT"
+aws_rekognition_face_detect_quality_filter = "AUTO"
 
 ###############################################################################
 # APIGateway parameters
