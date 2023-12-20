@@ -4,28 +4,26 @@
 #
 # date: sep-2023
 #
-# usage:  - implement a Python Lambda function to create a 'faceprint' of an image
-#           triggered by uploading the image to the S3 bucket
-#
-#         - implement role-based security for both Lambda functions.
+# usage:  - implement a Python Lambda function to create a dump of the
+#           configuration settings for the facial recognition system.
 #------------------------------------------------------------------------------
 locals {
-  search_function_name = "${var.shared_resource_identifier}_search"
+  info_function_name = "${var.shared_resource_identifier}_info"
 }
 
-resource "aws_lambda_function" "search" {
+resource "aws_lambda_function" "info" {
 
   # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-  function_name    = local.search_function_name
-  description      = "Facial recognition image analysis and search for indexed faces. invoked by API Gateway."
+  function_name    = local.info_function_name
+  description      = "Facial recognition configuration settings. invoked by API Gateway."
   role             = aws_iam_role.lambda.arn
   publish          = true
   runtime          = var.lambda_python_runtime
   memory_size      = var.lambda_memory_size
   timeout          = var.lambda_timeout
-  handler          = "rekognition_api.lambda_search.lambda_handler"
-  filename         = data.archive_file.lambda_search.output_path
-  source_code_hash = data.archive_file.lambda_search.output_base64sha256
+  handler          = "rekognition_api.lambda_info.lambda_handler"
+  filename         = data.archive_file.lambda_info.output_path
+  source_code_hash = data.archive_file.lambda_info.output_base64sha256
   layers           = [aws_lambda_layer_version.rekognition.arn]
   tags             = var.tags
 
@@ -46,8 +44,8 @@ resource "aws_lambda_function" "search" {
 ###############################################################################
 # Cloudwatch logging
 ###############################################################################
-resource "aws_cloudwatch_log_group" "search" {
-  name              = "/aws/lambda/${local.search_function_name}"
+resource "aws_cloudwatch_log_group" "info" {
+  name              = "/aws/lambda/${local.info_function_name}"
   retention_in_days = var.log_retention_days
   tags              = var.tags
 }
@@ -58,10 +56,10 @@ resource "aws_cloudwatch_log_group" "search" {
 ###############################################################################
 
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
-data "archive_file" "lambda_search" {
+data "archive_file" "lambda_info" {
   type        = "zip"
   source_dir  = "${path.module}/build/python/"
-  output_path = "${path.module}/build/lambda_search_payload.zip"
+  output_path = "${path.module}/build/lambda_info_payload.zip"
 
   depends_on = [null_resource.build_lambda_index]
 }
