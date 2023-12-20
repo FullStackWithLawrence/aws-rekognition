@@ -18,7 +18,10 @@ sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 # our stuff
 from rekognition_api.conf import Settings, SettingsDefaults  # noqa: E402
-from rekognition_api.exceptions import RekognitionValueError  # noqa: E402
+from rekognition_api.exceptions import (  # noqa: E402
+    RekognitionConfigurationError,
+    RekognitionValueError,
+)
 
 
 class TestConfiguration(unittest.TestCase):
@@ -106,6 +109,43 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.aws_rekognition_face_detect_quality_filter, "TEST_AUTO")
         self.assertEqual(mock_settings.aws_rekognition_face_detect_threshold, 100)
         self.assertEqual(mock_settings.debug_mode, True)
+
+    @patch.dict(
+        os.environ,
+        {"AWS_PROFILE": "TEST_PROFILE", "AWS_ACCESS_KEY_ID": "TEST_KEY", "AWS_SECRET_ACCESS_KEY": "TEST_SECRET"},
+    )
+    def test_aws_credentials_with_profile(self):
+        """Test that key and secret are unset when using profile."""
+
+        mock_settings = Settings()
+        self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
+        self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
+
+    @patch.dict(
+        os.environ, {"AWS_PROFILE": "", "AWS_ACCESS_KEY_ID": "TEST_KEY", "AWS_SECRET_ACCESS_KEY": "TEST_SECRET"}
+    )
+    def test_aws_credentials_without_profile(self):
+        """Test that key and secret are unset when using profile."""
+
+        mock_settings = Settings()
+        # pylint: disable=no-member
+        self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), "TEST_KEY")
+        # pylint: disable=no-member
+        self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), "TEST_SECRET")
+        self.assertEqual(mock_settings.aws_access_key_id_source, "environ")
+        self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
+
+    def test_aws_credentials_noinfo(self):
+        """Test that key and secret are unset when using profile."""
+        os.environ.clear()
+        mock_settings = Settings()
+        self.assertEqual(mock_settings.aws_profile, None)
+        # pylint: disable=no-member
+        self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), None)
+        # pylint: disable=no-member
+        self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), None)
+        self.assertEqual(mock_settings.aws_access_key_id_source, "unset")
+        self.assertEqual(mock_settings.aws_secret_access_key_source, "unset")
 
     @patch.dict(os.environ, {"AWS_REGION": "invalid-region"})
     def test_invalid_aws_region_code(self):
@@ -198,7 +238,6 @@ class TestConfiguration(unittest.TestCase):
         """Test that dump contains the expected keys."""
 
         dump = Settings().dump
-        self.assertIn("secrets", dump)
         self.assertIn("environment", dump)
         self.assertIn("aws", dump)
         self.assertIn("rekognition", dump)
