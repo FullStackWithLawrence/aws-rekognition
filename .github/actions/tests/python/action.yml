@@ -52,12 +52,6 @@ runs:
       env:
         SITE_PACKAGES_PATH: ${{ env.SITE_PACKAGES_PATH }}
 
-    - name: Create .env
-      shell: bash
-      run: |
-        touch ./.env
-      env:
-
     - name: Run Tests
       shell: bash
       run: |
