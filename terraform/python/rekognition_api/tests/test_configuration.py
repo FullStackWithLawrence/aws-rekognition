@@ -47,10 +47,20 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.face_detect_quality_filter, SettingsDefaults.FACE_DETECT_QUALITY_FILTER)
         self.assertEqual(mock_settings.face_detect_threshold, SettingsDefaults.FACE_DETECT_THRESHOLD)
 
+    def test_env_illegal_nulls(self):
+        """Test that settings handles missing .env values."""
+        os.environ.clear()
+        env_path = self.env_path(".env.test_illegal_nulls")
+        loaded = load_dotenv(env_path)
+        self.assertTrue(loaded)
+
+        with self.assertRaises(PydanticValidationError):
+            Settings()
+
     def test_env_nulls(self):
         """Test that settings handles missing .env values."""
         os.environ.clear()
-        env_path = self.env_path(".env.test_nulls")
+        env_path = self.env_path(".env.test_legal_nulls")
         loaded = load_dotenv(env_path)
         self.assertTrue(loaded)
 
@@ -59,10 +69,8 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
         self.assertEqual(mock_settings.table_id, SettingsDefaults.TABLE_ID)
         self.assertEqual(mock_settings.collection_id, SettingsDefaults.COLLECTION_ID)
-        self.assertEqual(mock_settings.face_detect_max_faces_count, SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT)
         self.assertEqual(mock_settings.face_detect_attributes, SettingsDefaults.FACE_DETECT_ATTRIBUTES)
         self.assertEqual(mock_settings.face_detect_quality_filter, SettingsDefaults.FACE_DETECT_QUALITY_FILTER)
-        self.assertEqual(mock_settings.face_detect_threshold, SettingsDefaults.FACE_DETECT_THRESHOLD)
 
     def test_env_overrides(self):
         """Test that settings takes custom .env values."""
