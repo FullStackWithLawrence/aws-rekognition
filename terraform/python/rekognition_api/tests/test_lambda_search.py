@@ -9,7 +9,7 @@ import unittest
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+PYTHON_ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 # our stuff

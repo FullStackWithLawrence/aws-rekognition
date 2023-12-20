@@ -7,8 +7,7 @@
 [![12-Factor](https://img.shields.io/badge/12--Factor-Compliant-green.svg)](./doc/Twelve_Factor_Methodology.md)
 [![Unit Tests](https://github.com/FullStackWithLawrence/aws-rekognition/actions/workflows/tests.yml/badge.svg)](https://github.com/FullStackWithLawrence/aws-rekognition/actions)
 ![GHA pushMain Status](https://img.shields.io/github/actions/workflow/status/FullStackWithLawrence/aws-rekognition/pushMain.yml?branch=main)
-![Auto Assign](https://github.com/FullStackwithLawrence/aws-rekognition/actions/workflows/auto-assign.yml/badge.svg)[![Source
-code](https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=orange&message=Source%20code)](https://github.com/FullStackWithLawrence/aws-rekognition)
+![Auto Assign](https://github.com/FullStackwithLawrence/aws-rekognition/actions/workflows/auto-assign.yml/badge.svg)
 [![Release Notes](https://img.shields.io/github/release/FullStackWithLawrence/aws-rekognition)](https://github.com/FullStackWithLawrence/aws-rekognition/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
@@ -68,6 +67,8 @@ terraform apply
 
 ## Requirements
 
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). _pre-installed on Linux and macOS_
+- [make](https://gnuwin32.sourceforge.net/packages/make.htm). _pre-installed on Linux and macOS._
 - [AWS account](https://aws.amazon.com/)
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Terraform](https://www.terraform.io/).
