@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 from dotenv import load_dotenv
-from pydantic import Field, ValidationError, ValidationInfo, field_validator
+from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
 from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 
@@ -31,6 +31,8 @@ from rekognition_api.exceptions import (
 )
 
 
+logger = logging.getLogger(__name__)
+TFVARS = TFVARS or {}
 DOT_ENV_LOADED = load_dotenv()
 
 
@@ -73,8 +75,11 @@ class SettingsDefaults:
     """Default values for Settings"""
 
     AWS_PROFILE = TFVARS.get("aws_profile", None)
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
+    AWS_ACCESS_KEY_ID = SecretStr(None)
+    AWS_SECRET_ACCESS_KEY = SecretStr(None)
     AWS_REGION = TFVARS.get("aws_region", "us-east-1")
+
+    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
 
@@ -123,10 +128,23 @@ class Settings(BaseSettings):
     """Settings for Lambda functions"""
 
     _aws_session: boto3.Session = None
+    _aws_access_key_id_source: str = "unset"
+    _aws_secret_access_key_source: str = "unset"
     _dump: dict = None
+    _initialized: bool = False
 
     def __init__(self, **data: Any):
         super().__init__(**data)
+        aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
+        if len(aws_profile) > 0:
+            logger.debug("Using AWS_PROFILE: %s", aws_profile)
+            self._aws_access_key_id_source = "aws_profile"
+            self._aws_secret_access_key_source = "aws_profile"
+        else:
+            if "AWS_ACCESS_KEY_ID" in os.environ:
+                self._aws_access_key_id_source = "environ"
+            if "AWS_SECRET_ACCESS_KEY" in os.environ:
+                self._aws_secret_access_key_source = "environ"
         self._initialized = True
 
     debug_mode: Optional[bool] = Field(
@@ -144,6 +162,14 @@ class Settings(BaseSettings):
     aws_profile: Optional[str] = Field(
         SettingsDefaults.AWS_PROFILE,
         env="AWS_PROFILE",
+    )
+    aws_access_key_id: Optional[SecretStr] = Field(
+        SettingsDefaults.AWS_ACCESS_KEY_ID,
+        env="AWS_ACCESS_KEY_ID",
+    )
+    aws_secret_access_key: Optional[SecretStr] = Field(
+        SettingsDefaults.AWS_SECRET_ACCESS_KEY,
+        env="AWS_SECRET_ACCESS_KEY",
     )
     aws_regions: Optional[List[str]] = Field(AWS_REGIONS, description="The list of AWS regions")
     aws_region: Optional[str] = Field(
@@ -186,13 +212,31 @@ class Settings(BaseSettings):
     )
 
     @property
+    def aws_access_key_id_source(self):
+        """Source of aws_access_key_id"""
+        return self._aws_access_key_id_source
+
+    @property
+    def aws_secret_access_key_source(self):
+        """Source of aws_secret_access_key"""
+        return self._aws_secret_access_key_source
+
+    @property
     def aws_session(self):
         """AWS session"""
         if not self._aws_session:
             if self.aws_profile:
                 self._aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
             else:
-                self._aws_session = boto3.Session(region_name=self.aws_region)
+                if self.aws_access_key_id_source == "unset" or self.aws_secret_access_key_source == "unset":
+                    raise RekognitionConfigurationError(
+                        "aws_access_key_id and aws_secret_access_key must be set when aws_profile is not set."
+                    )
+                self._aws_session = boto3.Session(
+                    region_name=self.aws_region,
+                    aws_access_key_id=self.aws_access_key_id.get_secret_value(),
+                    aws_secret_access_key=self.aws_secret_access_key.get_secret_value(),
+                )
         return self._aws_session
 
     @property
@@ -261,7 +305,6 @@ class Settings(BaseSettings):
             return self._dump
 
         self._dump = {
-            "secrets": {},
             "environment": {
                 "is_using_tfvars_file": self.is_using_tfvars_file,
                 "is_using_dotenv_file": self.is_using_dotenv_file,
@@ -277,19 +320,20 @@ class Settings(BaseSettings):
                 "version": self.version,
             },
             "aws": {
-                "profile": self.aws_profile,
-                "region": self.aws_region,
+                "aws_profile": self.aws_profile,
+                "aws_access_key_id_source": self.aws_access_key_id_source,
+                "aws_secret_access_key_source": self.aws_secret_access_key_source,
+                "aws_region": self.aws_region,
             },
             "rekognition": {
                 "aws_rekognition_collection_id": self.aws_rekognition_collection_id,
-                "aws_dynamodb_table_id": self.aws_dynamodb_table_id,
                 "aws_rekognition_face_detect_max_faces_count": self.aws_rekognition_face_detect_max_faces_count,
                 "aws_rekognition_face_detect_attributes": self.aws_rekognition_face_detect_attributes,
                 "aws_rekognition_face_detect_quality_filter": self.aws_rekognition_face_detect_quality_filter,
                 "aws_rekognition_face_detect_threshold": self.aws_rekognition_face_detect_threshold,
             },
             "dynamodb": {
-                "table": self.aws_dynamodb_table_id,
+                "aws_dynamodb_table_id": self.aws_dynamodb_table_id,
             },
         }
         if self.dump_defaults:
@@ -323,6 +367,34 @@ class Settings(BaseSettings):
         """Validate aws_profile"""
         if v in [None, ""]:
             return SettingsDefaults.AWS_PROFILE
+        return v
+
+    @field_validator("aws_access_key_id")
+    def validate_aws_access_key_id(cls, v, values: ValidationInfo) -> str:
+        """Validate aws_access_key_id"""
+        if not isinstance(v, SecretStr):
+            v = SecretStr(v)
+        if v.get_secret_value() in [None, ""]:
+            return SettingsDefaults.AWS_ACCESS_KEY_ID
+        if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
+            logger.warning("aws_access_key_id is ignored when aws_profile is set")
+            return SettingsDefaults.AWS_ACCESS_KEY_ID
+        if cls.aws_access_key_id_source == "unset":
+            cls._aws_access_key_id_source = "constructor"
+        return v
+
+    @field_validator("aws_secret_access_key")
+    def validate_aws_secret_access_key(cls, v, values: ValidationInfo) -> str:
+        """Validate aws_secret_access_key"""
+        if not isinstance(v, SecretStr):
+            v = SecretStr(v)
+        if v.get_secret_value() in [None, ""]:
+            return SettingsDefaults.AWS_SECRET_ACCESS_KEY
+        if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
+            logger.warning("aws_secret_access_key is ignored when aws_profile is set")
+            return SettingsDefaults.AWS_SECRET_ACCESS_KEY
+        if cls.aws_secret_access_key_source == "unset":
+            cls._aws_secret_access_key_source = "constructor"
         return v
 
     @field_validator("aws_region")

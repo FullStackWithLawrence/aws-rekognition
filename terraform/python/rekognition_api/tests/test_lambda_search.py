@@ -3,11 +3,13 @@
 """Test Search Lambda function."""
 
 # python stuff
+import logging
 import os
 import sys
 import unittest
 
 
+logger = logging.getLogger(__file__)
 HERE = os.path.abspath(os.path.dirname(__file__))
 PYTHON_ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.append(PYTHON_ROOT)  # noqa: E402
@@ -44,7 +46,7 @@ class TestLambdaIndex(unittest.TestCase):
         #     image_from_event = get_image_from_event(self.search_event)
 
         #     self.assertEqual(image_from_event, self.image)
-        print("Not implemented")
+        logger.debug("Not implemented")
         assert True
 
     def test_get_faces(self):
@@ -57,5 +59,5 @@ class TestLambdaIndex(unittest.TestCase):
         #     QualityFilter=settings.aws_rekognition_face_detect_quality_filter,
         # )
         # faces = get_faces(self.image_packed)
-        print("Not implemented")
+        logger.debug("Not implemented")
         assert True
