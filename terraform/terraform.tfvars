@@ -60,7 +60,7 @@ quota_settings_period = "DAY"
 
 # The API request burst limit, the maximum rate limit over a time ranging from one to a few seconds,
 # depending upon whether the underlying token bucket is at its full capacity.
-throttle_settings_burst_limit = 5
+throttle_settings_burst_limit = 25
 
 # The API request steady-state rate limit.
 throttle_settings_rate_limit = 10

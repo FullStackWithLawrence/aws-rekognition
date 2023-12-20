@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 from dotenv import load_dotenv
-from pydantic import Field, ValidationError, validator
+from pydantic import Field, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
 from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 
@@ -75,11 +75,11 @@ class SettingsDefaults:
     AWS_PROFILE = TFVARS.get("aws_profile", None)
     DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
     AWS_REGION = TFVARS.get("aws_region", "us-east-1")
-    DEBUG_MODE = TFVARS.get("debug_mode", False)
+    DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
     TABLE_ID = "rekognition"
     COLLECTION_ID = TABLE_ID + "-collection"
-    FACE_DETECT_MAX_FACES_COUNT = TFVARS.get("max_faces_count", 10)
-    FACE_DETECT_THRESHOLD = TFVARS.get("face_detect_threshold", 80)
+    FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("max_faces_count", 10))
+    FACE_DETECT_THRESHOLD: int = int(TFVARS.get("face_detect_threshold", 10))
     FACE_DETECT_ATTRIBUTES = TFVARS.get("face_detect_attributes", "DEFAULT")
     FACE_DETECT_QUALITY_FILTER = TFVARS.get("face_detect_quality_filter", "AUTO")
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
@@ -308,14 +308,14 @@ class Settings(BaseSettings):
 
         frozen = True
 
-    @validator("shared_resource_identifier", pre=True)
+    @field_validator("shared_resource_identifier")
     def validate_shared_resource_identifier(cls, v) -> str:
         """Validate shared_resource_identifier"""
         if v in [None, ""]:
             return SettingsDefaults.SHARED_RESOURCE_IDENTIFIER
         return v
 
-    @validator("aws_profile", pre=True)
+    @field_validator("aws_profile")
     # pylint: disable=no-self-argument,unused-argument
     def validate_aws_profile(cls, v, values, **kwargs) -> str:
         """Validate aws_profile"""
@@ -323,38 +323,39 @@ class Settings(BaseSettings):
             return SettingsDefaults.AWS_PROFILE
         return v
 
-    @validator("aws_region", pre=True)
+    @field_validator("aws_region")
     # pylint: disable=no-self-argument,unused-argument
-    def validate_aws_region(cls, v, values, **kwargs) -> str:
+    def validate_aws_region(cls, v, values: ValidationInfo, **kwargs) -> str:
         """Validate aws_region"""
+        valid_regions = values.data.get("aws_regions", [])
         if v in [None, ""]:
             return SettingsDefaults.AWS_REGION
-        if "aws_regions" in values and v not in values["aws_regions"]:
+        if v not in valid_regions:
             raise RekognitionValueError(f"aws_region {v} not in aws_regions")
         return v
 
-    @validator("table_id", pre=True)
+    @field_validator("table_id")
     def validate_table_id(cls, v) -> str:
         """Validate table_id"""
         if v in [None, ""]:
             return SettingsDefaults.TABLE_ID
         return v
 
-    @validator("collection_id", pre=True)
+    @field_validator("collection_id")
     def validate_collection_id(cls, v) -> str:
         """Validate collection_id"""
         if v in [None, ""]:
             return SettingsDefaults.COLLECTION_ID
         return v
 
-    @validator("face_detect_attributes", pre=True)
+    @field_validator("face_detect_attributes")
     def validate_face_detect_attributes(cls, v) -> str:
         """Validate face_detect_attributes"""
         if v in [None, ""]:
             return SettingsDefaults.FACE_DETECT_ATTRIBUTES
         return v
 
-    @validator("debug_mode", pre=True)
+    @field_validator("debug_mode")
     def parse_debug_mode(cls, v) -> bool:
         """Parse debug_mode"""
         if isinstance(v, bool):
@@ -363,7 +364,7 @@ class Settings(BaseSettings):
             return SettingsDefaults.DEBUG_MODE
         return v.lower() in ["true", "1", "t", "y", "yes"]
 
-    @validator("dump_defaults", pre=True)
+    @field_validator("dump_defaults")
     def parse_dump_defaults(cls, v) -> bool:
         """Parse dump_defaults"""
         if isinstance(v, bool):
@@ -372,14 +373,14 @@ class Settings(BaseSettings):
             return SettingsDefaults.DUMP_DEFAULTS
         return v.lower() in ["true", "1", "t", "y", "yes"]
 
-    @validator("face_detect_max_faces_count", pre=True)
+    @field_validator("face_detect_max_faces_count")
     def check_face_detect_max_faces_count(cls, v) -> int:
         """Check face_detect_max_faces_count"""
         if v in [None, ""]:
             return SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT
         return int(v)
 
-    @validator("face_detect_threshold", pre=True)
+    @field_validator("face_detect_threshold")
     def check_face_detect_threshold(cls, v) -> int:
         """Check face_detect_threshold"""
         if isinstance(v, int):
@@ -394,13 +395,3 @@ try:
     settings = Settings()
 except ValidationError as e:
     raise RekognitionConfigurationError("Invalid configuration: " + str(e)) from e
-
-logger = logging.getLogger(__name__)
-logger.debug("DEBUG_MODE: %s", settings.debug_mode)
-logger.debug("AWS_REGION: %s", settings.aws_region)
-logger.debug("TABLE_ID: %s", settings.table_id)
-logger.debug("COLLECTION_ID: %s", settings.collection_id)
-logger.debug("FACE_DETECT_MAX_FACES_COUNT: %s", settings.face_detect_max_faces_count)
-logger.debug("FACE_DETECT_ATTRIBUTES: %s", settings.face_detect_attributes)
-logger.debug("FACE_DETECT_QUALITY_FILTER: %s", settings.face_detect_quality_filter)
-logger.debug("FACE_DETECT_THRESHOLD: %s", settings.face_detect_threshold)
