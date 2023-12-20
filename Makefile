@@ -1,5 +1,11 @@
 SHELL := /bin/bash
-PYTHON = python3
+ifeq ($(OS),Windows_NT)
+    PYTHON = python.exe
+    ACTIVATE_VENV = venv\Scripts\activate
+else
+    PYTHON = python3.11
+    ACTIVATE_VENV = source venv/bin/activate
+endif
 PIP = $(PYTHON) -m pip
 
 .PHONY: env analyze init pre-commit requirements lint clean test build force-release publish-test publish-prod help
@@ -36,22 +42,10 @@ analyze:
 # -------------------------------------------------------------------------
 init:
 	make clean && \
-	npm install eslint --save-dev && \
-	npm install eslint-plugin-import --save-dev && \
-	npm install eslint-config-google --save-dev && \
-	npm install && \
-	python3.11 -m venv venv && \
+	$(PYTHON) -m venv venv && \
 	$(ACTIVATE_VENV) && \
-	pip install --upgrade pip && \
+	$(PIP) install --upgrade pip && \
 	make requirements
-
-# -------------------------------------------------------------------------
-# Install and run pre-commit hooks
-# -------------------------------------------------------------------------
-pre-commit:
-	pre-commit install
-	pre-commit autoupdate
-	pre-commit run --all-files
 
 # -------------------------------------------------------------------------
 # Install requirements: Python, npm and pre-commit
@@ -61,17 +55,21 @@ requirements:
 	$(PIP) install --upgrade pip wheel
 	$(PIP) install -r requirements.txt && \
 	npm install && \
+	pre-commit install
 	pre-commit autoupdate
-	make pre-commit
+	pre-commit run --all-files
 
 # -------------------------------------------------------------------------
 # Run black and pre-commit hooks.
 # includes prettier, isort, flake8, pylint, etc.
 # -------------------------------------------------------------------------
 lint:
+	pre-commit run --all-files && \
+	pylint ./terraform/python/rekognition_api && \
+	flake8 . && \
+	isort . && \
+	black ./terraform/python/rekognition_api && \
 	terraform fmt -recursive
-	pre-commit run --all-files
-	black ./terraform/python/
 
 # -------------------------------------------------------------------------
 # Destroy all build artifacts and Python temporary files
@@ -79,6 +77,7 @@ lint:
 clean:
 	rm -rf ./terraform/.terraform venv .pytest_cache __pycache__ .pytest_cache node_modules && \
 	rm -rf build dist aws-rekogition.egg-info
+	find ./terraform/python/ -name __pycache__ -type d -exec rm -rf {} +
 
 # -------------------------------------------------------------------------
 # Run Python unit tests
@@ -110,7 +109,6 @@ help:
 	@echo '===================================================================='
 	@echo 'init			- build virtual environment and install requirements'
 	@echo 'analyze			- runs cloc report'
-	@echo 'pre-commit		- install and configure pre-commit hooks'
 	@echo 'requirements		- install Python, npm and pre-commit requirements'
 	@echo 'lint			- run black and pre-commit hooks'
 	@echo 'clean			- destroy all build artifacts'
