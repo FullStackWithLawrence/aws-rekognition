@@ -1,7 +1,7 @@
 resource "null_resource" "create-rekognition-collection" {
 
   triggers = {
-    collection = local.collection_id
+    collection = local.aws_rekognition_collection_id
     region     = var.aws_region
     profile    = var.aws_profile
   }
