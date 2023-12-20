@@ -1,9 +1,15 @@
-## [0.2.3](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.2...v0.2.3) (2023-12-20)
+## [0.2.4](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.3...v0.2.4) (2023-12-20)
 
 
 ### Bug Fixes
 
-* raise throttle_settings_burst_limit=25 so that unit tests aren't throttled ([880be90](https://github.com/FullStackWithLawrence/aws-rekognition/commit/880be901e480a6f3ee79e649a1aa6f9af442d174))
+* add aws key pair with validation and business rules, and unit tests ([e4d0710](https://github.com/FullStackWithLawrence/aws-rekognition/commit/e4d0710a88c3e04945e3227dc791cb0523e259ae))
+
+## [0.2.3](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.2...v0.2.3) (2023-12-20)
+
+### Bug Fixes
+
+- raise throttle_settings_burst_limit=25 so that unit tests aren't throttled ([880be90](https://github.com/FullStackWithLawrence/aws-rekognition/commit/880be901e480a6f3ee79e649a1aa6f9af442d174))
 
 ## [0.2.2](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.1...v0.2.2) (2023-12-20)
 

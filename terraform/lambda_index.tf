@@ -36,6 +36,7 @@ resource "aws_lambda_function" "index" {
       S3_BUCKET_NAME                         = module.s3_bucket.s3_bucket_id
       AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES = var.aws_rekognition_face_detect_attributes
       QUALITY_FILTER                         = var.aws_rekognition_face_detect_quality_filter
+      AWS_DEPLOYED                           = true
     }
   }
 }
