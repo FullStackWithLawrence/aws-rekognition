@@ -51,10 +51,10 @@ class TestLambdaIndex(unittest.TestCase):
         """Test get_faces."""
         # faces = settings.rekognition_client.search_faces_by_image(
         #     Image=self.image_packed,
-        #     CollectionId=settings.collection_id,
-        #     MaxFaces=settings.face_detect_max_faces_count,
-        #     FaceMatchThreshold=settings.face_detect_threshold,
-        #     QualityFilter=settings.face_detect_quality_filter,
+        #     CollectionId=settings.aws_rekognition_collection_id,
+        #     MaxFaces=settings.aws_rekognition_face_detect_max_faces_count,
+        #     FaceMatchThreshold=settings.aws_rekognition_face_detect_threshold,
+        #     QualityFilter=settings.aws_rekognition_face_detect_quality_filter,
         # )
         # faces = get_faces(self.image_packed)
         print("Not implemented")

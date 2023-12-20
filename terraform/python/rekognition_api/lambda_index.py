@@ -128,12 +128,12 @@ def get_faces(event, record):
     faces = {"FaceRecords": []}
     try:
         faces = settings.rekognition_client.index_faces(
-            CollectionId=settings.collection_id,
+            CollectionId=settings.aws_rekognition_collection_id,
             Image={"S3Object": {"Bucket": s3_bucket_name, "Name": s3_object_key}},
             ExternalImageId=s3_object_key,
-            DetectionAttributes=[settings.face_detect_attributes],
-            MaxFaces=settings.face_detect_max_faces_count,
-            QualityFilter=settings.face_detect_quality_filter,
+            DetectionAttributes=[settings.aws_rekognition_face_detect_attributes],
+            MaxFaces=settings.aws_rekognition_face_detect_max_faces_count,
+            QualityFilter=settings.aws_rekognition_face_detect_quality_filter,
         )
 
     # handle anything that went wrong

@@ -190,7 +190,7 @@ class TestAWSInfrastructture(unittest.TestCase):
         rekognition_client = self.aws_session.client("rekognition")
         response = rekognition_client.list_collections()
         for collection in response["CollectionIds"]:
-            if collection == settings.collection_id:
+            if collection == settings.aws_rekognition_collection_id:
                 return True
         return False
 
@@ -201,7 +201,8 @@ class TestAWSInfrastructture(unittest.TestCase):
     def test_rekognition_collection_exists(self):
         """Test that the Rekognition collection exists."""
         self.assertTrue(
-            self.rekognition_collection_exists(), f"Rekognition collection {settings.collection_id} does not exist."
+            self.rekognition_collection_exists(),
+            f"Rekognition collection {settings.aws_rekognition_collection_id} does not exist.",
         )
 
     def test_aws_connection_works(self):

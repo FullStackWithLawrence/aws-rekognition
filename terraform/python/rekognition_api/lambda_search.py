@@ -73,10 +73,10 @@ def get_faces(image):
     """return a list of faces found in the image"""
     return settings.rekognition_client.search_faces_by_image(
         Image=image,
-        CollectionId=settings.collection_id,
-        MaxFaces=settings.face_detect_max_faces_count,
-        FaceMatchThreshold=settings.face_detect_threshold,
-        QualityFilter=settings.face_detect_quality_filter,
+        CollectionId=settings.aws_rekognition_collection_id,
+        MaxFaces=settings.aws_rekognition_face_detect_max_faces_count,
+        FaceMatchThreshold=settings.aws_rekognition_face_detect_threshold,
+        QualityFilter=settings.aws_rekognition_face_detect_quality_filter,
     )
 
 

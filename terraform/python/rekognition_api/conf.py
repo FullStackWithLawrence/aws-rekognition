@@ -76,13 +76,15 @@ class SettingsDefaults:
     DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
     AWS_REGION = TFVARS.get("aws_region", "us-east-1")
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    TABLE_ID = "rekognition"
-    COLLECTION_ID = TABLE_ID + "-collection"
-    FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("max_faces_count", 10))
-    FACE_DETECT_THRESHOLD: int = int(TFVARS.get("face_detect_threshold", 10))
-    FACE_DETECT_ATTRIBUTES = TFVARS.get("face_detect_attributes", "DEFAULT")
-    FACE_DETECT_QUALITY_FILTER = TFVARS.get("face_detect_quality_filter", "AUTO")
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
+
+    AWS_DYNAMODB_TABLE_ID = "rekognition"
+
+    AWS_REKOGNITION_COLLECTION_ID = AWS_DYNAMODB_TABLE_ID + "-collection"
+    AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("aws_rekognition_max_faces_count", 10))
+    AWS_REKOGNITION_FACE_DETECT_THRESHOLD: int = int(TFVARS.get("aws_rekognition_face_detect_threshold", 10))
+    AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES = TFVARS.get("aws_rekognition_face_detect_attributes", "DEFAULT")
+    AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER = TFVARS.get("aws_rekognition_face_detect_quality_filter", "AUTO")
 
     @classmethod
     def to_dict(cls):
@@ -148,36 +150,36 @@ class Settings(BaseSettings):
         SettingsDefaults.AWS_REGION,
         env="AWS_REGION",
     )
-    table_id: Optional[str] = Field(
-        SettingsDefaults.TABLE_ID,
-        env="TABLE_ID",
+    aws_dynamodb_table_id: Optional[str] = Field(
+        SettingsDefaults.AWS_DYNAMODB_TABLE_ID,
+        env="AWS_DYNAMODB_TABLE_ID",
     )
-    collection_id: Optional[str] = Field(
-        SettingsDefaults.COLLECTION_ID,
-        env="COLLECTION_ID",
+    aws_rekognition_collection_id: Optional[str] = Field(
+        SettingsDefaults.AWS_REKOGNITION_COLLECTION_ID,
+        env="AWS_REKOGNITION_COLLECTION_ID",
     )
 
-    face_detect_attributes: Optional[str] = Field(
-        SettingsDefaults.FACE_DETECT_ATTRIBUTES,
-        env="FACE_DETECT_ATTRIBUTES",
+    aws_rekognition_face_detect_attributes: Optional[str] = Field(
+        SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES,
+        env="AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES",
     )
-    face_detect_quality_filter: Optional[str] = Field(
-        SettingsDefaults.FACE_DETECT_QUALITY_FILTER,
-        env="FACE_DETECT_QUALITY_FILTER",
+    aws_rekognition_face_detect_quality_filter: Optional[str] = Field(
+        SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER,
+        env="AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER",
     )
-    face_detect_max_faces_count: Optional[int] = Field(
-        SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT,
+    aws_rekognition_face_detect_max_faces_count: Optional[int] = Field(
+        SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT,
         gt=0,
-        env="FACE_DETECT_MAX_FACES_COUNT",
+        env="AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT",
         pre=True,
-        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT),
+        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT),
     )
-    face_detect_threshold: Optional[int] = Field(
-        SettingsDefaults.FACE_DETECT_THRESHOLD,
+    aws_rekognition_face_detect_threshold: Optional[int] = Field(
+        SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD,
         gt=0,
-        env="FACE_DETECT_THRESHOLD",
+        env="AWS_REKOGNITION_FACE_DETECT_THRESHOLD",
         pre=True,
-        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.FACE_DETECT_THRESHOLD),
+        getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD),
     )
     shared_resource_identifier: Optional[str] = Field(
         SettingsDefaults.SHARED_RESOURCE_IDENTIFIER, env="SHARED_RESOURCE_IDENTIFIER"
@@ -211,7 +213,7 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
-        return self.dynamodb_client.Table(self.table_id)
+        return self.dynamodb_client.Table(self.aws_dynamodb_table_id)
 
     @property
     def is_using_dotenv_file(self) -> bool:
@@ -279,15 +281,15 @@ class Settings(BaseSettings):
                 "region": self.aws_region,
             },
             "rekognition": {
-                "collection_id": self.collection_id,
-                "table_id": self.table_id,
-                "face_detect_max_faces_count": self.face_detect_max_faces_count,
-                "face_detect_attributes": self.face_detect_attributes,
-                "face_detect_quality_filter": self.face_detect_quality_filter,
-                "face_detect_threshold": self.face_detect_threshold,
+                "aws_rekognition_collection_id": self.aws_rekognition_collection_id,
+                "aws_dynamodb_table_id": self.aws_dynamodb_table_id,
+                "aws_rekognition_face_detect_max_faces_count": self.aws_rekognition_face_detect_max_faces_count,
+                "aws_rekognition_face_detect_attributes": self.aws_rekognition_face_detect_attributes,
+                "aws_rekognition_face_detect_quality_filter": self.aws_rekognition_face_detect_quality_filter,
+                "aws_rekognition_face_detect_threshold": self.aws_rekognition_face_detect_threshold,
             },
             "dynamodb": {
-                "table": self.table_id,
+                "table": self.aws_dynamodb_table_id,
             },
         }
         if self.dump_defaults:
@@ -334,25 +336,25 @@ class Settings(BaseSettings):
             raise RekognitionValueError(f"aws_region {v} not in aws_regions")
         return v
 
-    @field_validator("table_id")
+    @field_validator("aws_dynamodb_table_id")
     def validate_table_id(cls, v) -> str:
-        """Validate table_id"""
+        """Validate aws_dynamodb_table_id"""
         if v in [None, ""]:
-            return SettingsDefaults.TABLE_ID
+            return SettingsDefaults.AWS_DYNAMODB_TABLE_ID
         return v
 
-    @field_validator("collection_id")
+    @field_validator("aws_rekognition_collection_id")
     def validate_collection_id(cls, v) -> str:
-        """Validate collection_id"""
+        """Validate aws_rekognition_collection_id"""
         if v in [None, ""]:
-            return SettingsDefaults.COLLECTION_ID
+            return SettingsDefaults.AWS_REKOGNITION_COLLECTION_ID
         return v
 
-    @field_validator("face_detect_attributes")
+    @field_validator("aws_rekognition_face_detect_attributes")
     def validate_face_detect_attributes(cls, v) -> str:
-        """Validate face_detect_attributes"""
+        """Validate aws_rekognition_face_detect_attributes"""
         if v in [None, ""]:
-            return SettingsDefaults.FACE_DETECT_ATTRIBUTES
+            return SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES
         return v
 
     @field_validator("debug_mode")
@@ -373,20 +375,20 @@ class Settings(BaseSettings):
             return SettingsDefaults.DUMP_DEFAULTS
         return v.lower() in ["true", "1", "t", "y", "yes"]
 
-    @field_validator("face_detect_max_faces_count")
-    def check_face_detect_max_faces_count(cls, v) -> int:
-        """Check face_detect_max_faces_count"""
+    @field_validator("aws_rekognition_face_detect_max_faces_count")
+    def check_aws_rekognition_face_detect_max_faces_count(cls, v) -> int:
+        """Check aws_rekognition_face_detect_max_faces_count"""
         if v in [None, ""]:
-            return SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT
+            return SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT
         return int(v)
 
-    @field_validator("face_detect_threshold")
+    @field_validator("aws_rekognition_face_detect_threshold")
     def check_face_detect_threshold(cls, v) -> int:
-        """Check face_detect_threshold"""
+        """Check aws_rekognition_face_detect_threshold"""
         if isinstance(v, int):
             return v
         if v in [None, ""]:
-            return SettingsDefaults.FACE_DETECT_THRESHOLD
+            return SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD
         return int(v)
 
 

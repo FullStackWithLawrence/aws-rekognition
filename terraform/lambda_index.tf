@@ -29,13 +29,13 @@ resource "aws_lambda_function" "index" {
 
   environment {
     variables = {
-      DEBUG_MODE             = var.debug_mode
-      COLLECTION_ID          = local.collection_id
-      TABLE_ID               = local.table_name
-      MAX_FACES_COUNT        = var.max_faces_count
-      S3_BUCKET_NAME         = module.s3_bucket.s3_bucket_id
-      FACE_DETECT_ATTRIBUTES = var.face_detect_attributes
-      QUALITY_FILTER         = var.face_detect_quality_filter
+      DEBUG_MODE                             = var.debug_mode
+      AWS_REKOGNITION_COLLECTION_ID          = local.aws_rekognition_collection_id
+      AWS_DYNAMODB_TABLE_ID                  = local.table_name
+      MAX_FACES_COUNT                        = var.aws_rekognition_max_faces_count
+      S3_BUCKET_NAME                         = module.s3_bucket.s3_bucket_id
+      AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES = var.aws_rekognition_face_detect_attributes
+      QUALITY_FILTER                         = var.aws_rekognition_face_detect_quality_filter
     }
   }
 }

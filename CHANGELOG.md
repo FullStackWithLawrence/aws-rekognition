@@ -7,10 +7,9 @@
 
 ## [0.2.2](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.1...v0.2.2) (2023-12-20)
 
-
 ### Bug Fixes
 
-* integrate TFVARS to defaults. add conf meta fields. expand dump dict. ([c653aa1](https://github.com/FullStackWithLawrence/aws-rekognition/commit/c653aa10ab069272f6269d85fd1a04eb6ed0339b))
+- integrate TFVARS to defaults. add conf meta fields. expand dump dict. ([c653aa1](https://github.com/FullStackWithLawrence/aws-rekognition/commit/c653aa10ab069272f6269d85fd1a04eb6ed0339b))
 
 # Change Log
 

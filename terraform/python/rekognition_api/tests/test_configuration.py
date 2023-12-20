@@ -40,12 +40,23 @@ class TestConfiguration(unittest.TestCase):
         mock_settings = Settings()
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
-        self.assertEqual(mock_settings.table_id, SettingsDefaults.TABLE_ID)
-        self.assertEqual(mock_settings.collection_id, SettingsDefaults.COLLECTION_ID)
-        self.assertEqual(mock_settings.face_detect_max_faces_count, SettingsDefaults.FACE_DETECT_MAX_FACES_COUNT)
-        self.assertEqual(mock_settings.face_detect_attributes, SettingsDefaults.FACE_DETECT_ATTRIBUTES)
-        self.assertEqual(mock_settings.face_detect_quality_filter, SettingsDefaults.FACE_DETECT_QUALITY_FILTER)
-        self.assertEqual(mock_settings.face_detect_threshold, SettingsDefaults.FACE_DETECT_THRESHOLD)
+        self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
+        self.assertEqual(mock_settings.aws_rekognition_collection_id, SettingsDefaults.AWS_REKOGNITION_COLLECTION_ID)
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_max_faces_count,
+            SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT,
+        )
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_attributes,
+            SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES,
+        )
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_quality_filter,
+            SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER,
+        )
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_threshold, SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD
+        )
 
     def test_env_illegal_nulls(self):
         """Test that settings handles missing .env values."""
@@ -67,10 +78,16 @@ class TestConfiguration(unittest.TestCase):
         mock_settings = Settings()
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
-        self.assertEqual(mock_settings.table_id, SettingsDefaults.TABLE_ID)
-        self.assertEqual(mock_settings.collection_id, SettingsDefaults.COLLECTION_ID)
-        self.assertEqual(mock_settings.face_detect_attributes, SettingsDefaults.FACE_DETECT_ATTRIBUTES)
-        self.assertEqual(mock_settings.face_detect_quality_filter, SettingsDefaults.FACE_DETECT_QUALITY_FILTER)
+        self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
+        self.assertEqual(mock_settings.aws_rekognition_collection_id, SettingsDefaults.AWS_REKOGNITION_COLLECTION_ID)
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_attributes,
+            SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES,
+        )
+        self.assertEqual(
+            mock_settings.aws_rekognition_face_detect_quality_filter,
+            SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER,
+        )
 
     def test_env_overrides(self):
         """Test that settings takes custom .env values."""
@@ -82,12 +99,12 @@ class TestConfiguration(unittest.TestCase):
         mock_settings = Settings()
 
         self.assertEqual(mock_settings.aws_region, "us-west-1")
-        self.assertEqual(mock_settings.table_id, "TEST_facialrecognition")
-        self.assertEqual(mock_settings.collection_id, "TEST_facialrecognition-collection")
-        self.assertEqual(mock_settings.face_detect_max_faces_count, 100)
-        self.assertEqual(mock_settings.face_detect_attributes, "TEST_DEFAULT")
-        self.assertEqual(mock_settings.face_detect_quality_filter, "TEST_AUTO")
-        self.assertEqual(mock_settings.face_detect_threshold, 100)
+        self.assertEqual(mock_settings.aws_dynamodb_table_id, "TEST_facialrecognition")
+        self.assertEqual(mock_settings.aws_rekognition_collection_id, "TEST_facialrecognition-collection")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_max_faces_count, 100)
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_attributes, "TEST_DEFAULT")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_quality_filter, "TEST_AUTO")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_threshold, 100)
         self.assertEqual(mock_settings.debug_mode, True)
 
     @patch.dict(os.environ, {"AWS_REGION": "invalid-region"})
@@ -97,14 +114,14 @@ class TestConfiguration(unittest.TestCase):
         with self.assertRaises(RekognitionValueError):
             Settings()
 
-    @patch.dict(os.environ, {"FACE_DETECT_MAX_FACES_COUNT": "-1"})
+    @patch.dict(os.environ, {"AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT": "-1"})
     def test_invalid_max_faces_count(self):
         """Test that Pydantic raises a validation error for environment variable w negative integer values."""
 
         with self.assertRaises(PydanticValidationError):
             Settings()
 
-    @patch.dict(os.environ, {"FACE_DETECT_THRESHOLD": "-1"})
+    @patch.dict(os.environ, {"AWS_REKOGNITION_FACE_DETECT_THRESHOLD": "-1"})
     def test_invalid_threshold(self):
         """Test that Pydantic raises a validation error for environment variable w negative integer values."""
 
@@ -116,32 +133,32 @@ class TestConfiguration(unittest.TestCase):
 
         mock_settings = Settings(
             aws_region="eu-west-1",
-            table_id="TEST_facialrecognition",
-            collection_id="TEST_facialrecognition-collection",
-            face_detect_max_faces_count=101,
-            face_detect_attributes="TEST_DEFAULT",
-            face_detect_quality_filter="TEST_AUTO",
-            face_detect_threshold=102,
+            aws_dynamodb_table_id="TEST_facialrecognition",
+            aws_rekognition_collection_id="TEST_facialrecognition-collection",
+            aws_rekognition_face_detect_max_faces_count=101,
+            aws_rekognition_face_detect_attributes="TEST_DEFAULT",
+            aws_rekognition_face_detect_quality_filter="TEST_AUTO",
+            aws_rekognition_face_detect_threshold=102,
             debug_mode=True,
         )
 
         self.assertEqual(mock_settings.aws_region, "eu-west-1")
-        self.assertEqual(mock_settings.table_id, "TEST_facialrecognition")
-        self.assertEqual(mock_settings.collection_id, "TEST_facialrecognition-collection")
-        self.assertEqual(mock_settings.face_detect_max_faces_count, 101)
-        self.assertEqual(mock_settings.face_detect_attributes, "TEST_DEFAULT")
-        self.assertEqual(mock_settings.face_detect_quality_filter, "TEST_AUTO")
-        self.assertEqual(mock_settings.face_detect_threshold, 102)
+        self.assertEqual(mock_settings.aws_dynamodb_table_id, "TEST_facialrecognition")
+        self.assertEqual(mock_settings.aws_rekognition_collection_id, "TEST_facialrecognition-collection")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_max_faces_count, 101)
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_attributes, "TEST_DEFAULT")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_quality_filter, "TEST_AUTO")
+        self.assertEqual(mock_settings.aws_rekognition_face_detect_threshold, 102)
         self.assertEqual(mock_settings.debug_mode, True)
 
     def test_configure_neg_int_with_class_constructor(self):
         """test that we cannot set negative int values with the class constructor"""
 
         with self.assertRaises(PydanticValidationError):
-            Settings(face_detect_max_faces_count=-1)
+            Settings(aws_rekognition_face_detect_max_faces_count=-1)
 
         with self.assertRaises(PydanticValidationError):
-            Settings(face_detect_threshold=-1)
+            Settings(aws_rekognition_face_detect_threshold=-1)
 
     def test_readonly_settings(self):
         """test that we can't set readonly values with the class constructor"""
@@ -151,25 +168,25 @@ class TestConfiguration(unittest.TestCase):
             mock_settings.aws_region = "us-west-1"
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.table_id = "TEST_facialrecognition"
+            mock_settings.aws_dynamodb_table_id = "TEST_facialrecognition"
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.collection_id = "TEST_facialrecognition-collection"
+            mock_settings.aws_rekognition_collection_id = "TEST_facialrecognition-collection"
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.face_detect_attributes = "TEST_DEFAULT"
+            mock_settings.aws_rekognition_face_detect_attributes = "TEST_DEFAULT"
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.face_detect_quality_filter = "TEST_AUTO"
+            mock_settings.aws_rekognition_face_detect_quality_filter = "TEST_AUTO"
 
         with self.assertRaises(PydanticValidationError):
             mock_settings.debug_mode = True
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.face_detect_max_faces_count = 25
+            mock_settings.aws_rekognition_face_detect_max_faces_count = 25
 
         with self.assertRaises(PydanticValidationError):
-            mock_settings.face_detect_threshold = 25
+            mock_settings.aws_rekognition_face_detect_threshold = 25
 
     def test_dump(self):
         """Test that dump is a dict."""

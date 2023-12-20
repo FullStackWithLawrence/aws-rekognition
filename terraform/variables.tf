@@ -63,11 +63,11 @@ variable "log_retention_days" {
   type    = number
   default = 3
 }
-variable "max_faces_count" {
+variable "aws_rekognition_max_faces_count" {
   type    = number
   default = 10
 }
-variable "face_detect_threshold" {
+variable "aws_rekognition_face_detect_threshold" {
   type    = number
   default = 10
 }
@@ -76,12 +76,12 @@ variable "face_detect_threshold" {
 # meet a required quality bar. The quality bar is based on a variety of common use cases.
 # Use QualityFilter to set the quality bar for filtering by specifying LOW, MEDIUM, or HIGH.
 # If you do not want to filter detected faces, specify NONE. The default value is NONE.
-variable "face_detect_quality_filter" {
+variable "aws_rekognition_face_detect_quality_filter" {
   description = "'NONE'|'AUTO'|'LOW'|'MEDIUM'|'HIGH'"
   type        = string
   default     = "AUTO"
 }
-variable "face_detect_attributes" {
+variable "aws_rekognition_face_detect_attributes" {
   description = "'DEFAULT'|'ALL'"
   type        = string
   default     = "DEFAULT"
