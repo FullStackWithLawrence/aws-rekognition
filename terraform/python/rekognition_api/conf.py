@@ -152,6 +152,7 @@ class Settings(BaseSettings):
     _dump: dict = None
     _initialized: bool = False
 
+    # pylint: disable=too-many-branches
     def __init__(self, **data: Any):
         super().__init__(**data)
         if bool(os.environ.get("AWS_DEPLOYED", False)):
@@ -162,12 +163,15 @@ class Settings(BaseSettings):
             self._initialized = True
 
         if not self._initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
-            # Delete AWS_PROFILE from os.environ if it exists
-            self._aws_session = boto3.Session(
-                region_name=os.environ.get("AWS_REGION", "us-east-1"),
-                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
-                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
-            )
+            try:
+                self._aws_session = boto3.Session(
+                    region_name=os.environ.get("AWS_REGION", "us-east-1"),
+                    aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
+                    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
+                )
+            except ProfileNotFound:
+                logger.warning("aws_profile %s not found", self.aws_profile)
+
             self._initialized = True
 
         if not self._initialized:
