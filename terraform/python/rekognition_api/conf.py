@@ -361,7 +361,8 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
-        return self.aws_dynamodb_client.Table(self.aws_dynamodb_table_id)
+        dynamodb_resource = boto3.resource("dynamodb")
+        return dynamodb_resource.Table(self.aws_dynamodb_table_id)
 
     @property
     def aws_s3_bucket_name(self) -> str:

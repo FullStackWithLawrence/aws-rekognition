@@ -28,6 +28,18 @@
       ]
     },
     {
+        "Effect": "Allow",
+        "Action": [
+            "apigateway:GET"
+        ],
+        "Resource": "*"
+    },
+    {
+        "Effect": "Allow",
+        "Action": "s3:ListAllMyBuckets",
+        "Resource": "*"
+    },
+    {
       "Effect": "Allow",
       "Action": [
         "rekognition:IndexFaces",
