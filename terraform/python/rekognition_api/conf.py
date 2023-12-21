@@ -358,7 +358,7 @@ class Settings(BaseSettings):
         except NoCredentialsError:
             # pylint: disable=logging-fstring-interpolation
             logger.error(f"NoCredentialsError. aws_auth: {self.aws_auth}")
-            raise
+            return None
 
         for item in response["items"]:
             if item["name"] == self.aws_apigateway_name:
