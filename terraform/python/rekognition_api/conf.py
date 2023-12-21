@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 import pkg_resources
+from botocore.exceptions import NoCredentialsError
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
@@ -343,7 +344,19 @@ class Settings(BaseSettings):
         if self.aws_apigateway_create_custom_domaim:
             return "api." + self.shared_resource_identifier + "." + self.aws_apigateway_root_domain
 
-        response = self.aws_apigateway_client.get_rest_apis()
+        try:
+            response = self.aws_apigateway_client.get_rest_apis()
+        except NoCredentialsError:
+            # pylint: disable=logging-fstring-interpolation
+            logger.warning(
+                "NoCredentialsError: unable to get_rest_apis. "
+                f"aws_profile: {self.aws_profile} "
+                f"aws_region: {self.aws_region} "
+                f"aws_access_key_id_source: {self.aws_access_key_id_source} "
+                f"aws_secret_access_key_source: {self.aws_secret_access_key_source}"
+            )
+            raise
+
         for item in response["items"]:
             if item["name"] == self.aws_apigateway_name:
                 api_id = item["id"]
