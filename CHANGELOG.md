@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.5...v0.2.6) (2023-12-21)
+
+
+### Bug Fixes
+
+* refactor aws infrastructure logic to AWSInfrastructureConfig() ([5f4f385](https://github.com/FullStackWithLawrence/aws-rekognition/commit/5f4f38576557d0b64e0c1407d124059a9a896bb7))
+
 ## [0.2.5](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.4...v0.2.5) (2023-12-20)
 
 
