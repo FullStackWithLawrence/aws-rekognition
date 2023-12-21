@@ -154,28 +154,33 @@ class Settings(BaseSettings):
             self._aws_secret_access_key_source: str = "overridden by IAM role-based security"
             self._aws_session = boto3.Session()
             self._initialized = True
-            return
 
-        aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
-        if len(aws_profile) > 0:
-            logger.debug("Using AWS_PROFILE: %s", aws_profile)
-            self._aws_access_key_id_source = "aws_profile"
-            self._aws_secret_access_key_source = "aws_profile"
-            self._initialized = True
-            return
+        if not self._initialized:
+            aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
+            if len(aws_profile) > 0:
+                logger.debug("Using AWS_PROFILE: %s", aws_profile)
+                self._aws_access_key_id_source = "aws_profile"
+                self._aws_secret_access_key_source = "aws_profile"
+                self._initialized = True
 
-        if "aws_access_key_id" in data or "aws_secret_access_key" in data:
-            if "aws_access_key_id" in data:
-                self._aws_access_key_id_source = "constructor"
-            if "aws_secret_access_key" in data:
-                self._aws_secret_access_key_source = "constructor"
-            self._initialized = True
-            return
+        if not self._initialized:
+            if "aws_access_key_id" in data or "aws_secret_access_key" in data:
+                if "aws_access_key_id" in data:
+                    self._aws_access_key_id_source = "constructor"
+                if "aws_secret_access_key" in data:
+                    self._aws_secret_access_key_source = "constructor"
+                self._initialized = True
 
-        if "AWS_ACCESS_KEY_ID" in os.environ:
-            self._aws_access_key_id_source = "environ"
-        if "AWS_SECRET_ACCESS_KEY" in os.environ:
-            self._aws_secret_access_key_source = "environ"
+        if not self._initialized:
+            if "AWS_ACCESS_KEY_ID" in os.environ:
+                self._aws_access_key_id_source = "environ"
+            if "AWS_SECRET_ACCESS_KEY" in os.environ:
+                self._aws_secret_access_key_source = "environ"
+
+        logger.info("using aws_region: %s", self.aws_region)
+        logger.info("using aws_profile: %s", self.aws_profile)
+        logger.info("using aws_access_key_id_source: %s", self._aws_access_key_id_source)
+        logger.info("using aws_secret_access_key_source: %s", self._aws_secret_access_key_source)
         self._initialized = True
 
     shared_resource_identifier: Optional[str] = Field(
