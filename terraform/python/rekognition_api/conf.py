@@ -361,7 +361,8 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
-        return self.aws_dynamodb_client.Table(self.aws_dynamodb_table_id)
+        dynamodb_resource = boto3.resource("dynamodb")
+        return dynamodb_resource.Table(self.aws_dynamodb_table_id)
 
     @property
     def aws_s3_bucket_name(self) -> str:
@@ -442,7 +443,6 @@ class Settings(BaseSettings):
 
         packages = get_installed_packages()
         packages_dict = [{"name": name, "version": version} for name, version in packages]
-        packages_json = json.dumps(packages_dict, indent=4)
 
         self._dump = {
             "environment": {
@@ -462,10 +462,7 @@ class Settings(BaseSettings):
                 "python_implementation": platform.python_implementation(),
                 "python_compiler": platform.python_compiler(),
                 "python_build": platform.python_build(),
-                "python_branch": platform.python_branch(),
-                "python_revision": platform.python_revision(),
-                "python_version_tuple": platform.python_version_tuple(),
-                "python_installed_packages": packages_json,
+                "python_installed_packages": packages_dict,
             },
             "aws_auth": self.aws_auth,
             "aws_rekognition": {
