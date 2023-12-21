@@ -15,10 +15,12 @@ to display the configuration values in the /info endpoint.
 
 """
 
+
 import importlib.util
-import logging
 
 # python stuff
+import json
+import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
 import re
@@ -26,6 +28,7 @@ from typing import Any, Dict, List, Optional
 
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
+import pkg_resources
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
@@ -89,6 +92,9 @@ class SettingsDefaults:
     DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
+
+    AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
+    AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
 
     AWS_DYNAMODB_TABLE_ID = "rekognition"
 
@@ -172,6 +178,9 @@ class Settings(BaseSettings):
             self._aws_secret_access_key_source = "environ"
         self._initialized = True
 
+    shared_resource_identifier: Optional[str] = Field(
+        SettingsDefaults.SHARED_RESOURCE_IDENTIFIER, env="SHARED_RESOURCE_IDENTIFIER"
+    )
     debug_mode: Optional[bool] = Field(
         SettingsDefaults.DEBUG_MODE,
         env="DEBUG_MODE",
@@ -200,6 +209,16 @@ class Settings(BaseSettings):
     aws_region: Optional[str] = Field(
         SettingsDefaults.AWS_REGION,
         env="AWS_REGION",
+    )
+    aws_apigateway_create_custom_domaim: Optional[bool] = Field(
+        SettingsDefaults.AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN,
+        env="AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN",
+        pre=True,
+        getter=lambda v: empty_str_to_bool_default(v, SettingsDefaults.AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN),
+    )
+    aws_apigateway_root_domain: Optional[str] = Field(
+        SettingsDefaults.AWS_APIGATEWAY_ROOT_DOMAIN,
+        env="AWS_APIGATEWAY_ROOT_DOMAIN",
     )
     aws_dynamodb_table_id: Optional[str] = Field(
         SettingsDefaults.AWS_DYNAMODB_TABLE_ID,
@@ -232,9 +251,11 @@ class Settings(BaseSettings):
         pre=True,
         getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD),
     )
-    shared_resource_identifier: Optional[str] = Field(
-        SettingsDefaults.SHARED_RESOURCE_IDENTIFIER, env="SHARED_RESOURCE_IDENTIFIER"
-    )
+
+    @property
+    def aws_account_id(self):
+        """AWS account id"""
+        return self.aws_session.client("sts").get_caller_identity()["Account"]
 
     @property
     def aws_access_key_id_source(self):
@@ -267,24 +288,52 @@ class Settings(BaseSettings):
         return self._aws_session
 
     @property
-    def s3_client(self):
+    def aws_apigateway_client(self):
+        """API Gateway client"""
+        return self.aws_session.client("apigateway")
+
+    @property
+    def aws_s3_client(self):
         """S3 client"""
-        return self.aws_session.resource("s3")
+        return self.aws_session.client("s3")
 
     @property
-    def dynamodb_client(self):
+    def aws_dynamodb_client(self):
         """DynamoDB client"""
-        return self.aws_session.resource("dynamodb")
+        return self.aws_session.client("dynamodb")
 
     @property
-    def rekognition_client(self):
+    def aws_rekognition_client(self):
         """Rekognition client"""
         return self.aws_session.client("rekognition")
 
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
-        return self.dynamodb_client.Table(self.aws_dynamodb_table_id)
+        return self.aws_dynamodb_client.Table(self.aws_dynamodb_table_id)
+
+    @property
+    def aws_s3_bucket_name(self) -> str:
+        """Return the S3 bucket name."""
+        return self.aws_account_id + "-" + self.shared_resource_identifier
+
+    @property
+    def aws_apigateway_name(self) -> str:
+        """Return the API name."""
+        return self.shared_resource_identifier + "-api"
+
+    @property
+    def aws_apigateway_domain_name(self) -> str:
+        """Return the API domain."""
+        if self.aws_apigateway_create_custom_domaim:
+            return "api." + self.shared_resource_identifier + "." + self.aws_apigateway_root_domain
+
+        response = self.aws_apigateway_client.get_rest_apis()
+        for item in response["items"]:
+            if item["name"] == self.aws_apigateway_name:
+                api_id = item["id"]
+                return f"{api_id}.execute-api.{settings.aws_region}.amazonaws.com"
+        return None
 
     @property
     def is_using_dotenv_file(self) -> bool:
@@ -328,8 +377,18 @@ class Settings(BaseSettings):
         def recursive_sort_dict(d):
             return {k: recursive_sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(d.items())}
 
+        def get_installed_packages():
+            installed_packages = pkg_resources.working_set
+            # pylint: disable=not-an-iterable
+            package_list = [(d.project_name, d.version) for d in installed_packages]
+            return package_list
+
         if self._dump and self._initialized:
             return self._dump
+
+        packages = get_installed_packages()
+        packages_dict = [{"name": name, "version": version} for name, version in packages]
+        packages_json = json.dumps(packages_dict, indent=4)
 
         self._dump = {
             "environment": {
@@ -345,22 +404,43 @@ class Settings(BaseSettings):
                 "debug_mode": self.debug_mode,
                 "dump_defaults": self.dump_defaults,
                 "version": self.version,
+                "python_version": platform.python_version(),
+                "python_implementation": platform.python_implementation(),
+                "python_compiler": platform.python_compiler(),
+                "python_build": platform.python_build(),
+                "python_branch": platform.python_branch(),
+                "python_revision": platform.python_revision(),
+                "python_version_tuple": platform.python_version_tuple(),
+                "python_installed_packages": packages_json,
             },
-            "aws": {
+            "aws_auth": {
                 "aws_profile": self.aws_profile,
                 "aws_access_key_id_source": self.aws_access_key_id_source,
                 "aws_secret_access_key_source": self.aws_secret_access_key_source,
                 "aws_region": self.aws_region,
             },
-            "rekognition": {
+            "aws_rekognition": {
                 "aws_rekognition_collection_id": self.aws_rekognition_collection_id,
                 "aws_rekognition_face_detect_max_faces_count": self.aws_rekognition_face_detect_max_faces_count,
                 "aws_rekognition_face_detect_attributes": self.aws_rekognition_face_detect_attributes,
                 "aws_rekognition_face_detect_quality_filter": self.aws_rekognition_face_detect_quality_filter,
                 "aws_rekognition_face_detect_threshold": self.aws_rekognition_face_detect_threshold,
             },
-            "dynamodb": {
+            "aws_dynamodb": {
                 "aws_dynamodb_table_id": self.aws_dynamodb_table_id,
+            },
+            "aws_apigateway": {
+                "aws_apigateway_create_custom_domaim": self.aws_apigateway_create_custom_domaim,
+                "aws_apigateway_name": self.aws_apigateway_name,
+                "aws_apigateway_root_domain": self.aws_apigateway_root_domain,
+                "aws_apigateway_domain_name": self.aws_apigateway_domain_name,
+            },
+            "aws_lambda": {},
+            "aws_s3": {
+                "aws_s3_bucket_prefix": self.aws_s3_bucket_name,
+            },
+            "terraform": {
+                "tfvars": self.tfvars_variables,
             },
         }
         if self.dump_defaults:
@@ -428,6 +508,20 @@ class Settings(BaseSettings):
             return SettingsDefaults.AWS_REGION
         if v not in valid_regions:
             raise RekognitionValueError(f"aws_region {v} not in aws_regions")
+        return v
+
+    @field_validator("aws_apigateway_root_domain")
+    def validate_aws_apigateway_root_domain(cls, v) -> str:
+        """Validate aws_apigateway_root_domain"""
+        if v in [None, ""]:
+            return SettingsDefaults.AWS_APIGATEWAY_ROOT_DOMAIN
+        return v
+
+    @field_validator("aws_apigateway_create_custom_domaim")
+    def validate_aws_apigateway_create_custom_domaim(cls, v) -> bool:
+        """Validate aws_apigateway_create_custom_domaim"""
+        if v in [None, ""]:
+            return SettingsDefaults.AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN
         return v
 
     @field_validator("aws_dynamodb_table_id")

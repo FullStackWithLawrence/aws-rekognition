@@ -10,14 +10,16 @@
 ###############################################################################
 # AWS CLI parameters
 ###############################################################################
-aws_account_id = "090511222473"
+aws_account_id = "012345678901"
 aws_region     = "us-east-1"
-aws_profile    = "lawrence"
+# aws_profile    = "ADD YOUR PROFILE HERE"
 tags = {
-  "terraform" = "true",
-  "project"   = "Facial Recognition microservice"
-  "contact"   = "Lawrence McDaniel - lpm0073@gmail.com"
+  "terraform"                  = "true",
+  "project"                    = "Facial Recognition microservice"
+  "contact"                    = "ADD YOUR CONTACT INFORMATION HERE"
+  "shared_resource_identifier" = "rekognition"
 }
+shared_resource_identifier = "rekognition"
 
 ###############################################################################
 # Lambda parameters
@@ -44,10 +46,9 @@ aws_rekognition_face_detect_quality_filter = "AUTO"
 ###############################################################################
 # APIGateway parameters
 ###############################################################################
-create_custom_domain_name  = true
-root_domain                = "lawrencemcdaniel.com"
-shared_resource_identifier = "rekognition"
-stage                      = "v1"
+aws_apigateway_create_custom_domaim = false
+aws_apigateway_root_domain          = "example.com"
+stage                               = "v1"
 
 # Maximum number of requests that can be made in a given time period.
 quota_settings_limit = 500

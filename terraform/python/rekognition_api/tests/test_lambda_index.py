@@ -11,7 +11,8 @@ import unittest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PYTHON_ROOT = os.path.dirname(os.path.dirname(HERE))
-sys.path.append(PYTHON_ROOT)  # noqa: E402
+if PYTHON_ROOT not in sys.path:
+    sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 from rekognition_api.exceptions import RekognitionIlligalInvocationError  # noqa: E402
 from rekognition_api.lambda_index import (  # noqa: E402

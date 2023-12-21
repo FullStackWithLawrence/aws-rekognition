@@ -14,14 +14,13 @@ from pydantic_core import ValidationError as PydanticValidationError
 
 
 PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-sys.path.append(PYTHON_ROOT)  # noqa: E402
+if PYTHON_ROOT not in sys.path:
+    sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 # our stuff
 from rekognition_api.conf import Settings, SettingsDefaults  # noqa: E402
-from rekognition_api.exceptions import (  # noqa: E402
-    RekognitionConfigurationError,
-    RekognitionValueError,
-)
+from rekognition_api.const import TFVARS  # noqa: E402
+from rekognition_api.exceptions import RekognitionValueError  # noqa: E402
 
 
 class TestConfiguration(unittest.TestCase):
@@ -139,7 +138,8 @@ class TestConfiguration(unittest.TestCase):
         """Test that key and secret are unset when using profile."""
         os.environ.clear()
         mock_settings = Settings()
-        self.assertEqual(mock_settings.aws_profile, None)
+        aws_profile = TFVARS.get("aws_profile", None)
+        self.assertEqual(mock_settings.aws_profile, aws_profile)
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), None)
         # pylint: disable=no-member
@@ -239,9 +239,12 @@ class TestConfiguration(unittest.TestCase):
 
         dump = Settings().dump
         self.assertIn("environment", dump)
-        self.assertIn("aws", dump)
-        self.assertIn("rekognition", dump)
-        self.assertIn("dynamodb", dump)
+        self.assertIn("aws_auth", dump)
+        self.assertIn("aws_rekognition", dump)
+        self.assertIn("aws_dynamodb", dump)
+        self.assertIn("aws_s3", dump)
+        self.assertIn("aws_apigateway", dump)
+        self.assertIn("terraform", dump)
 
     def test_dump_values(self):
         """Test that dump contains the expected values."""
