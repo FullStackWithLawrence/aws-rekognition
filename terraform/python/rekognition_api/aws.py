@@ -32,9 +32,23 @@ class AWSInfrastructureConfig:
             },
         }
 
+    def get_api_stage(self) -> str:
+        """Return the API stage."""
+        api = self.get_api(settings.aws_apigateway_name)
+        api_id = api["id"]
+        response = settings.aws_apigateway_client.get_stages(restApiId=api_id)
+        # Assuming you want the most recently deployed stage
+        stages = response.get("item", [])
+        if stages:
+            retval = stages[-1]["stageName"]
+            return retval
+        return ""
+
     def get_url(self, path) -> str:
         """Return the url for the given path."""
-        return f"https://{settings.aws_apigateway_domain_name}{path}"
+        if settings.aws_apigateway_create_custom_domaim:
+            return f"https://{settings.aws_apigateway_domain_name}{path}"
+        return f"https://{settings.aws_apigateway_domain_name}/{self.get_api_stage()}{path}"
 
     def aws_connection_works(self):
         """Test that the AWS connection works."""
