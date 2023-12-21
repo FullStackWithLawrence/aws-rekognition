@@ -54,5 +54,7 @@ runs:
 
     - name: Run Tests
       shell: bash
+      env:
+        AWS_DEPLOYED: "true"
       run: |
         make test

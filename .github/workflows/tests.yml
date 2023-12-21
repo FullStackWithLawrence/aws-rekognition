@@ -32,7 +32,5 @@ jobs:
 
       - name: Run Python tests
         uses: ./.github/actions/tests/python
-        env:
-          AWS_DEPLOYED: "true"
         with:
           python-version: "${{ env.python-version}}"
