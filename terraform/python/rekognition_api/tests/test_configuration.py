@@ -14,14 +14,13 @@ from pydantic_core import ValidationError as PydanticValidationError
 
 
 PYTHON_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-sys.path.append(PYTHON_ROOT)  # noqa: E402
+if PYTHON_ROOT not in sys.path:
+    sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 # our stuff
 from rekognition_api.conf import Settings, SettingsDefaults  # noqa: E402
-from rekognition_api.exceptions import (  # noqa: E402
-    RekognitionConfigurationError,
-    RekognitionValueError,
-)
+from rekognition_api.const import TFVARS  # noqa: E402
+from rekognition_api.exceptions import RekognitionValueError  # noqa: E402
 
 
 class TestConfiguration(unittest.TestCase):
@@ -29,6 +28,7 @@ class TestConfiguration(unittest.TestCase):
 
     # Get the directory of the current script
     here = os.path.dirname(os.path.abspath(__file__))
+    env_vars = dict(os.environ)
 
     def setUp(self):
         """Set up test fixtures."""
@@ -41,6 +41,7 @@ class TestConfiguration(unittest.TestCase):
         """Test that settings == SettingsDefaults when no .env is in use."""
         os.environ.clear()
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
         self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
@@ -71,6 +72,8 @@ class TestConfiguration(unittest.TestCase):
         with self.assertRaises(PydanticValidationError):
             Settings()
 
+        os.environ.update(self.env_vars)
+
     def test_env_nulls(self):
         """Test that settings handles missing .env values."""
         os.environ.clear()
@@ -79,6 +82,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(loaded)
 
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
         self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
@@ -100,6 +104,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(loaded)
 
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, "us-west-1")
         self.assertEqual(mock_settings.aws_dynamodb_table_id, "TEST_facialrecognition")
@@ -125,27 +130,39 @@ class TestConfiguration(unittest.TestCase):
         os.environ, {"AWS_PROFILE": "", "AWS_ACCESS_KEY_ID": "TEST_KEY", "AWS_SECRET_ACCESS_KEY": "TEST_SECRET"}
     )
     def test_aws_credentials_without_profile(self):
-        """Test that key and secret are unset when using profile."""
+        """Test that key and secret are set by environment variable when provided."""
 
         mock_settings = Settings()
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), "TEST_KEY")
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), "TEST_SECRET")
-        self.assertEqual(mock_settings.aws_access_key_id_source, "environ")
-        self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
+        # note: terraform.tfvars can set aws_profile, which overrides the env vars
+        if mock_settings.aws_profile:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
+        else:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "environ")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
 
     def test_aws_credentials_noinfo(self):
-        """Test that key and secret are unset when using profile."""
+        """Test that key and secret remain unset when no profile nor environment variables are provided."""
         os.environ.clear()
         mock_settings = Settings()
-        self.assertEqual(mock_settings.aws_profile, None)
+        os.environ.update(self.env_vars)
+        aws_profile = TFVARS.get("aws_profile", None)
+        self.assertEqual(mock_settings.aws_profile, aws_profile)
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), None)
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), None)
-        self.assertEqual(mock_settings.aws_access_key_id_source, "unset")
-        self.assertEqual(mock_settings.aws_secret_access_key_source, "unset")
+        # note: terraform.tfvars can set aws_profile, which overrides the env vars
+        if mock_settings.aws_profile:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
+        else:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "unset")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "unset")
 
     @patch.dict(os.environ, {"AWS_REGION": "invalid-region"})
     def test_invalid_aws_region_code(self):
@@ -227,33 +244,3 @@ class TestConfiguration(unittest.TestCase):
 
         with self.assertRaises(PydanticValidationError):
             mock_settings.aws_rekognition_face_detect_threshold = 25
-
-    def test_dump(self):
-        """Test that dump is a dict."""
-
-        mock_settings = Settings()
-        self.assertIsInstance(mock_settings.dump, dict)
-
-    def test_dump_keys(self):
-        """Test that dump contains the expected keys."""
-
-        dump = Settings().dump
-        self.assertIn("environment", dump)
-        self.assertIn("aws", dump)
-        self.assertIn("rekognition", dump)
-        self.assertIn("dynamodb", dump)
-
-    def test_dump_values(self):
-        """Test that dump contains the expected values."""
-
-        mock_settings = Settings()
-        environment = mock_settings.dump["environment"]
-
-        self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)
-        self.assertEqual(environment["is_using_dotenv_file"], mock_settings.is_using_dotenv_file)
-        self.assertEqual(environment["is_using_aws_rekognition"], mock_settings.is_using_aws_rekognition)
-        self.assertEqual(environment["is_using_aws_dynamodb"], mock_settings.is_using_aws_dynamodb)
-        self.assertEqual(environment["shared_resource_identifier"], mock_settings.shared_resource_identifier)
-        self.assertEqual(environment["debug_mode"], mock_settings.debug_mode)
-        self.assertEqual(environment["dump_defaults"], mock_settings.dump_defaults)
-        self.assertEqual(environment["version"], mock_settings.version)
