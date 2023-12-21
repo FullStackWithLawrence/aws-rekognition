@@ -424,6 +424,9 @@ class Settings(BaseSettings):
         if self._dump and self._initialized:
             return self._dump
 
+        if not self._initialized:
+            return {}
+
         packages = get_installed_packages()
         packages_dict = [{"name": name, "version": version} for name, version in packages]
         packages_json = json.dumps(packages_dict, indent=4)
