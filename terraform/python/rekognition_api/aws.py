@@ -15,9 +15,11 @@ class AWSInfrastructureConfig:
     @property
     def dump(self):
         """Return a dict of the AWS infrastructure config."""
+        api = self.get_api(settings.aws_apigateway_name)
+
         return {
             "aws_apigateway": {
-                "api_id": self.get_api(settings.aws_apigateway_name)["id"],
+                "api_id": api.get("id"),
             },
             "aws_dynamodb": {
                 "table_name": self.get_dyanmodb_table_by_name(
@@ -102,14 +104,14 @@ class AWSInfrastructureConfig:
                 return True
         return False
 
-    def get_api(self, api_name: str) -> json:
+    def get_api(self, api_name: str) -> dict:
         """Test that the API Gateway exists."""
         response = settings.aws_apigateway_client.get_rest_apis()
 
         for item in response["items"]:
             if item["name"] == api_name:
                 return item
-        return False
+        return {}
 
     def api_resource_and_method_exists(self, path, method) -> bool:
         """Test that the API Gateway resource and method exists."""
@@ -138,8 +140,7 @@ class AWSInfrastructureConfig:
 
     def get_rekognition_collection_by_id(self, collection_id) -> str:
         """Return the Rekognition collection."""
-        rekognition_client = settings.aws_session.client("rekognition")
-        response = rekognition_client.list_collections()
+        response = settings.aws_rekognition_client.list_collections()
         for collection in response["CollectionIds"]:
             if collection == collection_id:
                 return collection
