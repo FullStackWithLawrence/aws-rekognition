@@ -138,10 +138,15 @@ def empty_str_to_int_default(v: str, default: int) -> int:
 
 
 # pylint: disable=too-many-public-methods
+# pylint: disable=too-many-instance-attributes
 class Settings(BaseSettings):
     """Settings for Lambda functions"""
 
     _aws_session: boto3.Session = None
+    _aws_apigateway_client = None
+    _aws_s3_client = None
+    _aws_dynamodb_client = None
+    _aws_rekognition_client = None
     _aws_access_key_id_source: str = "unset"
     _aws_secret_access_key_source: str = "unset"
     _dump: dict = None
@@ -315,22 +320,30 @@ class Settings(BaseSettings):
     @property
     def aws_apigateway_client(self):
         """API Gateway client"""
-        return self.aws_session.client("apigateway")
+        if not self._aws_apigateway_client:
+            self._aws_apigateway_client = self.aws_session.client("apigateway")
+        return self._aws_apigateway_client
 
     @property
     def aws_s3_client(self):
         """S3 client"""
-        return self.aws_session.client("s3")
+        if not self._aws_s3_client:
+            self._aws_s3_client = self.aws_session.client("s3")
+        return self._aws_s3_client
 
     @property
     def aws_dynamodb_client(self):
         """DynamoDB client"""
-        return self.aws_session.client("dynamodb")
+        if not self._aws_dynamodb_client:
+            self._aws_dynamodb_client = self.aws_session.client("dynamodb")
+        return self._aws_dynamodb_client
 
     @property
     def aws_rekognition_client(self):
         """Rekognition client"""
-        return self.aws_session.client("rekognition")
+        if not self._aws_rekognition_client:
+            self._aws_rekognition_client = self.aws_session.client("rekognition")
+        return self._aws_rekognition_client
 
     @property
     def dynamodb_table(self):
@@ -353,18 +366,7 @@ class Settings(BaseSettings):
         if self.aws_apigateway_create_custom_domaim:
             return "api." + self.shared_resource_identifier + "." + self.aws_apigateway_root_domain
 
-        try:
-            response = self.aws_apigateway_client.get_rest_apis()
-        except NoCredentialsError:
-            # pylint: disable=logging-fstring-interpolation
-            logger.error(f"NoCredentialsError. aws_auth: {self.aws_auth}. reinitializing aws_session.")
-            self._aws_session = boto3.Session(
-                region_name=os.environ.get("AWS_REGION", "us-east-1"),
-                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
-                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
-            )
-            response = self.aws_apigateway_client.get_rest_apis()
-
+        response = self.aws_apigateway_client.get_rest_apis()
         for item in response["items"]:
             if item["name"] == self.aws_apigateway_name:
                 api_id = item["id"]
