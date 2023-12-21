@@ -188,10 +188,16 @@ class Settings(BaseSettings):
             if "AWS_SECRET_ACCESS_KEY" in os.environ:
                 self._aws_secret_access_key_source = "environ"
 
-        logger.info("using aws_region: %s", self.aws_region)
-        logger.info("using aws_profile: %s", self.aws_profile)
-        logger.info("using aws_access_key_id_source: %s", self._aws_access_key_id_source)
-        logger.info("using aws_secret_access_key_source: %s", self._aws_secret_access_key_source)
+        if self.debug_mode:
+            logger.setLevel(logging.DEBUG)
+
+        # pylint: disable=logging-fstring-interpolation
+        logger.debug(
+            f"aws_profile: {self.aws_profile}, "
+            f"aws_region: {self.aws_region}, "
+            f"aws_access_key_id_source: {self.aws_access_key_id_source}, "
+            f"aws_secret_access_key_source: {self.aws_secret_access_key_source}"
+        )
         self._initialized = True
 
     shared_resource_identifier: Optional[str] = Field(
