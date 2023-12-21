@@ -155,6 +155,16 @@ class Settings(BaseSettings):
             self._aws_session = boto3.Session()
             self._initialized = True
 
+        if not self._initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
+            # Delete AWS_PROFILE from os.environ if it exists
+            os.environ.pop("AWS_PROFILE", None)
+            self._aws_session = boto3.Session(
+                region_name=os.environ.get("AWS_REGION", "us-east-1"),
+                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
+                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
+            )
+            self._initialized = True
+
         if not self._initialized:
             aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
             if len(aws_profile) > 0:
