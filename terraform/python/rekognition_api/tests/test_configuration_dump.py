@@ -25,16 +25,12 @@ class TestConfigurationDump(unittest.TestCase):
         """Test that dump is a dict."""
 
         mock_settings = Settings(aws_region="us-east-1")
-        account_id = mock_settings.aws_session.client("sts").get_caller_identity()["Account"]
-        print(f"account_id: {account_id}")
         self.assertIsInstance(mock_settings.dump, dict)
 
     def test_dump_keys(self):
         """Test that dump contains the expected keys."""
 
         mock_settings = Settings(aws_region="us-east-1")
-        account_id = mock_settings.aws_session.client("sts").get_caller_identity()["Account"]
-        print(f"account_id: {account_id}")
 
         dump = mock_settings.dump
         self.assertIn("environment", dump)
@@ -49,8 +45,6 @@ class TestConfigurationDump(unittest.TestCase):
         """Test that dump contains the expected values."""
 
         mock_settings = Settings(aws_region="us-east-1")
-        account_id = mock_settings.aws_session.client("sts").get_caller_identity()["Account"]
-        print(f"account_id: {account_id}")
         environment = mock_settings.dump["environment"]
 
         self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)

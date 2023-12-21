@@ -28,6 +28,7 @@ class TestConfiguration(unittest.TestCase):
 
     # Get the directory of the current script
     here = os.path.dirname(os.path.abspath(__file__))
+    env_vars = dict(os.environ)
 
     def setUp(self):
         """Set up test fixtures."""
@@ -40,6 +41,7 @@ class TestConfiguration(unittest.TestCase):
         """Test that settings == SettingsDefaults when no .env is in use."""
         os.environ.clear()
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
         self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
@@ -70,6 +72,8 @@ class TestConfiguration(unittest.TestCase):
         with self.assertRaises(PydanticValidationError):
             Settings()
 
+        os.environ.update(self.env_vars)
+
     def test_env_nulls(self):
         """Test that settings handles missing .env values."""
         os.environ.clear()
@@ -78,6 +82,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(loaded)
 
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
         self.assertEqual(mock_settings.aws_dynamodb_table_id, SettingsDefaults.AWS_DYNAMODB_TABLE_ID)
@@ -99,6 +104,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(loaded)
 
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, "us-west-1")
         self.assertEqual(mock_settings.aws_dynamodb_table_id, "TEST_facialrecognition")
@@ -143,6 +149,7 @@ class TestConfiguration(unittest.TestCase):
         """Test that key and secret are unset when using profile."""
         os.environ.clear()
         mock_settings = Settings()
+        os.environ.update(self.env_vars)
         aws_profile = TFVARS.get("aws_profile", None)
         self.assertEqual(mock_settings.aws_profile, aws_profile)
         # pylint: disable=no-member
