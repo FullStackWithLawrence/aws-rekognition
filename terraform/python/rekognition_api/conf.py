@@ -192,7 +192,7 @@ class Settings(BaseSettings):
             logger.setLevel(logging.DEBUG)
 
         # pylint: disable=logging-fstring-interpolation
-        logger.debug(
+        logger.warning(
             f"aws_profile: {self.aws_profile}, "
             f"aws_region: {self.aws_region}, "
             f"aws_access_key_id_source: {self.aws_access_key_id_source}, "
