@@ -23,13 +23,13 @@ class TestConfigurationDump(unittest.TestCase):
     def test_dump(self):
         """Test that dump is a dict."""
 
-        mock_settings = Settings()
+        mock_settings = Settings(aws_region="us-east-1")
         self.assertIsInstance(mock_settings.dump, dict)
 
     def test_dump_keys(self):
         """Test that dump contains the expected keys."""
 
-        mock_settings = Settings()
+        mock_settings = Settings(aws_region="us-east-1")
 
         dump = mock_settings.dump
         self.assertIn("environment", dump)
@@ -43,7 +43,7 @@ class TestConfigurationDump(unittest.TestCase):
     def test_dump_values(self):
         """Test that dump contains the expected values."""
 
-        mock_settings = Settings()
+        mock_settings = Settings(aws_region="us-east-1")
         environment = mock_settings.dump["environment"]
 
         self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)
