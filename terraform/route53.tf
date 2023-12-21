@@ -12,15 +12,15 @@
 
 # see https://registry.terraform.io/providers/-/aws/4.51.0/docs/resources/api_gateway_domain_name
 resource "aws_api_gateway_domain_name" "rekognition" {
-  count           = var.create_custom_domain_name ? 1 : 0
+  count           = var.aws_apigateway_create_custom_domaim ? 1 : 0
   domain_name     = local.api_gateway_subdomain
   certificate_arn = module.acm.acm_certificate_arn
   tags            = var.tags
 }
 
 resource "aws_route53_record" "api" {
-  count   = var.create_custom_domain_name ? 1 : 0
-  zone_id = data.aws_route53_zone.root_domain.id
+  count   = var.aws_apigateway_create_custom_domaim ? 1 : 0
+  zone_id = data.aws_route53_zone.aws_apigateway_root_domain.id
   name    = local.api_gateway_subdomain
   type    = "A"
 
@@ -41,7 +41,7 @@ module "acm" {
   # }
 
   domain_name = local.api_gateway_subdomain
-  zone_id     = data.aws_route53_zone.root_domain.id
+  zone_id     = data.aws_route53_zone.aws_apigateway_root_domain.id
 
   subject_alternative_names = [
     "*.${local.api_gateway_subdomain}",

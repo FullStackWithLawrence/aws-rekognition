@@ -12,7 +12,8 @@ import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PYTHON_ROOT = os.path.dirname(HERE)
-sys.path.append(PYTHON_ROOT)  # noqa: E402
+if PYTHON_ROOT not in sys.path:
+    sys.path.append(PYTHON_ROOT)  # noqa: E402
 
 
 def noop():

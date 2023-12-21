@@ -54,5 +54,8 @@ runs:
 
     - name: Run Tests
       shell: bash
+      env:
+        GITHUB_ACTIONS: "true"
+        DEBUG_MODE: "true"
       run: |
         make test

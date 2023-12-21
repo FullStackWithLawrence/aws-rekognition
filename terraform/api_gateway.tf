@@ -12,7 +12,7 @@
 #         https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway
 #------------------------------------------------------------------------------
 locals {
-  api_gateway_subdomain    = "api.${var.shared_resource_identifier}.${var.root_domain}"
+  api_gateway_subdomain    = "api.${var.shared_resource_identifier}.${var.aws_apigateway_root_domain}"
   api_name                 = "${var.shared_resource_identifier}-api"
   apigateway_iam_role_name = "${var.shared_resource_identifier}-apigateway"
   iam_role_policy_name     = "${var.shared_resource_identifier}-apigateway"
@@ -23,10 +23,10 @@ locals {
 }
 
 # WARNING: You need a pre-existing Route53 Hosted Zone
-# for root_domain located in your AWS account.
+# for aws_apigateway_root_domain located in your AWS account.
 # see: https://aws.amazon.com/route53/
-data "aws_route53_zone" "root_domain" {
-  name = var.root_domain
+data "aws_route53_zone" "aws_apigateway_root_domain" {
+  name = var.aws_apigateway_root_domain
 }
 
 data "aws_caller_identity" "current" {}
