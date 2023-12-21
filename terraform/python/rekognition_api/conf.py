@@ -497,8 +497,10 @@ class Settings(BaseSettings):
             v = SecretStr(v)
         if v.get_secret_value() in [None, ""]:
             return SettingsDefaults.AWS_ACCESS_KEY_ID
-        if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
-            logger.warning("aws_access_key_id is ignored when aws_profile is set")
+        aws_profile = values.data.get("aws_profile", None)
+        if aws_profile and len(aws_profile) > 0 and aws_profile != SettingsDefaults.AWS_PROFILE:
+            # pylint: disable=logging-fstring-interpolation
+            logger.warning(f"aws_access_key_id is being ignored. using aws_profile {aws_profile}.")
             return SettingsDefaults.AWS_ACCESS_KEY_ID
         return v
 
@@ -509,8 +511,10 @@ class Settings(BaseSettings):
             v = SecretStr(v)
         if v.get_secret_value() in [None, ""]:
             return SettingsDefaults.AWS_SECRET_ACCESS_KEY
-        if "aws_profile" in values.data and values.data["aws_profile"] != SettingsDefaults.AWS_PROFILE:
-            logger.warning("aws_secret_access_key is ignored when aws_profile is set")
+        aws_profile = values.data.get("aws_profile", None)
+        if aws_profile and len(aws_profile) > 0 and aws_profile != SettingsDefaults.AWS_PROFILE:
+            # pylint: disable=logging-fstring-interpolation
+            logger.warning(f"aws_secret_access_key is being ignored. using aws_profile {aws_profile}.")
             return SettingsDefaults.AWS_SECRET_ACCESS_KEY
         return v
 
