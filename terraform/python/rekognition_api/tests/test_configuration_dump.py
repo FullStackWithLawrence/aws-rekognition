@@ -5,6 +5,7 @@
 # python stuff
 import os
 import sys
+import time
 import unittest
 
 
@@ -24,12 +25,14 @@ class TestConfigurationDump(unittest.TestCase):
         """Test that dump is a dict."""
 
         mock_settings = Settings(aws_region="us-east-1")
+        time.sleep(0.5)  # sleep for 500 ms
         self.assertIsInstance(mock_settings.dump, dict)
 
     def test_dump_keys(self):
         """Test that dump contains the expected keys."""
 
         mock_settings = Settings(aws_region="us-east-1")
+        time.sleep(0.5)  # sleep for 500 ms
 
         dump = mock_settings.dump
         self.assertIn("environment", dump)
@@ -44,6 +47,7 @@ class TestConfigurationDump(unittest.TestCase):
         """Test that dump contains the expected values."""
 
         mock_settings = Settings(aws_region="us-east-1")
+        time.sleep(0.5)  # sleep for 500 ms
         environment = mock_settings.dump["environment"]
 
         self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)
