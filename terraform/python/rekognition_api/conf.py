@@ -182,7 +182,6 @@ class Settings(BaseSettings):
 
         if not self._initialized:
             if self.aws_profile:
-                logger.debug("Using AWS_PROFILE: %s", self.aws_profile)
                 self._aws_access_key_id_source = "aws_profile"
                 self._aws_secret_access_key_source = "aws_profile"
                 self._initialized = True
