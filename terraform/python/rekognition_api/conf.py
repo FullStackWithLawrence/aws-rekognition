@@ -190,7 +190,7 @@ class Settings(BaseSettings):
             logger.setLevel(logging.DEBUG)
 
         # pylint: disable=logging-fstring-interpolation
-        logger.warning(f"initialized settings: {self.aws_auth}")
+        logger.debug(f"initialized settings: {self.aws_auth}")
         self._initialized = True
 
     shared_resource_identifier: Optional[str] = Field(
@@ -357,13 +357,7 @@ class Settings(BaseSettings):
             response = self.aws_apigateway_client.get_rest_apis()
         except NoCredentialsError:
             # pylint: disable=logging-fstring-interpolation
-            logger.warning(
-                "NoCredentialsError: unable to get_rest_apis. "
-                f"aws_profile: {self.aws_profile} "
-                f"aws_region: {self.aws_region} "
-                f"aws_access_key_id_source: {self.aws_access_key_id_source} "
-                f"aws_secret_access_key_source: {self.aws_secret_access_key_source}"
-            )
+            logger.error(f"NoCredentialsError. aws_auth: {self.aws_auth}")
             raise
 
         for item in response["items"]:
