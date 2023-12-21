@@ -15,7 +15,6 @@ if PYTHON_ROOT not in sys.path:
 
 # our stuff
 from rekognition_api.conf import Settings  # noqa: E402
-from rekognition_api.const import TFVARS  # noqa: E402
 
 
 class TestConfigurationDump(unittest.TestCase):
