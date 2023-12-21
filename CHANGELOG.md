@@ -1,3 +1,11 @@
+## [0.2.7](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.6...v0.2.7) (2023-12-21)
+
+
+### Bug Fixes
+
+* add more permissions for lambda, for introspections ([56e29f1](https://github.com/FullStackWithLawrence/aws-rekognition/commit/56e29f18a81343f2f2941e5d695abaaedc657f30))
+* post deployment tweaks ([169ea9e](https://github.com/FullStackWithLawrence/aws-rekognition/commit/169ea9e692358ab80cc0c8630a646719a3b026b9))
+
 ## [0.2.6](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.5...v0.2.6) (2023-12-21)
 
 
