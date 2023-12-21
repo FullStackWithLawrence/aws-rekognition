@@ -130,7 +130,7 @@ def get_faces(event, record):
 
     faces = {"FaceRecords": []}
     try:
-        faces = settings.rekognition_client.index_faces(
+        faces = settings.aws_rekognition_client.index_faces(
             CollectionId=settings.aws_rekognition_collection_id,
             Image={"S3Object": {"Bucket": s3_bucket_name, "Name": s3_object_key}},
             ExternalImageId=s3_object_key,
@@ -141,7 +141,7 @@ def get_faces(event, record):
 
     # handle anything that went wrong
     # see https://docs.aws.amazon.com/rekognition/latest/dg/error-handling.html
-    except settings.rekognition_client.exceptions.InvalidParameterException:
+    except settings.aws_rekognition_client.exceptions.InvalidParameterException:
         # If no faces are detected in the image, then index_faces()
         # returns an InvalidParameterException error
         pass
