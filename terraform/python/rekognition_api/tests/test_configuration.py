@@ -131,8 +131,13 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), "TEST_KEY")
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), "TEST_SECRET")
-        self.assertEqual(mock_settings.aws_access_key_id_source, "environ")
-        self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
+        # note: terraform.tfvars can set aws_profile, which overrides the env vars
+        if mock_settings.aws_profile:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
+        else:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "environ")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
 
     def test_aws_credentials_noinfo(self):
         """Test that key and secret are unset when using profile."""
@@ -144,8 +149,13 @@ class TestConfiguration(unittest.TestCase):
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), None)
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_secret_access_key.get_secret_value(), None)
-        self.assertEqual(mock_settings.aws_access_key_id_source, "unset")
-        self.assertEqual(mock_settings.aws_secret_access_key_source, "unset")
+        # note: terraform.tfvars can set aws_profile, which overrides the env vars
+        if mock_settings.aws_profile:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
+        else:
+            self.assertEqual(mock_settings.aws_access_key_id_source, "unset")
+            self.assertEqual(mock_settings.aws_secret_access_key_source, "unset")
 
     @patch.dict(os.environ, {"AWS_REGION": "invalid-region"})
     def test_invalid_aws_region_code(self):
@@ -232,12 +242,16 @@ class TestConfiguration(unittest.TestCase):
         """Test that dump is a dict."""
 
         mock_settings = Settings()
+        print("DEBUG test_dump() mock_settings.aws_auth: ", mock_settings.aws_auth)
         self.assertIsInstance(mock_settings.dump, dict)
 
     def test_dump_keys(self):
         """Test that dump contains the expected keys."""
 
-        dump = Settings().dump
+        mock_settings = Settings()
+        print("DEBUG test_dump_keys() mock_settings.aws_auth: ", mock_settings.aws_auth)
+
+        dump = mock_settings.dump
         self.assertIn("environment", dump)
         self.assertIn("aws_auth", dump)
         self.assertIn("aws_rekognition", dump)
@@ -250,6 +264,8 @@ class TestConfiguration(unittest.TestCase):
         """Test that dump contains the expected values."""
 
         mock_settings = Settings()
+        print("DEBUG test_dump_keys() mock_settings.aws_auth: ", mock_settings.aws_auth)
+
         environment = mock_settings.dump["environment"]
 
         self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)

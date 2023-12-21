@@ -158,7 +158,6 @@ class Settings(BaseSettings):
 
         if not self._initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
             # Delete AWS_PROFILE from os.environ if it exists
-            os.environ.pop("AWS_PROFILE", None)
             self._aws_session = boto3.Session(
                 region_name=os.environ.get("AWS_REGION", "us-east-1"),
                 aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
@@ -167,9 +166,8 @@ class Settings(BaseSettings):
             self._initialized = True
 
         if not self._initialized:
-            aws_profile = str(os.environ.get("AWS_PROFILE", "")).strip()
-            if len(aws_profile) > 0:
-                logger.debug("Using AWS_PROFILE: %s", aws_profile)
+            if self.aws_profile:
+                logger.debug("Using AWS_PROFILE: %s", self.aws_profile)
                 self._aws_access_key_id_source = "aws_profile"
                 self._aws_secret_access_key_source = "aws_profile"
                 self._initialized = True
@@ -192,12 +190,7 @@ class Settings(BaseSettings):
             logger.setLevel(logging.DEBUG)
 
         # pylint: disable=logging-fstring-interpolation
-        logger.warning(
-            f"aws_profile: {self.aws_profile}, "
-            f"aws_region: {self.aws_region}, "
-            f"aws_access_key_id_source: {self.aws_access_key_id_source}, "
-            f"aws_secret_access_key_source: {self.aws_secret_access_key_source}"
-        )
+        logger.warning(f"initialized settings: {self.aws_auth}")
         self._initialized = True
 
     shared_resource_identifier: Optional[str] = Field(
@@ -288,6 +281,16 @@ class Settings(BaseSettings):
     def aws_secret_access_key_source(self):
         """Source of aws_secret_access_key"""
         return self._aws_secret_access_key_source
+
+    @property
+    def aws_auth(self) -> dict:
+        """AWS authentication"""
+        return {
+            "aws_profile": self.aws_profile,
+            "aws_access_key_id_source": self.aws_access_key_id_source,
+            "aws_secret_access_key_source": self.aws_secret_access_key_source,
+            "aws_region": self.aws_region,
+        }
 
     @property
     def aws_session(self):
@@ -447,12 +450,7 @@ class Settings(BaseSettings):
                 "python_version_tuple": platform.python_version_tuple(),
                 "python_installed_packages": packages_json,
             },
-            "aws_auth": {
-                "aws_profile": self.aws_profile,
-                "aws_access_key_id_source": self.aws_access_key_id_source,
-                "aws_secret_access_key_source": self.aws_secret_access_key_source,
-                "aws_region": self.aws_region,
-            },
+            "aws_auth": self.aws_auth,
             "aws_rekognition": {
                 "aws_rekognition_collection_id": self.aws_rekognition_collection_id,
                 "aws_rekognition_face_detect_max_faces_count": self.aws_rekognition_face_detect_max_faces_count,

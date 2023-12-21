@@ -88,10 +88,13 @@ def validate_event(event):
     ---------------------------
     """
     try:
-        records = event["Records"]
+        if not isinstance(event, dict):
+            raise TypeError("event object is not a dictionary")
 
         if "Records" not in event:
-            raise TypeError("Records object not found in event object")
+            raise TypeError("Records object not found in event dict")
+
+        records = event.get("Records")
 
         if records[0]["eventSource"] != "aws:s3":
             service = records[0]["eventSource"]
