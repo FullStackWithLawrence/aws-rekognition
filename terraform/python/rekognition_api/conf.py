@@ -169,7 +169,11 @@ class Settings(BaseSettings):
                     aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", None),
                     aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
                 )
+                self._aws_access_key_id_source = "environ"
+                self._aws_secret_access_key_source = "environ"
             except ProfileNotFound:
+                self._aws_access_key_id_source = "aws_profile"
+                self._aws_secret_access_key_source = "aws_profile"
                 logger.warning("aws_profile %s not found", self.aws_profile)
 
             self._initialized = True
