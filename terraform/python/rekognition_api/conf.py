@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 import pkg_resources
-from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import NoCredentialsError, ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
@@ -303,7 +303,11 @@ class Settings(BaseSettings):
         if not self._aws_session:
             if self.aws_profile:
                 logger.debug("creating new aws_session with aws_profile: %s", self.aws_profile)
-                self._aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+                try:
+                    self._aws_session = boto3.Session(profile_name=self.aws_profile, region_name=self.aws_region)
+                except ProfileNotFound:
+                    logger.warning("aws_profile %s not found", self.aws_profile)
+
                 return self._aws_session
             if self.aws_access_key_id.get_secret_value() is not None and self.aws_secret_access_key is not None:
                 logger.debug("creating new aws_session with aws keypair: %s", self.aws_access_key_id_source)

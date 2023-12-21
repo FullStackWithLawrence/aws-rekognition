@@ -130,7 +130,7 @@ class TestConfiguration(unittest.TestCase):
         os.environ, {"AWS_PROFILE": "", "AWS_ACCESS_KEY_ID": "TEST_KEY", "AWS_SECRET_ACCESS_KEY": "TEST_SECRET"}
     )
     def test_aws_credentials_without_profile(self):
-        """Test that key and secret are unset when using profile."""
+        """Test that key and secret are set by environment variable when provided."""
 
         mock_settings = Settings()
         # pylint: disable=no-member
@@ -146,7 +146,7 @@ class TestConfiguration(unittest.TestCase):
             self.assertEqual(mock_settings.aws_secret_access_key_source, "environ")
 
     def test_aws_credentials_noinfo(self):
-        """Test that key and secret are unset when using profile."""
+        """Test that key and secret remain unset when no profile nor environment variables are provided."""
         os.environ.clear()
         mock_settings = Settings()
         os.environ.update(self.env_vars)
