@@ -118,7 +118,7 @@ def unpack_s3_object(event, record):
     """extracts the s3 object key, object, and object metadata from the event record"""
     s3_bucket_name = get_bucket_name(event)
     s3_object_key = unquote_plus(record["s3"]["object"]["key"], encoding="utf-8")
-    s3_object = settings.s3_client.Object(s3_bucket_name, s3_object_key)
+    s3_object = settings.aws_s3_client.Object(s3_bucket_name, s3_object_key)
     s3_object_metadata = {key.replace("x-amz-meta-", ""): s3_object.metadata[key] for key in s3_object.metadata.keys()}
     return s3_object_key, s3_object_metadata
 

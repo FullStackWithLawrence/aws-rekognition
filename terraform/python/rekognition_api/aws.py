@@ -60,19 +60,24 @@ class AWSInfrastructureConfig:
         """Return a dict of the AWS IAM policies."""
         iam_client = settings.aws_session.client("iam")
         policies = iam_client.list_policies()["Policies"]
-        rekognition_policies = {
-            policy["PolicyName"]: policy["Arn"]
-            for policy in policies
-            if settings.shared_resource_identifier in policy["PolicyName"]
-        }
-        return rekognition_policies or {}
+        rekognition_policies = {}
+        for policy in policies:
+            if settings.shared_resource_identifier in policy["PolicyName"]:
+                policy_version = iam_client.get_policy(PolicyArn=policy["Arn"])["Policy"]["DefaultVersionId"]
+                policy_document = iam_client.get_policy_version(PolicyArn=policy["Arn"], VersionId=policy_version)[
+                    "PolicyVersion"
+                ]["Document"]
+                rekognition_policies[policy["PolicyName"]] = {"Arn": policy["Arn"], "Policy": policy_document}
+        return rekognition_policies
 
     def get_iam_roles(self):
         """Return a dict of the AWS IAM roles."""
         iam_client = settings.aws_session.client("iam")
         roles = iam_client.list_roles()["Roles"]
         rekognition_roles = {
-            role["RoleName"]: role["Arn"] for role in roles if settings.shared_resource_identifier in role["RoleName"]
+            role["RoleName"]: {"Arn": role["Arn"], "Role": role}
+            for role in roles
+            if settings.shared_resource_identifier in role["RoleName"]
         }
         return rekognition_roles or {}
 
@@ -109,7 +114,7 @@ class AWSInfrastructureConfig:
         """Test that the AWS connection works."""
         try:
             # Try a benign operation
-            settings.aws_s3_client.list_buckets()
+            settings.aws_s3_client.buckets.all()
             return True
         except Exception:  # pylint: disable=broad-exception-caught
             return False
@@ -124,9 +129,9 @@ class AWSInfrastructureConfig:
 
     def get_bucket_by_prefix(self, bucket_prefix) -> str:
         """Return the bucket name given the bucket prefix."""
-        for bucket in settings.aws_s3_client.list_buckets()["Buckets"]:
-            if bucket["Name"].startswith(bucket_prefix):
-                return f"arn:aws:s3:::{bucket['Name']}"
+        for bucket in settings.aws_s3_client.buckets.all():
+            if bucket.name.startswith(bucket_prefix):
+                return f"arn:aws:s3:::{bucket.name}"
         return None
 
     def bucket_exists(self, bucket_prefix) -> bool:
