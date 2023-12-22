@@ -86,23 +86,28 @@ def get_semantic_version() -> str:
 class SettingsDefaults:
     """Default values for Settings"""
 
+    # defaults for this Python package
+    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
+    DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
+    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
+
+    # aws auth
     AWS_PROFILE = TFVARS.get("aws_profile", None)
     AWS_ACCESS_KEY_ID = SecretStr(None)
     AWS_SECRET_ACCESS_KEY = SecretStr(None)
     AWS_REGION = TFVARS.get("aws_region", "us-east-1")
 
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
-    DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
-
+    # aws api gateway defaults
     AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
     AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
     AWS_APIGATEWAY_READ_TIMEOUT = TFVARS.get("aws_apigateway_read_timeout", 70)
     AWS_APIGATEWAY_CONNECT_TIMEOUT = TFVARS.get("aws_apigateway_connect_timeout", 70)
     AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
 
+    # aws dynamodb defaults
     AWS_DYNAMODB_TABLE_ID = "rekognition"
 
+    # aws rekognition defaults
     AWS_REKOGNITION_COLLECTION_ID = AWS_DYNAMODB_TABLE_ID + "-collection"
     AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("aws_rekognition_max_faces_count", 10))
     AWS_REKOGNITION_FACE_DETECT_THRESHOLD: int = int(TFVARS.get("aws_rekognition_face_detect_threshold", 10))
