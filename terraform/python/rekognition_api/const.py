@@ -33,12 +33,9 @@ logger = logging.getLogger(__name__)
 #         return response.text
 #     return None
 
-with open(TERRAFORM_TFVARS, "r", encoding="utf-8") as f:
-    TFVARS = hcl2.load(f)
-
 try:
     with open(TERRAFORM_TFVARS, "r", encoding="utf-8") as f:
         TFVARS = hcl2.load(f)
     IS_USING_TFVARS = True
 except FileNotFoundError:
-    logger.warning("No terraform.tfvars file found. Using default values.")
+    logger.debug("No terraform.tfvars file found. Using default values.")
