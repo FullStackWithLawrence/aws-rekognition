@@ -88,7 +88,7 @@ class SettingsDefaults:
     # defaults for this Python package
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition")
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", True)
+    DUMP_DEFAULTS: bool = bool(TFVARS.get("dump_defaults", True))
 
     # aws auth
     AWS_PROFILE = TFVARS.get("aws_profile", None)
@@ -99,9 +99,9 @@ class SettingsDefaults:
     # aws api gateway defaults
     AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
     AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
-    AWS_APIGATEWAY_READ_TIMEOUT = TFVARS.get("aws_apigateway_read_timeout", 70)
-    AWS_APIGATEWAY_CONNECT_TIMEOUT = TFVARS.get("aws_apigateway_connect_timeout", 70)
-    AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
+    AWS_APIGATEWAY_READ_TIMEOUT: int = TFVARS.get("aws_apigateway_read_timeout", 70)
+    AWS_APIGATEWAY_CONNECT_TIMEOUT: int = TFVARS.get("aws_apigateway_connect_timeout", 70)
+    AWS_APIGATEWAY_MAX_ATTEMPTS: int = TFVARS.get("aws_apigateway_max_attempts", 10)
 
     # aws dynamodb defaults
     AWS_DYNAMODB_TABLE_ID = SHARED_RESOURCE_IDENTIFIER
