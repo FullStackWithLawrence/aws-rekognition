@@ -29,6 +29,7 @@
           "iam:ListPolicies",
           "iam:GetPolicy",
           "iam:GetPolicyVersion",
+          "iam:ListAttachedRolePolicies",
           "s3:ListAllMyBuckets",
           "rekognition:IndexFaces",
           "rekognition:DescribeCollection",

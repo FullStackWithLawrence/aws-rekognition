@@ -28,6 +28,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 import pkg_resources
+from botocore.config import Config
 from botocore.exceptions import ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
@@ -339,7 +340,8 @@ class Settings(BaseSettings):
     def aws_apigateway_client(self):
         """API Gateway client"""
         if not self._aws_apigateway_client:
-            self._aws_apigateway_client = self.aws_session.client("apigateway")
+            config = Config(read_timeout=70, connect_timeout=70, retries={"max_attempts": 10})
+            self._aws_apigateway_client = self.aws_session.client("apigateway", config=config)
         return self._aws_apigateway_client
 
     @property

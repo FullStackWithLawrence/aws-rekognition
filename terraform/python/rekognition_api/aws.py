@@ -73,11 +73,17 @@ class AWSInfrastructureConfig:
         """Return a dict of the AWS IAM roles."""
         iam_client = settings.aws_session.client("iam")
         roles = iam_client.list_roles()["Roles"]
-        rekognition_roles = {
-            role["RoleName"]: {"Arn": role["Arn"], "Role": role}
-            for role in roles
-            if settings.shared_resource_identifier in role["RoleName"]
-        }
+        rekognition_roles = {}
+        for role in roles:
+            if settings.shared_resource_identifier in role["RoleName"]:
+                attached_policies = iam_client.list_attached_role_policies(RoleName=role["RoleName"])[
+                    "AttachedPolicies"
+                ]
+                rekognition_roles[role["RoleName"]] = {
+                    "Arn": role["Arn"],
+                    "Role": role,
+                    "AttachedPolicies": attached_policies,
+                }
         return rekognition_roles or {}
 
     def get_api_stage(self) -> str:
