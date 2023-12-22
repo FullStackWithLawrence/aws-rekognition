@@ -5,8 +5,6 @@ import json
 import sys
 import traceback
 
-from rekognition_api.conf import settings
-
 
 class DateTimeEncoder(json.JSONEncoder):
     """JSON encoder that handles datetime objects."""
@@ -18,14 +16,19 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-def cloudwatch_handler(event, quiet: bool = False):
+def cloudwatch_handler(
+    event,
+    dump,
+    debug_mode: bool = False,
+    quiet: bool = False,
+):
     """Create a CloudWatch log entry for the event and dump the event to stdout."""
-    if settings.debug_mode and not quiet:
-        print(json.dumps(settings.dump, cls=DateTimeEncoder))
+    if debug_mode and not quiet:
+        print(json.dumps(dump, cls=DateTimeEncoder))
         print(json.dumps({"event": event}, cls=DateTimeEncoder))
 
 
-def http_response_factory(status_code: int, body: json) -> json:
+def http_response_factory(status_code: int, body: json, debug_mode: bool = False) -> json:
     """
     Generate a standardized JSON return dictionary for all possible response scenarios.
 
@@ -37,7 +40,7 @@ def http_response_factory(status_code: int, body: json) -> json:
     if status_code < 100 or status_code > 599:
         raise ValueError(f"Invalid HTTP response code received: {status_code}")
 
-    if settings.debug_mode:
+    if debug_mode:
         retval = {
             "isBase64Encoded": False,
             "statusCode": status_code,
