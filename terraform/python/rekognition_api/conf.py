@@ -32,9 +32,9 @@ from botocore.exceptions import ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
-from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 
 # our stuff
+from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 from rekognition_api.exceptions import (
     RekognitionConfigurationError,
     RekognitionValueError,
