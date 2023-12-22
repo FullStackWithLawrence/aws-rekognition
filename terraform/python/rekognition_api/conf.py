@@ -97,6 +97,9 @@ class SettingsDefaults:
 
     AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
     AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
+    AWS_APIGATEWAY_READ_TIMEOUT = TFVARS.get("aws_apigateway_read_timeout", 70)
+    AWS_APIGATEWAY_CONNECT_TIMEOUT = TFVARS.get("aws_apigateway_connect_timeout", 70)
+    AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
 
     AWS_DYNAMODB_TABLE_ID = "rekognition"
 
@@ -340,7 +343,11 @@ class Settings(BaseSettings):
     def aws_apigateway_client(self):
         """API Gateway client"""
         if not self._aws_apigateway_client:
-            config = Config(read_timeout=70, connect_timeout=70, retries={"max_attempts": 10})
+            config = Config(
+                read_timeout=SettingsDefaults.AWS_APIGATEWAY_READ_TIMEOUT,
+                connect_timeout=SettingsDefaults.AWS_APIGATEWAY_CONNECT_TIMEOUT,
+                retries={"max_attempts": SettingsDefaults.AWS_APIGATEWAY_MAX_ATTEMPTS},
+            )
             self._aws_apigateway_client = self.aws_session.client("apigateway", config=config)
         return self._aws_apigateway_client
 
