@@ -36,7 +36,8 @@
           "rekognition:IndexFaces",
           "rekognition:DescribeCollection",
           "ec2:DescribeRegions",
-          "route53:ListHostedZones"
+          "route53:ListHostedZones",
+          "route53:ListResourceRecordSets"
         ],
         "Resource": "*"
     }

@@ -8,7 +8,12 @@
 #           configuration settings for the facial recognition system.
 #------------------------------------------------------------------------------
 locals {
-  info_function_name = "${var.shared_resource_identifier}_info"
+  info_function_name    = "${var.shared_resource_identifier}_info"
+  info_build_folder     = "${path.module}/build"
+  info_source_dir       = "${path.module}/build/python/"
+  info_output_path      = "${local.info_build_folder}/lambda_info_payload.zip"
+  add_to_archive_script = "${path.module}/scripts/add_to_archive.sh"
+  info_archive_folder   = "${var.shared_resource_identifier}_api"
 }
 
 resource "aws_lambda_function" "info" {
@@ -58,8 +63,31 @@ resource "aws_cloudwatch_log_group" "info" {
 # see https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 data "archive_file" "lambda_info" {
   type        = "zip"
-  source_dir  = "${path.module}/build/python/"
-  output_path = "${path.module}/build/lambda_info_payload.zip"
+  source_dir  = local.info_source_dir
+  output_path = local.info_output_path
 
   depends_on = [null_resource.build_lambda_index]
+}
+
+# ------------------------------------------------------------------
+# add a copy of terraform.tfvars to the lambda payload
+# ------------------------------------------------------------------
+resource "null_resource" "add_tfvars" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash"]
+    command     = local.add_to_archive_script
+
+    environment = {
+      BUILD_FOLDER   = local.info_build_folder
+      ARCHIVE_FILE   = "lambda_info_payload.zip"
+      ARCHIVE_FOLDER = local.info_archive_folder
+      FILE_TO_ADD    = "terraform.tfvars"
+    }
+  }
+
+  depends_on = [data.archive_file.lambda_info]
 }

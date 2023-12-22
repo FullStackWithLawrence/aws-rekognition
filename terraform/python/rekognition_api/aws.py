@@ -78,14 +78,15 @@ class AWSInfrastructureConfig:
 
     def get_api_stage(self) -> str:
         """Return the API stage."""
-        api = self.get_api(settings.aws_apigateway_name)
-        api_id = api["id"]
-        response = settings.aws_apigateway_client.get_stages(restApiId=api_id)
-        # Assuming you want the most recently deployed stage
-        stages = response.get("item", [])
-        if stages:
-            retval = stages[-1]["stageName"]
-            return retval
+        api = self.get_api(settings.aws_apigateway_name) or {}
+        api_id = api.get("id")
+        if api_id:
+            response = settings.aws_apigateway_client.get_stages(restApiId=api_id)
+            # Assuming you want the most recently deployed stage
+            stages = response.get("item", [])
+            if stages:
+                retval = stages[-1]["stageName"]
+                return retval
         return ""
 
     def get_api_custom_domains(self) -> list:
@@ -167,8 +168,8 @@ class AWSInfrastructureConfig:
 
     def api_resource_and_method_exists(self, path, method) -> bool:
         """Test that the API Gateway resource and method exists."""
-        api = self.get_api(settings.aws_apigateway_name)
-        api_id = api["id"]
+        api = self.get_api(settings.aws_apigateway_name) or {}
+        api_id = api.get("id")
         resources = settings.aws_apigateway_client.get_resources(restApiId=api_id)
         for resource in resources["items"]:
             if resource["path"] == path:
