@@ -6,12 +6,7 @@
       "Action": [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "rekognition:DescribeCollection",
-        "rekognition:IndexFaces",
-        "dynamodb:PutItem",
-        "s3:GetObject",
-        "s3:ListBucket"
+        "logs:PutLogEvents"
       ],
       "Resource": "arn:aws:logs:*:*:*"
     },
@@ -32,6 +27,8 @@
         "Action": [
           "apigateway:GET",
           "iam:ListPolicies",
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
           "s3:ListAllMyBuckets",
           "rekognition:IndexFaces",
           "rekognition:DescribeCollection",

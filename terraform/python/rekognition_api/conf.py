@@ -345,7 +345,7 @@ class Settings(BaseSettings):
     def aws_s3_client(self):
         """S3 client"""
         if not self._aws_s3_client:
-            self._aws_s3_client = self.aws_session.client("s3")
+            self._aws_s3_client = self.aws_session.resource("s3")
         return self._aws_s3_client
 
     @property

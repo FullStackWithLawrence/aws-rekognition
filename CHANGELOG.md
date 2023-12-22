@@ -1,3 +1,11 @@
+## [0.2.8](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.7...v0.2.8) (2023-12-22)
+
+
+### Bug Fixes
+
+* add a copy of terraform.tfvars to rekognition_info lambda build ([4ca4b7a](https://github.com/FullStackWithLawrence/aws-rekognition/commit/4ca4b7a794b873eafb204feb66264bd712669c0b))
+* add remaining aws infrastructure resource meta data to /info ([64630ea](https://github.com/FullStackWithLawrence/aws-rekognition/commit/64630ea05295112b67b9b6de3c744ba93422fe56))
+
 ## [0.2.7](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.6...v0.2.7) (2023-12-21)
 
 
