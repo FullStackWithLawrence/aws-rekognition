@@ -10,13 +10,6 @@ PIP = $(PYTHON) -m pip
 
 .PHONY: env analyze init pre-commit requirements lint clean test build force-release publish-test publish-prod help
 
-
-ifeq ($(OS),Windows_NT)
-    ACTIVATE_VENV = venv\Scripts\activate
-else
-    ACTIVATE_VENV = source venv/bin/activate
-endif
-
 # Default target executed when no arguments are given to make.
 all: help
 
