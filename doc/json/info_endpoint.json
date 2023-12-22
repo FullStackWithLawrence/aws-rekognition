@@ -192,7 +192,7 @@
     },
     "aws_auth": {
       "aws_access_key_id_source": "overridden by IAM role-based security",
-      "aws_profile": "lawrence",
+      "aws_profile": "default",
       "aws_region": "us-east-1",
       "aws_secret_access_key_source": "overridden by IAM role-based security"
     },
@@ -324,7 +324,7 @@
         "aws_account_id": "****",
         "aws_apigateway_create_custom_domaim": true,
         "aws_apigateway_root_domain": "example.com",
-        "aws_profile": "lawrence",
+        "aws_profile": "default",
         "aws_region": "us-east-1",
         "aws_rekognition_face_detect_attributes": "DEFAULT",
         "aws_rekognition_face_detect_quality_filter": "AUTO",
@@ -342,7 +342,7 @@
         "shared_resource_identifier": "rekognition",
         "stage": "v1",
         "tags": {
-          "contact": "Lawrence McDaniel - lpm0073@gmail.com",
+          "contact": "YOUR CONTACT INFO HERE",
           "project": "Facial Recognition microservice",
           "shared_resource_identifier": "rekognition",
           "terraform": "true"
@@ -360,7 +360,7 @@
       "AWS_APIGATEWAY_READ_TIMEOUT": 70,
       "AWS_APIGATEWAY_ROOT_DOMAIN": "example.com",
       "AWS_DYNAMODB_TABLE_ID": "rekognition",
-      "AWS_PROFILE": "lawrence",
+      "AWS_PROFILE": null,
       "AWS_REGION": "us-east-1",
       "AWS_REKOGNITION_COLLECTION_ID": "rekognition-collection",
       "AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES": "DEFAULT",

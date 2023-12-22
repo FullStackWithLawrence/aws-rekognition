@@ -87,7 +87,7 @@ class SettingsDefaults:
     """Default values for Settings"""
 
     # defaults for this Python package
-    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
+    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition")
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
     DUMP_DEFAULTS = TFVARS.get("dump_defaults", True)
 
