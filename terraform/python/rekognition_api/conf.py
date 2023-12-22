@@ -4,15 +4,16 @@
 Configuration for Lambda functions.
 
 This module is used to configure the Lambda functions. It uses the pydantic_settings
-library to validate the configuration values. The configuration values are read from
-environment variables, or alternatively these can be set when instantiating Settings().
+library to validate the configuration values. The configuration values are initialized
+according to the following prioritization sequence:
+    1. constructor
+    2. environment variables
+    3. dotenv file
+    4. tfvars file
+    5. defaults
 
-The configuration values are validated using pydantic. If the configuration values are
-invalid, then a RekognitionConfigurationError is raised.
-
-The configuration values are dumped to a dict using the dump property. This is used
-to display the configuration values in the /info endpoint.
-
+The Settings class also provides a dump property that returns a dictionary of all
+configuration values. This is useful for debugging and logging.
 """
 
 
