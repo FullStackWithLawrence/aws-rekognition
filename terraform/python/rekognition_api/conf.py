@@ -171,7 +171,7 @@ class Settings(BaseSettings):
             self._aws_session = boto3.Session()
             self._initialized = True
 
-        if not self._initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
+        if not self.initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
             try:
                 self._aws_session = boto3.Session(
                     region_name=os.environ.get("AWS_REGION", "us-east-1"),
@@ -189,13 +189,13 @@ class Settings(BaseSettings):
                 self._aws_secret_access_key_source = "environ"
             self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if self.aws_profile:
                 self._aws_access_key_id_source = "aws_profile"
                 self._aws_secret_access_key_source = "aws_profile"
                 self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if "aws_access_key_id" in data or "aws_secret_access_key" in data:
                 if "aws_access_key_id" in data:
                     self._aws_access_key_id_source = "constructor"
@@ -203,7 +203,7 @@ class Settings(BaseSettings):
                     self._aws_secret_access_key_source = "constructor"
                 self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if "AWS_ACCESS_KEY_ID" in os.environ:
                 self._aws_access_key_id_source = "environ"
             if "AWS_SECRET_ACCESS_KEY" in os.environ:
@@ -289,6 +289,11 @@ class Settings(BaseSettings):
         pre=True,
         getter=lambda v: empty_str_to_int_default(v, SettingsDefaults.AWS_REKOGNITION_FACE_DETECT_THRESHOLD),
     )
+
+    @property
+    def initialized(self):
+        """Is settings initialized?"""
+        return self._initialized
 
     @property
     def aws_account_id(self):
@@ -454,10 +459,10 @@ class Settings(BaseSettings):
             package_list = [(d.project_name, d.version) for d in installed_packages]
             return package_list
 
-        if self._dump and self._initialized:
+        if self._dump and self.initialized:
             return self._dump
 
-        if not self._initialized:
+        if not self.initialized:
             return {}
 
         packages = get_installed_packages()
