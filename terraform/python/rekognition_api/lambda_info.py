@@ -5,8 +5,8 @@
 import json
 
 from rekognition_api.aws import aws_infrastructure_config as aws_config
-from rekognition_api.common import DateTimeEncoder, http_response_factory
 from rekognition_api.conf import settings
+from rekognition_api.utils import http_response_factory
 
 
 # pylint: disable=unused-argument

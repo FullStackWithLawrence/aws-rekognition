@@ -28,6 +28,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 import pkg_resources
+from botocore.config import Config
 from botocore.exceptions import ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
@@ -39,6 +40,7 @@ from rekognition_api.exceptions import (
     RekognitionConfigurationError,
     RekognitionValueError,
 )
+from rekognition_api.utils import recursive_sort_dict
 
 
 logger = logging.getLogger(__name__)
@@ -338,7 +340,8 @@ class Settings(BaseSettings):
     def aws_apigateway_client(self):
         """API Gateway client"""
         if not self._aws_apigateway_client:
-            self._aws_apigateway_client = self.aws_session.client("apigateway")
+            config = Config(read_timeout=70, connect_timeout=70, retries={"max_attempts": 10})
+            self._aws_apigateway_client = self.aws_session.client("apigateway", config=config)
         return self._aws_apigateway_client
 
     @property
@@ -432,10 +435,6 @@ class Settings(BaseSettings):
     @property
     def dump(self) -> dict:
         """Dump all settings."""
-
-        def recursive_sort_dict(d):
-            """Recursively sort a dictionary by key."""
-            return {k: recursive_sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(d.items())}
 
         def get_installed_packages():
             installed_packages = pkg_resources.working_set

@@ -10,13 +10,6 @@ PIP = $(PYTHON) -m pip
 
 .PHONY: env analyze init pre-commit requirements lint clean test build force-release publish-test publish-prod help
 
-
-ifeq ($(OS),Windows_NT)
-    ACTIVATE_VENV = venv\Scripts\activate
-else
-    ACTIVATE_VENV = source venv/bin/activate
-endif
-
 # Default target executed when no arguments are given to make.
 all: help
 
@@ -35,7 +28,7 @@ env:
 	endif
 
 analyze:
-	cloc . --exclude-ext=svg,json,zip --vcs=git
+	cloc . --exclude-ext=svg,zip --vcs=git
 
 # -------------------------------------------------------------------------
 # Initialize. create virtual environment and install requirements
@@ -51,12 +44,12 @@ init:
 # Install requirements: Python, npm and pre-commit
 # -------------------------------------------------------------------------
 requirements:
-	rm -rf .tox
-	$(PIP) install --upgrade pip wheel
+	rm -rf .tox && \
+	$(PIP) install --upgrade pip wheel && \
 	$(PIP) install -r requirements.txt && \
 	npm install && \
-	pre-commit install
-	pre-commit autoupdate
+	pre-commit install && \
+	pre-commit autoupdate && \
 	pre-commit run --all-files
 
 # -------------------------------------------------------------------------
@@ -76,7 +69,7 @@ lint:
 # -------------------------------------------------------------------------
 clean:
 	rm -rf ./terraform/.terraform venv .pytest_cache __pycache__ .pytest_cache node_modules && \
-	rm -rf build dist aws-rekogition.egg-info
+	rm -rf build dist aws-rekogition.egg-info && \
 	find ./terraform/python/ -name __pycache__ -type d -exec rm -rf {} +
 
 # -------------------------------------------------------------------------
@@ -92,10 +85,10 @@ force-release:
 	git commit -m "fix: force a new release" --allow-empty && git push
 
 update:
-	npm install -g npm
-	npm install -g npm-check-updates
-	ncu --upgrade --packageFile ./package.json
-	npm update -g
+	npm install -g npm && \
+	npm install -g npm-check-updates && \
+	ncu --upgrade --packageFile ./package.json && \
+	npm update -g && \
 	make init
 
 build:

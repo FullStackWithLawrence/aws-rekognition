@@ -37,13 +37,13 @@
 import base64  # library with base63 encoding/decoding functions
 import json  # library for interacting with JSON data https://www.json.org/json-en.html
 
-from rekognition_api.common import (
+from rekognition_api.conf import settings
+from rekognition_api.exceptions import EXCEPTION_MAP
+from rekognition_api.utils import (
     cloudwatch_handler,
     exception_response_factory,
     http_response_factory,
 )
-from rekognition_api.conf import settings
-from rekognition_api.exceptions import EXCEPTION_MAP
 
 
 def get_image_from_event(event):
@@ -107,7 +107,7 @@ def lambda_handler(event, context):  # noqa: C901
     """
     Facial recognition image analysis and search for indexed faces. invoked by API Gateway.
     """
-    cloudwatch_handler(event)
+    cloudwatch_handler(event, settings.dump, debug_mode=settings.debug_mode)
     try:
         image = get_image_from_event(event)
         faces = get_faces(image)
