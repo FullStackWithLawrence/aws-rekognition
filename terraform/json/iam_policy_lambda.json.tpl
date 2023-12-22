@@ -30,27 +30,16 @@
     {
         "Effect": "Allow",
         "Action": [
-            "apigateway:GET"
+          "apigateway:GET",
+          "iam:ListPolicies",
+          "s3:ListAllMyBuckets",
+          "rekognition:IndexFaces",
+          "rekognition:DescribeCollection",
+          "ec2:DescribeRegions",
+          "route53:ListHostedZones",
+          "route53:ListResourceRecordSets"
         ],
         "Resource": "*"
-    },
-    {
-        "Effect": "Allow",
-        "Action": "s3:ListAllMyBuckets",
-        "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "rekognition:IndexFaces",
-        "rekognition:DescribeCollection"
-        ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["ec2:DescribeRegions"],
-      "Resource": "*"
     }
   ]
 }

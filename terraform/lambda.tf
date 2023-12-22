@@ -4,6 +4,8 @@ locals {
   iam_policy_lambda = templatefile("${path.module}/json/iam_policy_lambda.json.tpl", {
     s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
     dynamodb_table_arn = module.dynamodb_table.dynamodb_table_arn
+    aws_region         = var.aws_region
+    aws_account_id     = var.aws_account_id
   })
 }
 
@@ -52,7 +54,7 @@ resource "aws_iam_role_policy_attachment" "AmazonRekognitionFullAccess" {
 resource "aws_iam_policy" "lambda_logging" {
   name        = "lambda_logging"
   path        = "/"
-  description = "IAM policy for logging from a lambda"
+  description = "${var.shared_resource_identifier}: IAM policy for logging from a lambda"
   policy      = file("${path.module}/json/iam_policy_lambda_logging.json")
   tags        = var.tags
 }

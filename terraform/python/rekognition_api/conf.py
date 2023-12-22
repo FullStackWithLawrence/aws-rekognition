@@ -19,7 +19,6 @@ to display the configuration values in the /info endpoint.
 import importlib.util
 
 # python stuff
-import json
 import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
@@ -29,7 +28,7 @@ from typing import Any, Dict, List, Optional
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 import pkg_resources
-from botocore.exceptions import NoCredentialsError, ProfileNotFound
+from botocore.exceptions import ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
@@ -331,6 +330,11 @@ class Settings(BaseSettings):
         return self._aws_session
 
     @property
+    def aws_route53_client(self):
+        """Route53 client"""
+        return self.aws_session.client("route53")
+
+    @property
     def aws_apigateway_client(self):
         """API Gateway client"""
         if not self._aws_apigateway_client:
@@ -403,9 +407,12 @@ class Settings(BaseSettings):
         return IS_USING_TFVARS
 
     @property
-    def tfvars_variables(self) -> List[str]:
+    def tfvars_variables(self) -> dict:
         """Terraform variables"""
-        return list(TFVARS.keys())
+        masked_TFVARS = TFVARS.copy()
+        if "aws_account_id" in masked_TFVARS:
+            masked_TFVARS["aws_account_id"] = "****"
+        return masked_TFVARS
 
     @property
     def is_using_aws_rekognition(self) -> bool:
@@ -427,6 +434,7 @@ class Settings(BaseSettings):
         """Dump all settings."""
 
         def recursive_sort_dict(d):
+            """Recursively sort a dictionary by key."""
             return {k: recursive_sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(d.items())}
 
         def get_installed_packages():
@@ -484,9 +492,6 @@ class Settings(BaseSettings):
             "aws_lambda": {},
             "aws_s3": {
                 "aws_s3_bucket_prefix": self.aws_s3_bucket_name,
-            },
-            "terraform": {
-                "tfvars": self.tfvars_variables,
             },
         }
         if self.dump_defaults:
