@@ -77,7 +77,9 @@ def get_semantic_version() -> str:
     - pypi does not allow semantic version numbers to contain a 'v' prefix.
     - pypi does not allow semantic version numbers to contain a 'next' suffix.
     """
-    version = VERSION["__version__"]
+    version = VERSION.get("__version__")
+    if not version:
+        return "unknown"
     version = re.sub(r"-next\.\d+", "", version)
     return re.sub(r"-next-major\.\d+", "", version)
 
