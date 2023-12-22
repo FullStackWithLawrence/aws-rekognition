@@ -118,7 +118,7 @@ class SettingsDefaults:
     def to_dict(cls):
         """Convert SettingsDefaults to dict"""
         return {
-            key: value
+            key: "***MASKED***" if key in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"] else value
             for key, value in SettingsDefaults.__dict__.items()
             if not key.startswith("__") and not callable(key) and key != "to_dict"
         }
