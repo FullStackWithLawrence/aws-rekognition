@@ -2,13 +2,15 @@
 """A utility class for introspecting AWS infrastructure."""
 
 # python stuff
-import json
 import socket
+
+from rekognition_api.common import recursive_sort_dict
 
 # our stuff
 from rekognition_api.conf import settings
 
 
+# pylint: disable=too-many-public-methods
 class AWSInfrastructureConfig:
     """AWS Infrastructure Config"""
 
@@ -17,22 +19,62 @@ class AWSInfrastructureConfig:
         """Return a dict of the AWS infrastructure config."""
         api = self.get_api(settings.aws_apigateway_name)
 
-        return {
-            "aws_apigateway": {
+        retval = {
+            "apigateway": {
                 "api_id": api.get("id"),
+                "stage": self.get_api_stage(),
+                "domains": self.get_api_custom_domains(),
             },
-            "aws_dynamodb": {
+            "dynamodb": {
                 "table_name": self.get_dyanmodb_table_by_name(
                     settings.aws_dynamodb_table_id,
                 )
             },
-            "aws_s3": {
+            "s3": {
                 "bucket_name": self.get_bucket_by_prefix(settings.aws_s3_bucket_name),
             },
-            "aws_rekognition": {
+            "rekognition": {
                 "collection_id": self.get_rekognition_collection_by_id(settings.aws_rekognition_collection_id),
             },
+            "iam": {
+                "policies": self.get_iam_policies(),
+                "roles": self.get_iam_roles(),
+            },
+            "lambda": self.get_lambdas(),
+            "route53": self.get_dns_record_from_hosted_zone(),
         }
+        return recursive_sort_dict(retval)
+
+    def get_lambdas(self):
+        """Return a dict of the AWS Lambdas."""
+        lambda_client = settings.aws_session.client("lambda")
+        lambdas = lambda_client.list_functions()["Functions"]
+        rekognition_lambdas = {
+            lambda_function["FunctionName"]: lambda_function["FunctionArn"]
+            for lambda_function in lambdas
+            if settings.shared_resource_identifier in lambda_function["FunctionName"]
+        }
+        return rekognition_lambdas or {}
+
+    def get_iam_policies(self):
+        """Return a dict of the AWS IAM policies."""
+        iam_client = settings.aws_session.client("iam")
+        policies = iam_client.list_policies()["Policies"]
+        rekognition_policies = {
+            policy["PolicyName"]: policy["Arn"]
+            for policy in policies
+            if settings.shared_resource_identifier in policy["PolicyName"]
+        }
+        return rekognition_policies or {}
+
+    def get_iam_roles(self):
+        """Return a dict of the AWS IAM roles."""
+        iam_client = settings.aws_session.client("iam")
+        roles = iam_client.list_roles()["Roles"]
+        rekognition_roles = {
+            role["RoleName"]: role["Arn"] for role in roles if settings.shared_resource_identifier in role["RoleName"]
+        }
+        return rekognition_roles or {}
 
     def get_api_stage(self) -> str:
         """Return the API stage."""
@@ -45,6 +87,16 @@ class AWSInfrastructureConfig:
             retval = stages[-1]["stageName"]
             return retval
         return ""
+
+    def get_api_custom_domains(self) -> list:
+        """Return the API custom domains."""
+
+        def filter_dicts(lst):
+            return [d for d in lst if "domainName" in d and settings.shared_resource_identifier in d["domainName"]]
+
+        response = settings.aws_apigateway_client.get_domain_names()
+        retval = response.get("items", [])
+        return filter_dicts(retval)
 
     def get_url(self, path) -> str:
         """Return the url for the given path."""
@@ -150,6 +202,27 @@ class AWSInfrastructureConfig:
         """Test that the Rekognition collection exists."""
         collection = self.get_rekognition_collection_by_id(settings.aws_rekognition_collection_id)
         return collection is not None
+
+    def get_hosted_zone(self, domain_name) -> str:
+        """Return the hosted zone."""
+        response = settings.aws_route53_client.list_hosted_zones()
+        for hosted_zone in response["HostedZones"]:
+            if hosted_zone["Name"] == domain_name or hosted_zone["Name"] == f"{domain_name}.":
+                return hosted_zone["Id"]
+        return None
+
+    def get_dns_record_from_hosted_zone(self) -> str:
+        """Return the DNS record from the hosted zone."""
+        hosted_zone_id = self.get_hosted_zone(settings.aws_apigateway_root_domain)
+        if hosted_zone_id:
+            response = settings.aws_route53_client.list_resource_record_sets(HostedZoneId=hosted_zone_id)
+            for record in response["ResourceRecordSets"]:
+                if (
+                    record["Name"] == settings.aws_apigateway_domain_name
+                    or record["Name"] == f"{settings.aws_apigateway_domain_name}."
+                ):
+                    return record
+        return None
 
 
 aws_infrastructure_config = AWSInfrastructureConfig()
