@@ -89,7 +89,7 @@ class SettingsDefaults:
     # defaults for this Python package
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
+    DUMP_DEFAULTS = TFVARS.get("dump_defaults", True)
 
     # aws auth
     AWS_PROFILE = TFVARS.get("aws_profile", None)
