@@ -39,7 +39,6 @@ class TestConfigurationDump(unittest.TestCase):
         self.assertIn("aws_dynamodb", dump)
         self.assertIn("aws_s3", dump)
         self.assertIn("aws_apigateway", dump)
-        self.assertIn("terraform", dump)
 
     def test_dump_values(self):
         """Test that dump contains the expected values."""

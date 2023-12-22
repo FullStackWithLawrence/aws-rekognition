@@ -14,7 +14,6 @@ PYTHON_ROOT = os.path.dirname(os.path.dirname(HERE))
 if PYTHON_ROOT not in sys.path:
     sys.path.append(PYTHON_ROOT)  # noqa: E402
 
-from rekognition_api.conf import settings  # noqa: E402
 from rekognition_api.lambda_info import lambda_handler  # noqa: E402
 
 # our stuff

@@ -65,11 +65,7 @@ resource "aws_api_gateway_deployment" "rekognition" {
     aws_api_gateway_integration.search
   ]
   triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.rekognition.body,
-      aws_api_gateway_integration.index_put.id,
-      aws_api_gateway_integration.search.id
-    ]))
+    redeployment = timestamp()
   }
   lifecycle {
     create_before_destroy = true
@@ -121,13 +117,26 @@ resource "aws_api_gateway_usage_plan_key" "rekognition" {
   usage_plan_id = aws_api_gateway_usage_plan.rekognition.id
 }
 
+# resource "null_resource" "api_gateway_deployment" {
+#   triggers = {
+#     always_redeploy = "${timestamp()}"
+#   }
+
+#   provisioner "local-exec" {
+#     command = "aws apigateway create-deployment --rest-api-id ${aws_api_gateway_rest_api.rekognition.arn} --region ${var.aws_region}"
+#   }
+
+#   depends_on = [
+#     aws_api_gateway_rest_api.rekognition
+#   ]
+# }
 
 ###############################################################################
 # REST API resources - IAM
 ###############################################################################
 resource "aws_iam_role" "apigateway" {
   name               = local.apigateway_iam_role_name
-  description        = "Allows API Gateway to push files to an S3 bucket"
+  description        = "${var.shared_resource_identifier}: Allows API Gateway to push files to an S3 bucket"
   assume_role_policy = file("${path.module}/json/iam_role_apigateway.json")
   tags               = var.tags
 }
