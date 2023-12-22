@@ -39,6 +39,7 @@ from rekognition_api.exceptions import (
     RekognitionConfigurationError,
     RekognitionValueError,
 )
+from rekognition_api.utils import recursive_sort_dict
 
 
 logger = logging.getLogger(__name__)
@@ -432,10 +433,6 @@ class Settings(BaseSettings):
     @property
     def dump(self) -> dict:
         """Dump all settings."""
-
-        def recursive_sort_dict(d):
-            """Recursively sort a dictionary by key."""
-            return {k: recursive_sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(d.items())}
 
         def get_installed_packages():
             installed_packages = pkg_resources.working_set

@@ -4,10 +4,9 @@
 # python stuff
 import socket
 
-from rekognition_api.common import recursive_sort_dict
-
 # our stuff
 from rekognition_api.conf import settings
+from rekognition_api.utils import recursive_sort_dict
 
 
 # pylint: disable=too-many-public-methods
