@@ -86,20 +86,28 @@ def get_semantic_version() -> str:
 class SettingsDefaults:
     """Default values for Settings"""
 
+    # defaults for this Python package
+    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
+    DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
+    DUMP_DEFAULTS = TFVARS.get("dump_defaults", True)
+
+    # aws auth
     AWS_PROFILE = TFVARS.get("aws_profile", None)
     AWS_ACCESS_KEY_ID = SecretStr(None)
     AWS_SECRET_ACCESS_KEY = SecretStr(None)
     AWS_REGION = TFVARS.get("aws_region", "us-east-1")
 
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", False)
-    DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition_api")
-
+    # aws api gateway defaults
     AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
     AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
+    AWS_APIGATEWAY_READ_TIMEOUT = TFVARS.get("aws_apigateway_read_timeout", 70)
+    AWS_APIGATEWAY_CONNECT_TIMEOUT = TFVARS.get("aws_apigateway_connect_timeout", 70)
+    AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
 
+    # aws dynamodb defaults
     AWS_DYNAMODB_TABLE_ID = "rekognition"
 
+    # aws rekognition defaults
     AWS_REKOGNITION_COLLECTION_ID = AWS_DYNAMODB_TABLE_ID + "-collection"
     AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("aws_rekognition_max_faces_count", 10))
     AWS_REKOGNITION_FACE_DETECT_THRESHOLD: int = int(TFVARS.get("aws_rekognition_face_detect_threshold", 10))
@@ -110,7 +118,7 @@ class SettingsDefaults:
     def to_dict(cls):
         """Convert SettingsDefaults to dict"""
         return {
-            key: value
+            key: "***MASKED***" if key in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"] else value
             for key, value in SettingsDefaults.__dict__.items()
             if not key.startswith("__") and not callable(key) and key != "to_dict"
         }
@@ -340,7 +348,11 @@ class Settings(BaseSettings):
     def aws_apigateway_client(self):
         """API Gateway client"""
         if not self._aws_apigateway_client:
-            config = Config(read_timeout=70, connect_timeout=70, retries={"max_attempts": 10})
+            config = Config(
+                read_timeout=SettingsDefaults.AWS_APIGATEWAY_READ_TIMEOUT,
+                connect_timeout=SettingsDefaults.AWS_APIGATEWAY_CONNECT_TIMEOUT,
+                retries={"max_attempts": SettingsDefaults.AWS_APIGATEWAY_MAX_ATTEMPTS},
+            )
             self._aws_apigateway_client = self.aws_session.client("apigateway", config=config)
         return self._aws_apigateway_client
 

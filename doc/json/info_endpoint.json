@@ -1,0 +1,376 @@
+{
+  "aws": {
+    "apigateway": {
+      "api_id": "287c8j8dcf",
+      "domains": [
+        {
+          "domainName": "api.rekognition.example.com",
+          "certificateArn": "arn:aws:acm:us-east-1:012345678901:certificate/613c0965-4495-4ce3-8e3e-63538eb40fd0",
+          "certificateUploadDate": "2023-12-13",
+          "distributionDomainName": "d1b9nzmXj7j3jr.cloudfront.net",
+          "distributionHostedZoneId": "ABCDEFG123HIJKL",
+          "endpointConfiguration": {
+            "types": ["EDGE"]
+          },
+          "domainNameStatus": "AVAILABLE",
+          "securityPolicy": "TLS_1_2",
+          "tags": {
+            "contact": "YOUR CONTACT INFO HERE",
+            "project": "Facial Recognition microservice",
+            "shared_resource_identifier": "rekognition",
+            "terraform": "true"
+          }
+        }
+      ],
+      "stage": "v1"
+    },
+    "dynamodb": {
+      "table_name": "arn:aws:dynamodb:us-east-1:012345678901:table/rekognition"
+    },
+    "iam": {
+      "policies": {
+        "rekognition-lambda": {
+          "Arn": "arn:aws:iam::012345678901:policy/rekognition-lambda",
+          "Policy": {
+            "Statement": [
+              {
+                "Action": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "Effect": "Allow",
+                "Resource": "arn:aws:logs:*:*:*"
+              },
+              {
+                "Action": ["s3:GetObject"],
+                "Effect": "Allow",
+                "Resource": [
+                  "arn:aws:s3:::012345678901-rekognition-f799c26b853b1d12e9092e66413f4492/*"
+                ]
+              },
+              {
+                "Action": ["dynamodb:PutItem"],
+                "Effect": "Allow",
+                "Resource": [
+                  "arn:aws:dynamodb:us-east-1:012345678901:table/rekognition/*"
+                ]
+              },
+              {
+                "Action": [
+                  "apigateway:GET",
+                  "iam:ListPolicies",
+                  "iam:GetPolicy",
+                  "iam:GetPolicyVersion",
+                  "iam:ListAttachedRolePolicies",
+                  "s3:ListAllMyBuckets",
+                  "rekognition:IndexFaces",
+                  "rekognition:DescribeCollection",
+                  "ec2:DescribeRegions",
+                  "route53:ListHostedZones",
+                  "route53:ListResourceRecordSets"
+                ],
+                "Effect": "Allow",
+                "Resource": "*"
+              }
+            ],
+            "Version": "2012-10-17"
+          }
+        }
+      },
+      "roles": {
+        "rekognition-apigateway": {
+          "Arn": "arn:aws:iam::012345678901:role/rekognition-apigateway",
+          "AttachedPolicies": [
+            {
+              "PolicyName": "AmazonAPIGatewayPushToCloudWatchLogs",
+              "PolicyArn": "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+            }
+          ],
+          "Role": {
+            "Arn": "arn:aws:iam::012345678901:role/rekognition-apigateway",
+            "AssumeRolePolicyDocument": {
+              "Statement": [
+                {
+                  "Sid": "",
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": "apigateway.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "CreateDate": "2023-12-13",
+            "Description": "rekognition: Allows API Gateway to push files to an S3 bucket",
+            "MaxSessionDuration": 3600,
+            "Path": "/",
+            "RoleId": "AROARKEXDU3E64TIYPAYH",
+            "RoleName": "rekognition-apigateway"
+          }
+        },
+        "rekognition-lambda": {
+          "Arn": "arn:aws:iam::012345678901:role/rekognition-lambda",
+          "AttachedPolicies": [
+            {
+              "PolicyName": "AWSLambdaExecute",
+              "PolicyArn": "arn:aws:iam::aws:policy/AWSLambdaExecute"
+            },
+            {
+              "PolicyName": "AmazonRekognitionFullAccess",
+              "PolicyArn": "arn:aws:iam::aws:policy/AmazonRekognitionFullAccess"
+            },
+            {
+              "PolicyName": "AmazonDynamoDBFullAccess",
+              "PolicyArn": "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+            },
+            {
+              "PolicyName": "AmazonS3ObjectLambdaExecutionRolePolicy",
+              "PolicyArn": "arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"
+            },
+            {
+              "PolicyName": "rekognition-lambda",
+              "PolicyArn": "arn:aws:iam::012345678901:policy/rekognition-lambda"
+            },
+            {
+              "PolicyName": "lambda_logging",
+              "PolicyArn": "arn:aws:iam::012345678901:policy/lambda_logging"
+            }
+          ],
+          "Role": {
+            "Arn": "arn:aws:iam::012345678901:role/rekognition-lambda",
+            "AssumeRolePolicyDocument": {
+              "Statement": [
+                {
+                  "Sid": "",
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": "lambda.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "CreateDate": "2023-12-13",
+            "MaxSessionDuration": 3600,
+            "Path": "/",
+            "RoleId": "AROARKEXDU3E7FDUUVX4I",
+            "RoleName": "rekognition-lambda"
+          }
+        }
+      }
+    },
+    "lambda": {
+      "rekognition_index": "arn:aws:lambda:us-east-1:012345678901:function:rekognition_index",
+      "rekognition_info": "arn:aws:lambda:us-east-1:012345678901:function:rekognition_info",
+      "rekognition_search": "arn:aws:lambda:us-east-1:012345678901:function:rekognition_search"
+    },
+    "rekognition": {
+      "collection_id": "rekognition-collection"
+    },
+    "route53": {
+      "AliasTarget": {
+        "DNSName": "d1b9nzmXj7j3jr.cloudfront.net.",
+        "EvaluateTargetHealth": false,
+        "HostedZoneId": "ABCDEFG123HIJKL"
+      },
+      "Name": "api.rekognition.example.com.",
+      "Type": "A"
+    },
+    "s3": {
+      "bucket_name": "arn:aws:s3:::012345678901-rekognition-f799c26b853b1d12e9092e66413f4492"
+    }
+  },
+  "settings": {
+    "aws_apigateway": {
+      "aws_apigateway_create_custom_domaim": true,
+      "aws_apigateway_domain_name": "api.rekognition.example.com",
+      "aws_apigateway_name": "rekognition-api",
+      "aws_apigateway_root_domain": "example.com"
+    },
+    "aws_auth": {
+      "aws_access_key_id_source": "overridden by IAM role-based security",
+      "aws_profile": "lawrence",
+      "aws_region": "us-east-1",
+      "aws_secret_access_key_source": "overridden by IAM role-based security"
+    },
+    "aws_dynamodb": {
+      "aws_dynamodb_table_id": "rekognition"
+    },
+    "aws_lambda": {},
+    "aws_rekognition": {
+      "aws_rekognition_collection_id": "rekognition-collection",
+      "aws_rekognition_face_detect_attributes": "DEFAULT",
+      "aws_rekognition_face_detect_max_faces_count": 10,
+      "aws_rekognition_face_detect_quality_filter": "AUTO",
+      "aws_rekognition_face_detect_threshold": 10
+    },
+    "aws_s3": {
+      "aws_s3_bucket_prefix": "012345678901-rekognition"
+    },
+    "environment": {
+      "boto3": "1.27.1",
+      "debug_mode": true,
+      "dump_defaults": true,
+      "is_using_aws_dynamodb": true,
+      "is_using_aws_rekognition": true,
+      "is_using_dotenv_file": false,
+      "is_using_tfvars_file": true,
+      "os": "posix",
+      "python_build": ["main", "Oct  2 2023 18:13:32"],
+      "python_compiler": "GCC 7.3.1 20180712 (Red Hat 7.3.1-17)",
+      "python_implementation": "CPython",
+      "python_installed_packages": [
+        {
+          "name": "certifi",
+          "version": "2023.11.17"
+        },
+        {
+          "name": "typing-extensions",
+          "version": "4.9.0"
+        },
+        {
+          "name": "python-hcl2",
+          "version": "4.3.2"
+        },
+        {
+          "name": "idna",
+          "version": "3.6"
+        },
+        {
+          "name": "charset-normalizer",
+          "version": "3.3.2"
+        },
+        {
+          "name": "requests",
+          "version": "2.31.0"
+        },
+        {
+          "name": "pydantic-core",
+          "version": "2.14.5"
+        },
+        {
+          "name": "pydantic",
+          "version": "2.5.2"
+        },
+        {
+          "name": "pydantic-settings",
+          "version": "2.1.0"
+        },
+        {
+          "name": "urllib3",
+          "version": "2.1.0"
+        },
+        {
+          "name": "lark",
+          "version": "1.1.8"
+        },
+        {
+          "name": "python-dotenv",
+          "version": "1.0.0"
+        },
+        {
+          "name": "annotated-types",
+          "version": "0.6.0"
+        },
+        {
+          "name": "setuptools",
+          "version": "65.5.0"
+        },
+        {
+          "name": "pip",
+          "version": "23.2.1"
+        },
+        {
+          "name": "simplejson",
+          "version": "3.17.2"
+        },
+        {
+          "name": "python-dateutil",
+          "version": "2.8.2"
+        },
+        {
+          "name": "awslambdaric",
+          "version": "2.0.7"
+        },
+        {
+          "name": "botocore",
+          "version": "1.30.1"
+        },
+        {
+          "name": "boto3",
+          "version": "1.27.1"
+        },
+        {
+          "name": "six",
+          "version": "1.16.0"
+        },
+        {
+          "name": "jmespath",
+          "version": "1.0.1"
+        },
+        {
+          "name": "s3transfer",
+          "version": "0.6.1"
+        }
+      ],
+      "python_version": "3.11.6",
+      "release": "5.10.201-213.748.amzn2.x86_64",
+      "shared_resource_identifier": "rekognition",
+      "system": "Linux",
+      "tfvars": {
+        "aws_account_id": "****",
+        "aws_apigateway_create_custom_domaim": true,
+        "aws_apigateway_root_domain": "example.com",
+        "aws_profile": "lawrence",
+        "aws_region": "us-east-1",
+        "aws_rekognition_face_detect_attributes": "DEFAULT",
+        "aws_rekognition_face_detect_quality_filter": "AUTO",
+        "aws_rekognition_face_detect_threshold": 10,
+        "aws_rekognition_max_faces_count": 10,
+        "debug_mode": true,
+        "lambda_memory_size": 256,
+        "lambda_python_runtime": "python3.11",
+        "lambda_timeout": 60,
+        "log_retention_days": 3,
+        "logging_level": "INFO",
+        "quota_settings_limit": 500,
+        "quota_settings_offset": 0,
+        "quota_settings_period": "DAY",
+        "shared_resource_identifier": "rekognition",
+        "stage": "v1",
+        "tags": {
+          "contact": "Lawrence McDaniel - lpm0073@gmail.com",
+          "project": "Facial Recognition microservice",
+          "shared_resource_identifier": "rekognition",
+          "terraform": "true"
+        },
+        "throttle_settings_burst_limit": 25,
+        "throttle_settings_rate_limit": 10
+      },
+      "version": "0.2.10"
+    },
+    "settings_defaults": {
+      "AWS_ACCESS_KEY_ID": "***MASKED***",
+      "AWS_APIGATEWAY_CONNECT_TIMEOUT": 70,
+      "AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN": true,
+      "AWS_APIGATEWAY_MAX_ATTEMPTS": 10,
+      "AWS_APIGATEWAY_READ_TIMEOUT": 70,
+      "AWS_APIGATEWAY_ROOT_DOMAIN": "example.com",
+      "AWS_DYNAMODB_TABLE_ID": "rekognition",
+      "AWS_PROFILE": "lawrence",
+      "AWS_REGION": "us-east-1",
+      "AWS_REKOGNITION_COLLECTION_ID": "rekognition-collection",
+      "AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES": "DEFAULT",
+      "AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT": 10,
+      "AWS_REKOGNITION_FACE_DETECT_QUALITY_FILTER": "AUTO",
+      "AWS_REKOGNITION_FACE_DETECT_THRESHOLD": 10,
+      "AWS_SECRET_ACCESS_KEY": "***MASKED***",
+      "DEBUG_MODE": true,
+      "DUMP_DEFAULTS": true,
+      "SHARED_RESOURCE_IDENTIFIER": "rekognition"
+    }
+  }
+}
