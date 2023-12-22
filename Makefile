@@ -35,7 +35,7 @@ env:
 	endif
 
 analyze:
-	cloc . --exclude-ext=svg,json,zip --vcs=git
+	cloc . --exclude-ext=svg,zip --vcs=git
 
 # -------------------------------------------------------------------------
 # Initialize. create virtual environment and install requirements
