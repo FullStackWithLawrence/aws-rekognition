@@ -304,7 +304,15 @@ class Settings(BaseSettings):
     @property
     def aws_account_id(self):
         """AWS account id"""
-        return self.aws_session.client("sts").get_caller_identity()["Account"]
+        sts_client = self.aws_session.client("sts")
+        if not sts_client:
+            logger.warning("could not initialize sts_client")
+            return None
+        retval = sts_client.get_caller_identity()
+        if not isinstance(retval, dict):
+            logger.warning("sts_client.get_caller_identity() did not return a dict")
+            return None
+        return retval.get("Account", None)
 
     @property
     def aws_access_key_id_source(self):
