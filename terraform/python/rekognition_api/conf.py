@@ -16,10 +16,8 @@ The Settings class also provides a dump property that returns a dictionary of al
 configuration values. This is useful for debugging and logging.
 """
 
-
-import importlib.util
-
 # python stuff
+import importlib.util
 import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
