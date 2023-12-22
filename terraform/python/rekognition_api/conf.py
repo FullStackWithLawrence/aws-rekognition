@@ -50,6 +50,8 @@ DOT_ENV_LOADED = load_dotenv()
 def load_version() -> Dict[str, str]:
     """Stringify the __version__ module."""
     version_file_path = os.path.join(HERE, "__version__.py")
+    if not os.path.exists(version_file_path):
+        return {}
     spec = importlib.util.spec_from_file_location("__version__", version_file_path)
     version_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(version_module)
@@ -77,6 +79,9 @@ def get_semantic_version() -> str:
     - pypi does not allow semantic version numbers to contain a 'v' prefix.
     - pypi does not allow semantic version numbers to contain a 'next' suffix.
     """
+    if not isinstance(VERSION, dict):
+        return "unknown"
+
     version = VERSION.get("__version__")
     if not version:
         return "unknown"
