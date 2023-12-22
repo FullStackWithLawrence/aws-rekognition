@@ -1,9 +1,8 @@
 ## [0.2.9](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.8...v0.2.9) (2023-12-22)
 
-
 ### Bug Fixes
 
-* switch aws_s3_client to resource. lint lambda policy. ([d85bfae](https://github.com/FullStackWithLawrence/aws-rekognition/commit/d85bfae995076755d9b4e09e5c3cdfc952b50279))
+- switch aws_s3_client to resource. lint lambda policy. ([d85bfae](https://github.com/FullStackWithLawrence/aws-rekognition/commit/d85bfae995076755d9b4e09e5c3cdfc952b50279))
 
 ## [0.2.8](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.7...v0.2.8) (2023-12-22)
 
