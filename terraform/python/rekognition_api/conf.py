@@ -105,10 +105,10 @@ class SettingsDefaults:
     AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
 
     # aws dynamodb defaults
-    AWS_DYNAMODB_TABLE_ID = "rekognition"
+    AWS_DYNAMODB_TABLE_ID = SHARED_RESOURCE_IDENTIFIER
 
     # aws rekognition defaults
-    AWS_REKOGNITION_COLLECTION_ID = AWS_DYNAMODB_TABLE_ID + "-collection"
+    AWS_REKOGNITION_COLLECTION_ID = SHARED_RESOURCE_IDENTIFIER + "-collection"
     AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT: int = int(TFVARS.get("aws_rekognition_max_faces_count", 10))
     AWS_REKOGNITION_FACE_DETECT_THRESHOLD: int = int(TFVARS.get("aws_rekognition_face_detect_threshold", 10))
     AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES = TFVARS.get("aws_rekognition_face_detect_attributes", "DEFAULT")
