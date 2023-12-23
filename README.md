@@ -12,7 +12,7 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
 
-A facial recognition microservice built with AWS Rekognition, DynamoDB, S3, API Gateway and Lambda.
+A facial recognition microservice built with AWS Rekognition, DynamoDB, S3, IAM, CloudWatch, API Gateway and Lambda. See this [json dump](./doc/json/info_endpoint.json) for configuration options.
 
 ## Usage
 

@@ -1,9 +1,8 @@
 ## [0.2.10](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.9...v0.2.10) (2023-12-22)
 
-
 ### Bug Fixes
 
-* add policy attchments to roles. add a config to apigateway session w longer timeout ([ef2ffb7](https://github.com/FullStackWithLawrence/aws-rekognition/commit/ef2ffb7ee6ad76205d95ea5d1e2e7bba9ef3ab3d))
+- add policy attachments to roles. add a config to apigateway session w longer timeout ([ef2ffb7](https://github.com/FullStackWithLawrence/aws-rekognition/commit/ef2ffb7ee6ad76205d95ea5d1e2e7bba9ef3ab3d))
 
 ## [0.2.9](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.8...v0.2.9) (2023-12-22)
 
