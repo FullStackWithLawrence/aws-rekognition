@@ -1,21 +1,21 @@
 {
   "aws": {
     "apigateway": {
-      "api_id": "287c8j8dcf",
+      "api_id": "287c9j8dcf",
       "domains": [
         {
           "domainName": "api.rekognition.example.com",
           "certificateArn": "arn:aws:acm:us-east-1:012345678901:certificate/613c0965-4495-4ce3-8e3e-63538eb40fd0",
           "certificateUploadDate": "2023-12-13",
-          "distributionDomainName": "d1b9nzmXj7j3jr.cloudfront.net",
-          "distributionHostedZoneId": "ABCDEFG123HIJKL",
+          "distributionDomainName": "d1b9nzmfj7j3jr.cloudfront.net",
+          "distributionHostedZoneId": "Z2FDTNDATAQYW2",
           "endpointConfiguration": {
             "types": ["EDGE"]
           },
           "domainNameStatus": "AVAILABLE",
           "securityPolicy": "TLS_1_2",
           "tags": {
-            "contact": "YOUR CONTACT INFO HERE",
+            "contact": "YOUR CONTACT INFORMATION",
             "project": "Facial Recognition microservice",
             "shared_resource_identifier": "rekognition",
             "terraform": "true"
@@ -172,9 +172,9 @@
     },
     "route53": {
       "AliasTarget": {
-        "DNSName": "d1b9nzmXj7j3jr.cloudfront.net.",
+        "DNSName": "d1b9nzmfj7j3jr.cloudfront.net.",
         "EvaluateTargetHealth": false,
-        "HostedZoneId": "ABCDEFG123HIJKL"
+        "HostedZoneId": "Z2FDTNDATAQYW2"
       },
       "Name": "api.rekognition.example.com.",
       "Type": "A"
@@ -192,7 +192,7 @@
     },
     "aws_auth": {
       "aws_access_key_id_source": "overridden by IAM role-based security",
-      "aws_profile": "default",
+      "aws_profile": "lawrence",
       "aws_region": "us-east-1",
       "aws_secret_access_key_source": "overridden by IAM role-based security"
     },
@@ -324,7 +324,7 @@
         "aws_account_id": "****",
         "aws_apigateway_create_custom_domaim": true,
         "aws_apigateway_root_domain": "example.com",
-        "aws_profile": "default",
+        "aws_profile": "lawrence",
         "aws_region": "us-east-1",
         "aws_rekognition_face_detect_attributes": "DEFAULT",
         "aws_rekognition_face_detect_quality_filter": "AUTO",
@@ -342,7 +342,7 @@
         "shared_resource_identifier": "rekognition",
         "stage": "v1",
         "tags": {
-          "contact": "YOUR CONTACT INFO HERE",
+          "contact": "YOUR CONTACT INFORMATION",
           "project": "Facial Recognition microservice",
           "shared_resource_identifier": "rekognition",
           "terraform": "true"
@@ -350,8 +350,20 @@
         "throttle_settings_burst_limit": 25,
         "throttle_settings_rate_limit": 10
       },
-      "version": "0.2.10"
+      "version": "0.2.11"
     },
+    "services": [
+      "apigateway",
+      "aws-cli",
+      "cloudwatch",
+      "dynamodb",
+      "ec2",
+      "iam",
+      "lambda",
+      "rekognition",
+      "route53",
+      "s3"
+    ],
     "settings_defaults": {
       "AWS_ACCESS_KEY_ID": "***MASKED***",
       "AWS_APIGATEWAY_CONNECT_TIMEOUT": 70,
@@ -360,7 +372,7 @@
       "AWS_APIGATEWAY_READ_TIMEOUT": 70,
       "AWS_APIGATEWAY_ROOT_DOMAIN": "example.com",
       "AWS_DYNAMODB_TABLE_ID": "rekognition",
-      "AWS_PROFILE": null,
+      "AWS_PROFILE": "lawrence",
       "AWS_REGION": "us-east-1",
       "AWS_REKOGNITION_COLLECTION_ID": "rekognition-collection",
       "AWS_REKOGNITION_FACE_DETECT_ATTRIBUTES": "DEFAULT",

@@ -127,7 +127,7 @@ class Services:
         }
 
     @classmethod
-    def enabled_services(cls):
+    def enabled_services(cls) -> List[str]:
         """Return a list of enabled services"""
         return [
             getattr(cls, key)[0]
@@ -547,6 +547,7 @@ class Settings(BaseSettings):
         packages_dict = [{"name": name, "version": version} for name, version in packages]
 
         self._dump = {
+            "services": Services.enabled_services(),
             "environment": {
                 "is_using_tfvars_file": self.is_using_tfvars_file,
                 "is_using_dotenv_file": self.is_using_dotenv_file,
