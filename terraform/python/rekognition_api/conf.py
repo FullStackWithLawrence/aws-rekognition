@@ -123,7 +123,9 @@ class Services:
         return {
             key: value
             for key, value in Services.__dict__.items()
-            if not key.startswith("__") and not callable(key) and key != "to_dict"
+            if not key.startswith("__")
+            and not callable(key)
+            and key not in ["enabled", "raise_error_on_disabled", "to_dict", "enabled_services"]
         }
 
     @classmethod
@@ -134,7 +136,7 @@ class Services:
             for key in dir(cls)
             if not key.startswith("__")
             and not callable(getattr(cls, key))
-            and key != "to_dict"
+            and key not in ["enabled", "raise_error_on_disabled", "to_dict", "enabled_services"]
             and getattr(cls, key)[1] is True
         ]
 
