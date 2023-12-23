@@ -22,7 +22,7 @@ import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
@@ -89,6 +89,50 @@ def get_semantic_version() -> str:
     return re.sub(r"-next-major\.\d+", "", version)
 
 
+class Services:
+    """Services enabled for this solution. This is intended to be permanently read-only"""
+
+    AWS_CLI = ("aws-cli", True)
+    AWS_APIGATEWAY = ("apigateway", True)
+    AWS_CLOUDWATCH = ("cloudwatch", True)
+    AWS_DYNAMODB = ("dynamodb", True)
+    AWS_EC2 = ("ec2", True)
+    AWS_IAM = ("iam", True)
+    AWS_LAMBDA = ("lambda", True)
+    AWS_REKOGNITION = ("rekognition", True)
+    AWS_ROUTE53 = ("route53", True)
+    AWS_S3 = ("s3", True)
+    AWS_RDS = ("rds", False)
+
+    @classmethod
+    def enabled(cls, service: Union[str, Tuple[str, bool]]) -> bool:
+        """Is the service enabled?"""
+        if isinstance(service, tuple):
+            service = service[0]
+        return service in cls.enabled_services()
+
+    @classmethod
+    def to_dict(cls):
+        """Convert Services to dict"""
+        return {
+            key: value
+            for key, value in Services.__dict__.items()
+            if not key.startswith("__") and not callable(key) and key != "to_dict"
+        }
+
+    @classmethod
+    def enabled_services(cls):
+        """Return a list of enabled services"""
+        return [
+            getattr(cls, key)[0]
+            for key in dir(cls)
+            if not key.startswith("__")
+            and not callable(getattr(cls, key))
+            and key != "to_dict"
+            and getattr(cls, key)[1] is True
+        ]
+
+
 class SettingsDefaults:
     """Default values for Settings"""
 
@@ -130,9 +174,11 @@ class SettingsDefaults:
         }
 
 
-ec2 = boto3.Session().client("ec2")
-regions = ec2.describe_regions()
-AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
+AWS_REGIONS = []
+if Services.enabled(Services.AWS_EC2):
+    ec2 = boto3.Session().client("ec2")
+    regions = ec2.describe_regions()
+    AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
 
 
 def empty_str_to_bool_default(v: str, default: bool) -> bool:
@@ -170,6 +216,10 @@ class Settings(BaseSettings):
     # pylint: disable=too-many-branches
     def __init__(self, **data: Any):
         super().__init__(**data)
+        if not Services.enabled(Services.AWS_CLI):
+            self._initialized = True
+            return
+
         if bool(os.environ.get("AWS_DEPLOYED", False)):
             # If we're running inside AWS Lambda, then we don't need to set the AWS credentials.
             self._aws_access_key_id_source: str = "overridden by IAM role-based security"
@@ -304,6 +354,8 @@ class Settings(BaseSettings):
     @property
     def aws_account_id(self):
         """AWS account id"""
+        if not Services.enabled(Services.AWS_CLI):
+            return None
         sts_client = self.aws_session.client("sts")
         if not sts_client:
             logger.warning("could not initialize sts_client")
@@ -337,6 +389,8 @@ class Settings(BaseSettings):
     @property
     def aws_session(self):
         """AWS session"""
+        if not Services.enabled(Services.AWS_CLI):
+            return None
         if not self._aws_session:
             if self.aws_profile:
                 logger.debug("creating new aws_session with aws_profile: %s", self.aws_profile)
@@ -361,11 +415,15 @@ class Settings(BaseSettings):
     @property
     def aws_route53_client(self):
         """Route53 client"""
+        if not Services.enabled(Services.AWS_ROUTE53):
+            return None
         return self.aws_session.client("route53")
 
     @property
     def aws_apigateway_client(self):
         """API Gateway client"""
+        if not Services.enabled(Services.AWS_APIGATEWAY):
+            return None
         if not self._aws_apigateway_client:
             config = Config(
                 read_timeout=SettingsDefaults.AWS_APIGATEWAY_READ_TIMEOUT,
@@ -378,6 +436,8 @@ class Settings(BaseSettings):
     @property
     def aws_s3_client(self):
         """S3 client"""
+        if not Services.enabled(Services.AWS_S3):
+            return None
         if not self._aws_s3_client:
             self._aws_s3_client = self.aws_session.resource("s3")
         return self._aws_s3_client
@@ -385,6 +445,8 @@ class Settings(BaseSettings):
     @property
     def aws_dynamodb_client(self):
         """DynamoDB client"""
+        if not Services.enabled(Services.AWS_DYNAMODB):
+            return None
         if not self._aws_dynamodb_client:
             self._aws_dynamodb_client = self.aws_session.client("dynamodb")
         return self._aws_dynamodb_client
@@ -392,6 +454,8 @@ class Settings(BaseSettings):
     @property
     def aws_rekognition_client(self):
         """Rekognition client"""
+        if not Services.enabled(Services.AWS_REKOGNITION):
+            return None
         if not self._aws_rekognition_client:
             self._aws_rekognition_client = self.aws_session.client("rekognition")
         return self._aws_rekognition_client
@@ -399,6 +463,8 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
+        if not Services.enabled(Services.AWS_DYNAMODB):
+            return None
         dynamodb_resource = boto3.resource("dynamodb")
         return dynamodb_resource.Table(self.aws_dynamodb_table_id)
 
