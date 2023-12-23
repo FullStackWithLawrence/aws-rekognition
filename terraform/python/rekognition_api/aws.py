@@ -5,7 +5,7 @@
 import socket
 
 # our stuff
-from rekognition_api.conf import settings
+from rekognition_api.conf import Services, settings
 from rekognition_api.utils import recursive_sort_dict
 
 
@@ -16,32 +16,28 @@ class AWSInfrastructureConfig:
     @property
     def dump(self):
         """Return a dict of the AWS infrastructure config."""
-        api = self.get_api(settings.aws_apigateway_name)
-
-        retval = {
-            "apigateway": {
+        retval = {}
+        if Services.enabled(Services.AWS_APIGATEWAY):
+            api = self.get_api(settings.aws_apigateway_name)
+            retval["apigateway"] = {
                 "api_id": api.get("id"),
                 "stage": self.get_api_stage(),
                 "domains": self.get_api_custom_domains(),
-            },
-            "dynamodb": {
-                "table_name": self.get_dyanmodb_table_by_name(
-                    settings.aws_dynamodb_table_id,
-                )
-            },
-            "s3": {
-                "bucket_name": self.get_bucket_by_prefix(settings.aws_s3_bucket_name),
-            },
-            "rekognition": {
-                "collection_id": self.get_rekognition_collection_by_id(settings.aws_rekognition_collection_id),
-            },
-            "iam": {
-                "policies": self.get_iam_policies(),
-                "roles": self.get_iam_roles(),
-            },
-            "lambda": self.get_lambdas(),
-            "route53": self.get_dns_record_from_hosted_zone(),
-        }
+            }
+        if Services.enabled(Services.AWS_S3):
+            retval["s3"] = {"bucket_name": self.get_bucket_by_prefix(settings.aws_s3_bucket_name)}
+        if Services.enabled(Services.AWS_DYNAMODB):
+            retval["dynamodb"] = {"table_name": self.get_dyanmodb_table_by_name(settings.aws_dynamodb_table_id)}
+        if Services.enabled(Services.AWS_REKOGNITION):
+            retval["rekognition"] = {
+                "collection_id": self.get_rekognition_collection_by_id(settings.aws_rekognition_collection_id)
+            }
+        if Services.enabled(Services.AWS_IAM):
+            retval["iam"] = {"policies": self.get_iam_policies(), "roles": self.get_iam_roles()}
+        if Services.enabled(Services.AWS_LAMBDA):
+            retval["lambda"] = self.get_lambdas()
+        if Services.enabled(Services.AWS_ROUTE53):
+            retval["route53"] = self.get_dns_record_from_hosted_zone()
         return recursive_sort_dict(retval)
 
     def get_lambdas(self):

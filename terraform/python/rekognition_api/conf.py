@@ -4,26 +4,25 @@
 Configuration for Lambda functions.
 
 This module is used to configure the Lambda functions. It uses the pydantic_settings
-library to validate the configuration values. The configuration values are read from
-environment variables, or alternatively these can be set when instantiating Settings().
+library to validate the configuration values. The configuration values are initialized
+according to the following prioritization sequence:
+    1. constructor
+    2. environment variables
+    3. dotenv file
+    4. tfvars file
+    5. defaults
 
-The configuration values are validated using pydantic. If the configuration values are
-invalid, then a RekognitionConfigurationError is raised.
-
-The configuration values are dumped to a dict using the dump property. This is used
-to display the configuration values in the /info endpoint.
-
+The Settings class also provides a dump property that returns a dictionary of all
+configuration values. This is useful for debugging and logging.
 """
 
-
-import importlib.util
-
 # python stuff
+import importlib.util
 import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this Lambda runs on
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # 3rd party stuff
 import boto3  # AWS SDK for Python https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
@@ -33,9 +32,9 @@ from botocore.exceptions import ProfileNotFound
 from dotenv import load_dotenv
 from pydantic import Field, SecretStr, ValidationError, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
-from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 
 # our stuff
+from rekognition_api.const import HERE, IS_USING_TFVARS, TFVARS
 from rekognition_api.exceptions import (
     RekognitionConfigurationError,
     RekognitionValueError,
@@ -51,6 +50,8 @@ DOT_ENV_LOADED = load_dotenv()
 def load_version() -> Dict[str, str]:
     """Stringify the __version__ module."""
     version_file_path = os.path.join(HERE, "__version__.py")
+    if not os.path.exists(version_file_path):
+        return {}
     spec = importlib.util.spec_from_file_location("__version__", version_file_path)
     version_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(version_module)
@@ -78,9 +79,64 @@ def get_semantic_version() -> str:
     - pypi does not allow semantic version numbers to contain a 'v' prefix.
     - pypi does not allow semantic version numbers to contain a 'next' suffix.
     """
-    version = VERSION["__version__"]
+    if not isinstance(VERSION, dict):
+        return "unknown"
+
+    version = VERSION.get("__version__")
+    if not version:
+        return "unknown"
     version = re.sub(r"-next\.\d+", "", version)
     return re.sub(r"-next-major\.\d+", "", version)
+
+
+class Services:
+    """Services enabled for this solution. This is intended to be permanently read-only"""
+
+    AWS_CLI = ("aws-cli", True)
+    AWS_APIGATEWAY = ("apigateway", True)
+    AWS_CLOUDWATCH = ("cloudwatch", True)
+    AWS_DYNAMODB = ("dynamodb", True)
+    AWS_EC2 = ("ec2", True)
+    AWS_IAM = ("iam", True)
+    AWS_LAMBDA = ("lambda", True)
+    AWS_REKOGNITION = ("rekognition", True)
+    AWS_ROUTE53 = ("route53", True)
+    AWS_S3 = ("s3", True)
+    AWS_RDS = ("rds", False)
+
+    @classmethod
+    def enabled(cls, service: Union[str, Tuple[str, bool]]) -> bool:
+        """Is the service enabled?"""
+        if isinstance(service, tuple):
+            service = service[0]
+        return service in cls.enabled_services()
+
+    @classmethod
+    def raise_error_on_disabled(cls, service: Union[str, Tuple[str, bool]]) -> None:
+        """Raise an error if the service is disabled"""
+        if not cls.enabled(service):
+            raise RekognitionConfigurationError(f"{service} is not enabled. See conf.Services")
+
+    @classmethod
+    def to_dict(cls):
+        """Convert Services to dict"""
+        return {
+            key: value
+            for key, value in Services.__dict__.items()
+            if not key.startswith("__") and not callable(key) and key != "to_dict"
+        }
+
+    @classmethod
+    def enabled_services(cls) -> List[str]:
+        """Return a list of enabled services"""
+        return [
+            getattr(cls, key)[0]
+            for key in dir(cls)
+            if not key.startswith("__")
+            and not callable(getattr(cls, key))
+            and key != "to_dict"
+            and getattr(cls, key)[1] is True
+        ]
 
 
 class SettingsDefaults:
@@ -89,7 +145,7 @@ class SettingsDefaults:
     # defaults for this Python package
     SHARED_RESOURCE_IDENTIFIER = TFVARS.get("shared_resource_identifier", "rekognition")
     DEBUG_MODE: bool = bool(TFVARS.get("debug_mode", False))
-    DUMP_DEFAULTS = TFVARS.get("dump_defaults", True)
+    DUMP_DEFAULTS: bool = bool(TFVARS.get("dump_defaults", True))
 
     # aws auth
     AWS_PROFILE = TFVARS.get("aws_profile", None)
@@ -100,9 +156,9 @@ class SettingsDefaults:
     # aws api gateway defaults
     AWS_APIGATEWAY_CREATE_CUSTOM_DOMAIN = TFVARS.get("aws_apigateway_create_custom_domaim", False)
     AWS_APIGATEWAY_ROOT_DOMAIN = TFVARS.get("aws_apigateway_root_domain", None)
-    AWS_APIGATEWAY_READ_TIMEOUT = TFVARS.get("aws_apigateway_read_timeout", 70)
-    AWS_APIGATEWAY_CONNECT_TIMEOUT = TFVARS.get("aws_apigateway_connect_timeout", 70)
-    AWS_APIGATEWAY_MAX_ATTEMPTS = TFVARS.get("aws_apigateway_max_attempts", 10)
+    AWS_APIGATEWAY_READ_TIMEOUT: int = TFVARS.get("aws_apigateway_read_timeout", 70)
+    AWS_APIGATEWAY_CONNECT_TIMEOUT: int = TFVARS.get("aws_apigateway_connect_timeout", 70)
+    AWS_APIGATEWAY_MAX_ATTEMPTS: int = TFVARS.get("aws_apigateway_max_attempts", 10)
 
     # aws dynamodb defaults
     AWS_DYNAMODB_TABLE_ID = SHARED_RESOURCE_IDENTIFIER
@@ -124,9 +180,11 @@ class SettingsDefaults:
         }
 
 
-ec2 = boto3.Session().client("ec2")
-regions = ec2.describe_regions()
-AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
+AWS_REGIONS = []
+if Services.enabled(Services.AWS_EC2):
+    ec2 = boto3.Session().client("ec2")
+    regions = ec2.describe_regions()
+    AWS_REGIONS = [region["RegionName"] for region in regions["Regions"]]
 
 
 def empty_str_to_bool_default(v: str, default: bool) -> bool:
@@ -164,6 +222,10 @@ class Settings(BaseSettings):
     # pylint: disable=too-many-branches
     def __init__(self, **data: Any):
         super().__init__(**data)
+        if not Services.enabled(Services.AWS_CLI):
+            self._initialized = True
+            return
+
         if bool(os.environ.get("AWS_DEPLOYED", False)):
             # If we're running inside AWS Lambda, then we don't need to set the AWS credentials.
             self._aws_access_key_id_source: str = "overridden by IAM role-based security"
@@ -171,7 +233,7 @@ class Settings(BaseSettings):
             self._aws_session = boto3.Session()
             self._initialized = True
 
-        if not self._initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
+        if not self.initialized and bool(os.environ.get("GITHUB_ACTIONS", False)):
             try:
                 self._aws_session = boto3.Session(
                     region_name=os.environ.get("AWS_REGION", "us-east-1"),
@@ -189,13 +251,13 @@ class Settings(BaseSettings):
                 self._aws_secret_access_key_source = "environ"
             self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if self.aws_profile:
                 self._aws_access_key_id_source = "aws_profile"
                 self._aws_secret_access_key_source = "aws_profile"
                 self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if "aws_access_key_id" in data or "aws_secret_access_key" in data:
                 if "aws_access_key_id" in data:
                     self._aws_access_key_id_source = "constructor"
@@ -203,7 +265,7 @@ class Settings(BaseSettings):
                     self._aws_secret_access_key_source = "constructor"
                 self._initialized = True
 
-        if not self._initialized:
+        if not self.initialized:
             if "AWS_ACCESS_KEY_ID" in os.environ:
                 self._aws_access_key_id_source = "environ"
             if "AWS_SECRET_ACCESS_KEY" in os.environ:
@@ -291,9 +353,23 @@ class Settings(BaseSettings):
     )
 
     @property
+    def initialized(self):
+        """Is settings initialized?"""
+        return self._initialized
+
+    @property
     def aws_account_id(self):
         """AWS account id"""
-        return self.aws_session.client("sts").get_caller_identity()["Account"]
+        Services.raise_error_on_disabled(Services.AWS_CLI)
+        sts_client = self.aws_session.client("sts")
+        if not sts_client:
+            logger.warning("could not initialize sts_client")
+            return None
+        retval = sts_client.get_caller_identity()
+        if not isinstance(retval, dict):
+            logger.warning("sts_client.get_caller_identity() did not return a dict")
+            return None
+        return retval.get("Account", None)
 
     @property
     def aws_access_key_id_source(self):
@@ -318,6 +394,7 @@ class Settings(BaseSettings):
     @property
     def aws_session(self):
         """AWS session"""
+        Services.raise_error_on_disabled(Services.AWS_CLI)
         if not self._aws_session:
             if self.aws_profile:
                 logger.debug("creating new aws_session with aws_profile: %s", self.aws_profile)
@@ -342,11 +419,13 @@ class Settings(BaseSettings):
     @property
     def aws_route53_client(self):
         """Route53 client"""
+        Services.raise_error_on_disabled(Services.AWS_ROUTE53)
         return self.aws_session.client("route53")
 
     @property
     def aws_apigateway_client(self):
         """API Gateway client"""
+        Services.raise_error_on_disabled(Services.AWS_APIGATEWAY)
         if not self._aws_apigateway_client:
             config = Config(
                 read_timeout=SettingsDefaults.AWS_APIGATEWAY_READ_TIMEOUT,
@@ -359,6 +438,7 @@ class Settings(BaseSettings):
     @property
     def aws_s3_client(self):
         """S3 client"""
+        Services.raise_error_on_disabled(Services.AWS_S3)
         if not self._aws_s3_client:
             self._aws_s3_client = self.aws_session.resource("s3")
         return self._aws_s3_client
@@ -366,6 +446,7 @@ class Settings(BaseSettings):
     @property
     def aws_dynamodb_client(self):
         """DynamoDB client"""
+        Services.raise_error_on_disabled(Services.AWS_DYNAMODB)
         if not self._aws_dynamodb_client:
             self._aws_dynamodb_client = self.aws_session.client("dynamodb")
         return self._aws_dynamodb_client
@@ -373,6 +454,7 @@ class Settings(BaseSettings):
     @property
     def aws_rekognition_client(self):
         """Rekognition client"""
+        Services.raise_error_on_disabled(Services.AWS_REKOGNITION)
         if not self._aws_rekognition_client:
             self._aws_rekognition_client = self.aws_session.client("rekognition")
         return self._aws_rekognition_client
@@ -380,6 +462,7 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
+        Services.raise_error_on_disabled(Services.AWS_DYNAMODB)
         dynamodb_resource = boto3.resource("dynamodb")
         return dynamodb_resource.Table(self.aws_dynamodb_table_id)
 
@@ -454,16 +537,17 @@ class Settings(BaseSettings):
             package_list = [(d.project_name, d.version) for d in installed_packages]
             return package_list
 
-        if self._dump and self._initialized:
+        if self._dump and self.initialized:
             return self._dump
 
-        if not self._initialized:
+        if not self.initialized:
             return {}
 
         packages = get_installed_packages()
         packages_dict = [{"name": name, "version": version} for name, version in packages]
 
         self._dump = {
+            "services": Services.enabled_services(),
             "environment": {
                 "is_using_tfvars_file": self.is_using_tfvars_file,
                 "is_using_dotenv_file": self.is_using_dotenv_file,
