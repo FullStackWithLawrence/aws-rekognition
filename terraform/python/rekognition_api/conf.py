@@ -112,6 +112,12 @@ class Services:
         return service in cls.enabled_services()
 
     @classmethod
+    def raise_error_on_disabled(cls, service: Union[str, Tuple[str, bool]]) -> None:
+        """Raise an error if the service is disabled"""
+        if not cls.enabled(service):
+            raise RekognitionConfigurationError(f"{service} is not enabled. See conf.Services")
+
+    @classmethod
     def to_dict(cls):
         """Convert Services to dict"""
         return {
@@ -354,8 +360,7 @@ class Settings(BaseSettings):
     @property
     def aws_account_id(self):
         """AWS account id"""
-        if not Services.enabled(Services.AWS_CLI):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_CLI)
         sts_client = self.aws_session.client("sts")
         if not sts_client:
             logger.warning("could not initialize sts_client")
@@ -389,8 +394,7 @@ class Settings(BaseSettings):
     @property
     def aws_session(self):
         """AWS session"""
-        if not Services.enabled(Services.AWS_CLI):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_CLI)
         if not self._aws_session:
             if self.aws_profile:
                 logger.debug("creating new aws_session with aws_profile: %s", self.aws_profile)
@@ -415,15 +419,13 @@ class Settings(BaseSettings):
     @property
     def aws_route53_client(self):
         """Route53 client"""
-        if not Services.enabled(Services.AWS_ROUTE53):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_ROUTE53)
         return self.aws_session.client("route53")
 
     @property
     def aws_apigateway_client(self):
         """API Gateway client"""
-        if not Services.enabled(Services.AWS_APIGATEWAY):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_APIGATEWAY)
         if not self._aws_apigateway_client:
             config = Config(
                 read_timeout=SettingsDefaults.AWS_APIGATEWAY_READ_TIMEOUT,
@@ -436,8 +438,7 @@ class Settings(BaseSettings):
     @property
     def aws_s3_client(self):
         """S3 client"""
-        if not Services.enabled(Services.AWS_S3):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_S3)
         if not self._aws_s3_client:
             self._aws_s3_client = self.aws_session.resource("s3")
         return self._aws_s3_client
@@ -445,8 +446,7 @@ class Settings(BaseSettings):
     @property
     def aws_dynamodb_client(self):
         """DynamoDB client"""
-        if not Services.enabled(Services.AWS_DYNAMODB):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_DYNAMODB)
         if not self._aws_dynamodb_client:
             self._aws_dynamodb_client = self.aws_session.client("dynamodb")
         return self._aws_dynamodb_client
@@ -454,8 +454,7 @@ class Settings(BaseSettings):
     @property
     def aws_rekognition_client(self):
         """Rekognition client"""
-        if not Services.enabled(Services.AWS_REKOGNITION):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_REKOGNITION)
         if not self._aws_rekognition_client:
             self._aws_rekognition_client = self.aws_session.client("rekognition")
         return self._aws_rekognition_client
@@ -463,8 +462,7 @@ class Settings(BaseSettings):
     @property
     def dynamodb_table(self):
         """DynamoDB table"""
-        if not Services.enabled(Services.AWS_DYNAMODB):
-            return None
+        Services.raise_error_on_disabled(Services.AWS_DYNAMODB)
         dynamodb_resource = boto3.resource("dynamodb")
         return dynamodb_resource.Table(self.aws_dynamodb_table_id)
 
