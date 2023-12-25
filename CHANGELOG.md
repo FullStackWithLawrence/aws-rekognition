@@ -1,3 +1,11 @@
+## [0.2.11](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.10...v0.2.11) (2023-12-23)
+
+
+### Bug Fixes
+
+* add Services class to control which services are enabled and should be tested ([c217965](https://github.com/FullStackWithLawrence/aws-rekognition/commit/c21796533a2b7a4c37bc61a0b42a0a82241d84d1))
+* raise error if a disabled client setter is called ([8de3c2c](https://github.com/FullStackWithLawrence/aws-rekognition/commit/8de3c2c7cd70676c80314f8bab810eb55c24552e))
+
 ## [0.2.10](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.9...v0.2.10) (2023-12-22)
 
 ### Bug Fixes
