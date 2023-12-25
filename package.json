@@ -307,7 +307,7 @@
     "strip-ansi": "^6.0.1",
     "strip-bom": "^5.0.0",
     "strip-final-newline": "^2.0.0",
-    "strip-json-comments": "^2.0.1",
+    "strip-json-comments": "^5.0.1",
     "supports-color": "^5.5.0",
     "supports-hyperlinks": "^3.0.0",
     "supports-preserve-symlinks-flag": "^1.0.0",
