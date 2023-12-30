@@ -232,4 +232,22 @@ class AWSInfrastructureConfig:
         return None
 
 
-aws_infrastructure_config = AWSInfrastructureConfig()
+class SingletonConfig:
+    """Singleton for Settings"""
+
+    _instance = None
+
+    def __new__(cls):
+        """Create a new instance of Settings"""
+        if cls._instance is None:
+            cls._instance = super(SingletonConfig, cls).__new__(cls)
+            cls._instance._config = AWSInfrastructureConfig()
+        return cls._instance
+
+    @property
+    def config(self):
+        """Return the settings"""
+        return self._config  # pylint: disable=E1101
+
+
+aws_infrastructure_config = SingletonConfig().config
