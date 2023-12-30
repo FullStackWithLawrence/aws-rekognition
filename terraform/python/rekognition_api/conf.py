@@ -418,6 +418,7 @@ class Settings(BaseSettings):
         }
         if self.init_info:
             retval["init_info"] = self.init_info
+        return retval
 
     @property
     def aws_session(self):
