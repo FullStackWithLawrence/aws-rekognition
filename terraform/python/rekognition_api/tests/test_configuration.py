@@ -31,7 +31,13 @@ class TestConfiguration(unittest.TestCase):
     env_vars = dict(os.environ)
 
     def setUp(self):
-        """Set up test fixtures."""
+        # Save current environment variables
+        self.saved_env = dict(os.environ)
+
+    def tearDown(self):
+        # Restore environment variables
+        os.environ.clear()
+        os.environ.update(self.saved_env)
 
     def env_path(self, filename):
         """Return the path to the .env file."""
@@ -40,7 +46,7 @@ class TestConfiguration(unittest.TestCase):
     def test_conf_defaults(self):
         """Test that settings == SettingsDefaults when no .env is in use."""
         os.environ.clear()
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_conf_defaults()")
         os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
@@ -70,7 +76,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(loaded)
 
         with self.assertRaises(PydanticValidationError):
-            Settings()
+            Settings(init_info="test_env_illegal_nulls()")
 
         os.environ.update(self.env_vars)
 
@@ -81,7 +87,7 @@ class TestConfiguration(unittest.TestCase):
         loaded = load_dotenv(env_path)
         self.assertTrue(loaded)
 
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_env_nulls()")
         os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, SettingsDefaults.AWS_REGION)
@@ -103,7 +109,7 @@ class TestConfiguration(unittest.TestCase):
         loaded = load_dotenv(env_path)
         self.assertTrue(loaded)
 
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_env_overrides()")
         os.environ.update(self.env_vars)
 
         self.assertEqual(mock_settings.aws_region, "us-west-1")
@@ -122,7 +128,7 @@ class TestConfiguration(unittest.TestCase):
     def test_aws_credentials_with_profile(self):
         """Test that key and secret are unset when using profile."""
 
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_aws_credentials_with_profile()")
         self.assertEqual(mock_settings.aws_access_key_id_source, "aws_profile")
         self.assertEqual(mock_settings.aws_secret_access_key_source, "aws_profile")
 
@@ -132,7 +138,7 @@ class TestConfiguration(unittest.TestCase):
     def test_aws_credentials_without_profile(self):
         """Test that key and secret are set by environment variable when provided."""
 
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_aws_credentials_without_profile()")
         # pylint: disable=no-member
         self.assertEqual(mock_settings.aws_access_key_id.get_secret_value(), "TEST_KEY")
         # pylint: disable=no-member
@@ -148,7 +154,7 @@ class TestConfiguration(unittest.TestCase):
     def test_aws_credentials_noinfo(self):
         """Test that key and secret remain unset when no profile nor environment variables are provided."""
         os.environ.clear()
-        mock_settings = Settings()
+        mock_settings = Settings(init_info="test_aws_credentials_noinfo()")
         os.environ.update(self.env_vars)
         aws_profile = TFVARS.get("aws_profile", None)
         self.assertEqual(mock_settings.aws_profile, aws_profile)
@@ -169,21 +175,21 @@ class TestConfiguration(unittest.TestCase):
         """Test that Pydantic raises a validation error for environment variable with non-existent aws region code."""
 
         with self.assertRaises(RekognitionValueError):
-            Settings()
+            Settings(init_info="test_invalid_aws_region_code()")
 
     @patch.dict(os.environ, {"AWS_REKOGNITION_FACE_DETECT_MAX_FACES_COUNT": "-1"})
     def test_invalid_max_faces_count(self):
         """Test that Pydantic raises a validation error for environment variable w negative integer values."""
 
         with self.assertRaises(PydanticValidationError):
-            Settings()
+            Settings(init_info="test_invalid_max_faces_count()")
 
     @patch.dict(os.environ, {"AWS_REKOGNITION_FACE_DETECT_THRESHOLD": "-1"})
     def test_invalid_threshold(self):
         """Test that Pydantic raises a validation error for environment variable w negative integer values."""
 
         with self.assertRaises(PydanticValidationError):
-            Settings()
+            Settings(init_info="test_invalid_threshold()")
 
     def test_configure_with_class_constructor(self):
         """test that we can set values with the class constructor"""
@@ -197,6 +203,7 @@ class TestConfiguration(unittest.TestCase):
             aws_rekognition_face_detect_quality_filter="TEST_AUTO",
             aws_rekognition_face_detect_threshold=102,
             debug_mode=True,
+            init_info="test_configure_with_class_constructor()",
         )
 
         self.assertEqual(mock_settings.aws_region, "eu-west-1")
@@ -212,15 +219,20 @@ class TestConfiguration(unittest.TestCase):
         """test that we cannot set negative int values with the class constructor"""
 
         with self.assertRaises(PydanticValidationError):
-            Settings(aws_rekognition_face_detect_max_faces_count=-1)
+            Settings(
+                aws_rekognition_face_detect_max_faces_count=-1,
+                init_info="test_configure_neg_int_with_class_constructor()",
+            )
 
         with self.assertRaises(PydanticValidationError):
-            Settings(aws_rekognition_face_detect_threshold=-1)
+            Settings(
+                aws_rekognition_face_detect_threshold=-1, init_info="test_configure_neg_int_with_class_constructor()"
+            )
 
     def test_readonly_settings(self):
         """test that we can't set readonly values with the class constructor"""
 
-        mock_settings = Settings(aws_region="eu-west-1")
+        mock_settings = Settings(aws_region="eu-west-1", init_info="test_readonly_settings()")
         with self.assertRaises(PydanticValidationError):
             mock_settings.aws_region = "us-west-1"
 

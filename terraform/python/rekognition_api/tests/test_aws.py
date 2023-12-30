@@ -32,14 +32,20 @@ class TestAWSInfrastructture(unittest.TestCase):
     # Get the working directory of this script
     here = os.path.dirname(os.path.abspath(__file__))
 
+    def setUp(self):
+        """Set up test fixtures."""
+        self.saved_env = dict(os.environ)
+        env_path = self.env_path(".env")
+        load_dotenv(env_path)
+
+    def tearDown(self):
+        # Restore environment variables
+        os.environ.clear()
+        os.environ.update(self.saved_env)
+
     def env_path(self, filename):
         """Return the path to the .env file."""
         return os.path.join(self.here, filename)
-
-    def setUp(self):
-        """Set up test fixtures."""
-        env_path = self.env_path(".env")
-        load_dotenv(env_path)
 
     def test_rekognition_collection_exists(self):
         """Test that the Rekognition collection exists."""
