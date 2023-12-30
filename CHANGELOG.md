@@ -1,3 +1,11 @@
+## [0.2.12](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.11...v0.2.12) (2023-12-30)
+
+
+### Bug Fixes
+
+* add console logging when running inside of github actions. add init_info property ([56e3550](https://github.com/FullStackWithLawrence/aws-rekognition/commit/56e35503bf237817811a71191c5fabf5718705ab))
+* echo IAM username ([fe59281](https://github.com/FullStackWithLawrence/aws-rekognition/commit/fe592816467c64f873ed95b6aebdbbb42df75573))
+
 ## [0.2.11](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.10...v0.2.11) (2023-12-23)
 
 
