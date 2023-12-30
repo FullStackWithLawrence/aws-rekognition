@@ -16,9 +16,6 @@ if PYTHON_ROOT not in sys.path:
 
 from rekognition_api.lambda_info import lambda_handler  # noqa: E402
 
-# our stuff
-from rekognition_api.tests.test_setup import get_test_file  # noqa: E402
-
 
 class TestLambdaInfo(unittest.TestCase):
     """Test Index Lambda function."""
