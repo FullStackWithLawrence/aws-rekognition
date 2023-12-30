@@ -262,7 +262,9 @@ class Settings(BaseSettings):
                 self._aws_access_key_id_source = "environ"
                 self._aws_secret_access_key_source = "environ"
             except ProfileNotFound:
-                logger.warning("aws_profile %s not found", self.aws_profile)
+                # only log this if the aws_profile is set
+                if self.aws_profile:
+                    logger.warning("aws_profile %s not found", self.aws_profile)
 
             if self.aws_profile:
                 self._aws_access_key_id_source = "aws_profile"
