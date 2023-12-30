@@ -21,16 +21,25 @@ from rekognition_api.conf import Settings  # noqa: E402
 class TestConfigurationDump(unittest.TestCase):
     """Test configuration."""
 
+    def setUp(self):
+        # Save current environment variables
+        self.saved_env = dict(os.environ)
+
+    def tearDown(self):
+        # Restore environment variables
+        os.environ.clear()
+        os.environ.update(self.saved_env)
+
     def test_dump(self):
         """Test that dump is a dict."""
 
-        mock_settings = Settings(aws_region="us-east-1")
+        mock_settings = Settings(aws_region="us-east-1", init_info="test_dump()")
         self.assertIsInstance(mock_settings.dump, dict)
 
     def test_dump_keys(self):
         """Test that dump contains the expected keys."""
 
-        mock_settings = Settings(aws_region="us-east-1")
+        mock_settings = Settings(aws_region="us-east-1", init_info="test_dump_keys()")
 
         dump = mock_settings.dump
         self.assertIn("environment", dump)
@@ -43,7 +52,7 @@ class TestConfigurationDump(unittest.TestCase):
     def test_dump_values(self):
         """Test that dump contains the expected values."""
 
-        mock_settings = Settings(aws_region="us-east-1")
+        mock_settings = Settings(aws_region="us-east-1", init_info="test_dump_values()")
         environment = mock_settings.dump["environment"]
 
         self.assertEqual(environment["is_using_tfvars_file"], mock_settings.is_using_tfvars_file)
