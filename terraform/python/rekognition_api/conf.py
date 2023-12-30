@@ -759,8 +759,25 @@ class Settings(BaseSettings):
         return int(v)
 
 
-settings = None
-try:
-    settings = Settings()
-except ValidationError as e:
-    raise RekognitionConfigurationError("Invalid configuration: " + str(e)) from e
+class SingletonSettings:
+    """Singleton for Settings"""
+
+    _instance = None
+
+    def __new__(cls):
+        """Create a new instance of Settings"""
+        if cls._instance is None:
+            cls._instance = super(SingletonSettings, cls).__new__(cls)
+            try:
+                cls._instance._settings = Settings()
+            except ValidationError as e:
+                raise RekognitionConfigurationError("Invalid configuration: " + str(e)) from e
+        return cls._instance
+
+    @property
+    def settings(self):
+        """Return the settings"""
+        return self._settings
+
+
+settings = SingletonSettings().settings
