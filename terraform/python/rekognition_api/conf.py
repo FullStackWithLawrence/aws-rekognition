@@ -245,14 +245,12 @@ class Settings(BaseSettings):
             logger.info("running inside GitHub Actions")
             aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID", None)
             aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY", None)
-            if not aws_access_key_id or not aws_secret_access_key:
+            if not aws_access_key_id or not aws_secret_access_key and not self.aws_profile:
                 raise RekognitionConfigurationError(
                     "required environment variable(s) AWS_ACCESS_KEY_ID and/or AWS_SECRET_ACCESS_KEY not set"
                 )
-            self._aws_access_key_id_source = "environ"
-            self._aws_secret_access_key_source = "environ"
             region_name = os.environ.get("AWS_REGION", None)
-            if not region_name:
+            if not region_name and not self.aws_profile:
                 raise RekognitionConfigurationError("required environment variable AWS_REGION not set")
             try:
                 self._aws_session = boto3.Session(
@@ -266,9 +264,13 @@ class Settings(BaseSettings):
             except ProfileNotFound:
                 logger.warning("aws_profile %s not found", self.aws_profile)
 
-            if self.aws_profile and self._aws_access_key_id_source == "unset":
+            if self.aws_profile:
                 self._aws_access_key_id_source = "aws_profile"
                 self._aws_secret_access_key_source = "aws_profile"
+            else:
+                self._aws_access_key_id_source = "environ"
+                self._aws_secret_access_key_source = "environ"
+
             self._initialized = True
 
         if not self.initialized:
