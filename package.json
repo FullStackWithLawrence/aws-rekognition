@@ -158,7 +158,7 @@
     "internal-slot": "^1.0.6",
     "into-stream": "^7.0.0",
     "is-array-buffer": "^3.0.2",
-    "is-arrayish": "^0.2.1",
+    "is-arrayish": "^0.3.2",
     "is-bigint": "^1.0.4",
     "is-boolean-object": "^1.1.2",
     "is-callable": "^1.2.7",
