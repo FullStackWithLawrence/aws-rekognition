@@ -238,7 +238,7 @@
     "object.groupby": "^1.0.1",
     "object.values": "^1.1.7",
     "once": "^1.4.0",
-    "onetime": "^5.1.2",
+    "onetime": "^7.0.0",
     "optionator": "^0.9.3",
     "p-each-series": "^3.0.0",
     "p-filter": "^3.0.0",
