@@ -5,7 +5,7 @@ resource "random_id" "hash" {
 module "s3_bucket" {
   # see https://registry.terraform.io/modules/terraform-aws-modules/s3-bucket/aws/latest
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.14"
+  version = "~> 4.0"
 
   bucket                   = "${var.aws_account_id}-${var.shared_resource_identifier}-${random_id.hash.hex}"
   acl                      = "private"
