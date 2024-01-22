@@ -242,7 +242,7 @@
     "optionator": "^0.9.3",
     "p-each-series": "^3.0.0",
     "p-filter": "^4.1.0",
-    "p-is-promise": "^3.0.0",
+    "p-is-promise": "^4.0.0",
     "p-limit": "^5.0.0",
     "p-locate": "^2.0.0",
     "p-map": "^7.0.0",
