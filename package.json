@@ -287,7 +287,7 @@
     "shebang-command": "^2.0.0",
     "shebang-regex": "^3.0.0",
     "side-channel": "^1.0.4",
-    "signal-exit": "^3.0.7",
+    "signal-exit": "^4.1.0",
     "signale": "^1.4.0",
     "skin-tone": "^2.0.0",
     "slash": "^5.1.0",
