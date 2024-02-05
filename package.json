@@ -252,7 +252,7 @@
     "parse-json": "^8.1.0",
     "path-exists": "^3.0.0",
     "path-is-absolute": "^2.0.0",
-    "path-key": "^3.1.1",
+    "path-key": "^4.0.0",
     "path-parse": "^1.0.7",
     "path-type": "^5.0.0",
     "picomatch": "^2.3.1",
