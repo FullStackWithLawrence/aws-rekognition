@@ -256,7 +256,7 @@
     "path-parse": "^1.0.7",
     "path-type": "^5.0.0",
     "picomatch": "^2.3.1",
-    "pify": "^3.0.0",
+    "pify": "^6.1.0",
     "pkg-conf": "^5.0.0",
     "prelude-ls": "^1.2.1",
     "process-nextick-args": "^2.0.1",
