@@ -300,7 +300,7 @@
     "split2": "^4.2.0",
     "stream-combiner2": "^1.1.1",
     "string_decoder": "^1.1.1",
-    "string-width": "^4.2.3",
+    "string-width": "^7.1.0",
     "string.prototype.trim": "^1.2.8",
     "string.prototype.trimend": "^1.0.7",
     "string.prototype.trimstart": "^1.0.7",
