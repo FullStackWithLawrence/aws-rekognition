@@ -246,7 +246,7 @@
     "p-limit": "^5.0.0",
     "p-locate": "^2.0.0",
     "p-map": "^7.0.0",
-    "p-reduce": "^2.1.0",
+    "p-reduce": "^3.0.0",
     "p-try": "^1.0.0",
     "parent-module": "^3.1.0",
     "parse-json": "^8.1.0",
