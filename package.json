@@ -47,7 +47,7 @@
     "brace-expansion": "^3.0.0",
     "braces": "^3.0.2",
     "call-bind": "^1.0.5",
-    "callsites": "^3.1.0",
+    "callsites": "^4.1.0",
     "cardinal": "^2.1.1",
     "chalk": "^5.3.0",
     "char-regex": "^2.0.1",
