@@ -29,7 +29,7 @@
     "ajv": "^8.12.0",
     "ansi-escapes": "^6.2.0",
     "ansi-regex": "^5.0.1",
-    "ansi-styles": "^3.2.1",
+    "ansi-styles": "^6.2.1",
     "ansicolors": "^0.3.2",
     "argparse": "^2.0.1",
     "argv-formatter": "^1.0.0",
