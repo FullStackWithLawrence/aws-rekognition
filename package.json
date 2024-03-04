@@ -289,7 +289,7 @@
     "side-channel": "^1.0.4",
     "signal-exit": "^4.1.0",
     "signale": "^1.4.0",
-    "skin-tone": "^2.0.0",
+    "skin-tone": "^4.0.0",
     "slash": "^5.1.0",
     "source-map": "^0.7.4",
     "spawn-error-forwarder": "^1.0.0",
