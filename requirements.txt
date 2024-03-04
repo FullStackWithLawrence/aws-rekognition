@@ -20,7 +20,7 @@ codespell==2.2.6
 # project dependencies
 # ------------
 boto3==1.34.54
-botocore==1.34.44
+botocore==1.34.54
 python-dotenv==1.0.1
 pydantic==2.6.3
 pydantic-settings==2.2.1
