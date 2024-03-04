@@ -55,7 +55,7 @@
     "cli-table3": "^0.6.3",
     "cliui": "^8.0.1",
     "color-convert": "^1.9.3",
-    "color-name": "^1.1.3",
+    "color-name": "^2.0.0",
     "compare-func": "^2.0.0",
     "concat-map": "^0.0.2",
     "config-chain": "^1.1.13",
