@@ -126,7 +126,7 @@
     "git-log-parser": "^1.2.0",
     "glob": "^10.3.10",
     "glob-parent": "^6.0.2",
-    "globals": "^13.24.0",
+    "globals": "^14.0.0",
     "globalthis": "^1.0.3",
     "globby": "^14.0.0",
     "gopd": "^1.0.1",
