@@ -348,7 +348,7 @@
     "yallist": "^4.0.0",
     "yargs": "^17.7.2",
     "yargs-parser": "^21.1.1",
-    "yocto-queue": "^0.1.0"
+    "yocto-queue": "^1.0.0"
   },
   "repository": {
     "type": "git",
