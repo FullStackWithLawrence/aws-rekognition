@@ -54,7 +54,7 @@
     "clean-stack": "^5.2.0",
     "cli-table3": "^0.6.3",
     "cliui": "^8.0.1",
-    "color-convert": "^1.9.3",
+    "color-convert": "^2.0.1",
     "color-name": "^2.0.0",
     "compare-func": "^2.0.0",
     "concat-map": "^0.0.2",
