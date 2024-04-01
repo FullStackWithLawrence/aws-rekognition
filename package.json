@@ -7,7 +7,7 @@
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^9.2.3",
-    "@semantic-release/release-notes-generator": "^12.1.0",
+    "@semantic-release/release-notes-generator": "^13.0.0",
     "eslint": "^8.55.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-google": "^0.14.0",
