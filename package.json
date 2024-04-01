@@ -121,7 +121,7 @@
     "functions-have-names": "^1.2.3",
     "get-caller-file": "^2.0.5",
     "get-intrinsic": "^1.2.2",
-    "get-stream": "^8.0.1",
+    "get-stream": "^9.0.1",
     "get-symbol-description": "^1.0.0",
     "git-log-parser": "^1.2.0",
     "glob": "^10.3.10",
