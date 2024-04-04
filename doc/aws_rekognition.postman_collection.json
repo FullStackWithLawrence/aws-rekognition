@@ -19,7 +19,8 @@
               "});",
               ""
             ],
-            "type": "text/javascript"
+            "type": "text/javascript",
+            "packages": {}
           }
         }
       ],
@@ -37,7 +38,7 @@
         "header": [
           {
             "key": "x-api-key",
-            "value": "{{api_key}}",
+            "value": "{{rekognition_api_key}}",
             "type": "text"
           },
           {
@@ -49,12 +50,12 @@
         "body": {
           "mode": "file",
           "file": {
-            "src": "/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Keanu-Reeves.jpg"
+            "src": "/Users/mcdaniel/Desktop/rekognition/Keanu-Reeves.jpg"
           }
         },
         "url": {
-          "raw": "{{base_url}}/index/Keanu-Reeves.jpg",
-          "host": ["{{base_url}}"],
+          "raw": "{{rekognition_base_url}}/index/Keanu-Reeves.jpg",
+          "host": ["{{rekognition_base_url}}"],
           "path": ["index", "Keanu-Reeves.jpg"]
         },
         "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -73,7 +74,8 @@
               "});",
               ""
             ],
-            "type": "text/javascript"
+            "type": "text/javascript",
+            "packages": {}
           }
         }
       ],
@@ -91,7 +93,7 @@
         "header": [
           {
             "key": "x-api-key",
-            "value": "{{api_key}}",
+            "value": "{{rekognition_api_key}}",
             "type": "text"
           },
           {
@@ -107,8 +109,8 @@
           }
         },
         "url": {
-          "raw": "{{base_url}}/info",
-          "host": ["{{base_url}}"],
+          "raw": "{{rekognition_base_url}}/info",
+          "host": ["{{rekognition_base_url}}"],
           "path": ["info"]
         },
         "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -127,7 +129,8 @@
               "});",
               ""
             ],
-            "type": "text/javascript"
+            "type": "text/javascript",
+            "packages": {}
           }
         }
       ],
@@ -139,7 +142,7 @@
         "header": [
           {
             "key": "x-api-key",
-            "value": "{{api_key}}",
+            "value": "znLMlIkmsw58bxPChjHhJtA0rttpYt38YuGCDpnb",
             "type": "text"
           },
           {
@@ -151,13 +154,13 @@
         "body": {
           "mode": "file",
           "file": {
-            "src": "/Users/mcdaniel/Desktop/aws-rekognition/terraform/python/rekognition_api/tests/mock_data/img/Jim-Carrey.jpg"
+            "src": "/Users/mcdaniel/Desktop/rekognition/Mike-Meyers.jpg"
           }
         },
         "url": {
-          "raw": "{{base_url}}/search/",
-          "host": ["{{base_url}}"],
-          "path": ["search", ""],
+          "raw": "{{rekognition_base_url}}/search/Mike-Meyers.jpg",
+          "host": ["{{rekognition_base_url}}"],
+          "path": ["search", "Mike-Meyers.jpg"],
           "query": [
             {
               "key": "",
