@@ -171,7 +171,7 @@
     "is-number": "^7.0.0",
     "is-number-object": "^1.0.7",
     "is-obj": "^3.0.0",
-    "is-path-inside": "^3.0.3",
+    "is-path-inside": "^4.0.0",
     "is-regex": "^1.1.4",
     "is-shared-array-buffer": "^1.0.2",
     "is-stream": "^4.0.1",
