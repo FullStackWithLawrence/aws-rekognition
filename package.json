@@ -156,7 +156,7 @@
     "inherits": "^2.0.4",
     "ini": "^4.1.1",
     "internal-slot": "^1.0.6",
-    "into-stream": "^7.0.0",
+    "into-stream": "^8.0.1",
     "is-array-buffer": "^3.0.2",
     "is-arrayish": "^0.3.2",
     "is-bigint": "^1.0.4",
