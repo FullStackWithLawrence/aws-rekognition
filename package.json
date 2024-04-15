@@ -181,7 +181,7 @@
     "is-typed-array": "^1.1.12",
     "is-unicode-supported": "^2.0.0",
     "is-weakref": "^1.0.2",
-    "isarray": "^1.0.0",
+    "isarray": "^2.0.5",
     "isexe": "^3.1.1",
     "issue-parser": "^7.0.0",
     "java-properties": "^1.0.2",
