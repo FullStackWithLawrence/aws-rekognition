@@ -212,7 +212,7 @@
     "lodash.uniqby": "^4.7.0",
     "lru-cache": "^10.1.0",
     "marked": "^11.1.0",
-    "marked-terminal": "^6.2.0",
+    "marked-terminal": "^7.0.0",
     "meow": "^13.0.0",
     "merge-stream": "^2.0.0",
     "merge2": "^1.4.1",
