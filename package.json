@@ -200,7 +200,7 @@
     "keyv": "^4.5.4",
     "levn": "^0.4.1",
     "lines-and-columns": "^2.0.4",
-    "load-json-file": "^4.0.0",
+    "load-json-file": "^7.0.1",
     "locate-path": "^7.2.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
