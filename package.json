@@ -313,7 +313,7 @@
     "supports-preserve-symlinks-flag": "^1.0.0",
     "temp-dir": "^3.0.0",
     "tempy": "^3.1.0",
-    "text-extensions": "^2.4.0",
+    "text-extensions": "^3.0.0",
     "text-table": "^0.2.0",
     "through": "^2.3.8",
     "through2": "^4.0.2",
