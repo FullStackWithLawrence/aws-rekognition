@@ -75,7 +75,7 @@
     "deprecation": "^2.3.1",
     "dir-glob": "^3.0.1",
     "doctrine": "^3.0.0",
-    "dot-prop": "^8.0.2",
+    "dot-prop": "^9.0.0",
     "duplexer2": "^0.1.4",
     "emoji-regex": "^10.3.0",
     "emojilib": "^3.0.12",
