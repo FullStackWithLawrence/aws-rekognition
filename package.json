@@ -329,7 +329,7 @@
     "uglify-js": "^3.17.4",
     "unbox-primitive": "^1.0.2",
     "unicode-emoji-modifier-base": "^1.0.0",
-    "unicorn-magic": "^0.1.0",
+    "unicorn-magic": "^0.2.0",
     "unique-string": "^3.0.0",
     "universal-user-agent": "^7.0.2",
     "universalify": "^2.0.1",
