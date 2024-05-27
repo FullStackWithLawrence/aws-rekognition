@@ -11,4 +11,4 @@ python-dotenv==1.0.1
 pydantic==2.7.1
 pydantic-settings==2.2.1
 python-hcl2==4.3.3
-requests==2.31.0
+requests==2.32.2
