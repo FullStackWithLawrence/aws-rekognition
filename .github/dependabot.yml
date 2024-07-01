@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     assignees:
       - "lpm0073"
     reviewers:
@@ -11,7 +11,7 @@ updates:
   - package-ecosystem: terraform
     directory: "/terraform"
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     assignees:
       - "lpm0073"
@@ -20,7 +20,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "javascript"
@@ -31,7 +31,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "python"
@@ -42,7 +42,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/terraform/python/rekognition_layer"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "python"
