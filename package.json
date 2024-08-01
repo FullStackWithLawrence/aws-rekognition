@@ -220,7 +220,7 @@
     "micromatch": "^4.0.5",
     "mime": "^4.0.0",
     "mimic-fn": "^5.0.0",
-    "minimatch": "^9.0.4",
+    "minimatch": "^10.0.1",
     "minimist": "^1.2.8",
     "ms": "^2.1.2",
     "natural-compare": "^1.4.0",
