@@ -255,7 +255,7 @@
     "path-is-absolute": "^2.0.0",
     "path-key": "^4.0.0",
     "path-parse": "^1.0.7",
-    "path-type": "^5.0.0",
+    "path-type": "^6.0.0",
     "picomatch": "^4.0.1",
     "pify": "^6.1.0",
     "pkg-conf": "^5.0.0",
