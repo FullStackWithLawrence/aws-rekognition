@@ -142,7 +142,7 @@
     "has-tostringtag": "^1.0.0",
     "hasown": "^2.0.0",
     "hook-std": "^3.0.0",
-    "hosted-git-info": "^7.0.1",
+    "hosted-git-info": "^8.0.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.2",
     "human-signals": "^8.0.0",
