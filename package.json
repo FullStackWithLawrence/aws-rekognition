@@ -111,7 +111,7 @@
     "find-up": "^7.0.0",
     "find-up-simple": "^1.0.0",
     "find-versions": "^6.0.0",
-    "flat-cache": "^5.0.0",
+    "flat-cache": "^6.1.0",
     "flatted": "^3.2.9",
     "for-each": "^0.3.3",
     "from2": "^2.3.0",
