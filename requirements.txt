@@ -1,6 +1,6 @@
 # dev and test
 # ------------
-pytest==8.3.2
+pytest==8.3.3
 pytest_mock==3.14.0
 
 # Code linters, formatters, and security scanners
@@ -12,17 +12,17 @@ pre-commit==3.8.0
 isort==5.13.2
 mypy==1.11.2
 pylint
-bandit==1.7.9
+bandit==1.7.10
 pydocstringformatter==0.7.3
-tox==4.16.0
+tox==4.21.0
 codespell==2.3.0
 
 # project dependencies
 # ------------
-boto3==1.34.136
+boto3==1.35.30
 botocore==1.34.151
 python-dotenv==1.0.1
 pydantic==2.8.2
-pydantic-settings==2.4.0
+pydantic-settings==2.5.2
 python-hcl2==4.3.5
 requests==2.32.3
