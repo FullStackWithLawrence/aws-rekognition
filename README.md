@@ -101,4 +101,4 @@ For developers, please see:
 - the [Developer Setup Guide](./doc/CONTRIBUTING.md)
 - and these [commit comment guidelines](./doc/SEMANTIC_VERSIONING.md) 😬😬😬 for managing CI rules for automated semantic releases.
 
-You can also contact [Lawrence McDaniel](https://lawrencemcdaniel.com/contact) directly.
+You can also contact [Lawrence McDaniel](https://lawrencemcdaniel.com/contact) directly. :)
