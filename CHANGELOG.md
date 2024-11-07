@@ -1,3 +1,11 @@
+## [0.2.14](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.13...v0.2.14) (2024-11-01)
+
+
+### Bug Fixes
+
+* force a new release ([447434a](https://github.com/FullStackWithLawrence/aws-rekognition/commit/447434a5b76786da538bfff28e5e4ebdadfd31bc))
+* force a new release ([ef14fd2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/ef14fd2c097c1d6dd79dd002b8ec2fb35a3feb30))
+
 ## [0.2.13](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.12...v0.2.13) (2024-08-01)
 
 
