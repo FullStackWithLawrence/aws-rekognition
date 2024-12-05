@@ -76,7 +76,7 @@ jobs:
           node-version: "20.9.0"
 
       - name: Install npm dev dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Update .pre-commit-config.yaml
         run: |
