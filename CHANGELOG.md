@@ -1,34 +1,30 @@
 ## [0.2.14](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.13...v0.2.14) (2024-11-01)
 
-
 ### Bug Fixes
 
-* force a new release ([447434a](https://github.com/FullStackWithLawrence/aws-rekognition/commit/447434a5b76786da538bfff28e5e4ebdadfd31bc))
-* force a new release ([ef14fd2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/ef14fd2c097c1d6dd79dd002b8ec2fb35a3feb30))
+- force a new release ([447434a](https://github.com/FullStackWithLawrence/aws-rekognition/commit/447434a5b76786da538bfff28e5e4ebdadfd31bc))
+- force a new release ([ef14fd2](https://github.com/FullStackWithLawrence/aws-rekognition/commit/ef14fd2c097c1d6dd79dd002b8ec2fb35a3feb30))
 
 ## [0.2.13](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.12...v0.2.13) (2024-08-01)
 
-
 ### Bug Fixes
 
-* force a new release ([337ed44](https://github.com/FullStackWithLawrence/aws-rekognition/commit/337ed44efceb368a7a3721590243a46ba78edc90))
-* force a new release ([24edc1c](https://github.com/FullStackWithLawrence/aws-rekognition/commit/24edc1c900f8af11566f7dce6f12405307877311))
+- force a new release ([337ed44](https://github.com/FullStackWithLawrence/aws-rekognition/commit/337ed44efceb368a7a3721590243a46ba78edc90))
+- force a new release ([24edc1c](https://github.com/FullStackWithLawrence/aws-rekognition/commit/24edc1c900f8af11566f7dce6f12405307877311))
 
 ## [0.2.12](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.11...v0.2.12) (2023-12-30)
 
-
 ### Bug Fixes
 
-* add console logging when running inside of github actions. add init_info property ([56e3550](https://github.com/FullStackWithLawrence/aws-rekognition/commit/56e35503bf237817811a71191c5fabf5718705ab))
-* echo IAM username ([fe59281](https://github.com/FullStackWithLawrence/aws-rekognition/commit/fe592816467c64f873ed95b6aebdbbb42df75573))
+- add console logging when running inside of github actions. add init_info property ([56e3550](https://github.com/FullStackWithLawrence/aws-rekognition/commit/56e35503bf237817811a71191c5fabf5718705ab))
+- echo IAM username ([fe59281](https://github.com/FullStackWithLawrence/aws-rekognition/commit/fe592816467c64f873ed95b6aebdbbb42df75573))
 
 ## [0.2.11](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.10...v0.2.11) (2023-12-23)
 
-
 ### Bug Fixes
 
-* add Services class to control which services are enabled and should be tested ([c217965](https://github.com/FullStackWithLawrence/aws-rekognition/commit/c21796533a2b7a4c37bc61a0b42a0a82241d84d1))
-* raise error if a disabled client setter is called ([8de3c2c](https://github.com/FullStackWithLawrence/aws-rekognition/commit/8de3c2c7cd70676c80314f8bab810eb55c24552e))
+- add Services class to control which services are enabled and should be tested ([c217965](https://github.com/FullStackWithLawrence/aws-rekognition/commit/c21796533a2b7a4c37bc61a0b42a0a82241d84d1))
+- raise error if a disabled client setter is called ([8de3c2c](https://github.com/FullStackWithLawrence/aws-rekognition/commit/8de3c2c7cd70676c80314f8bab810eb55c24552e))
 
 ## [0.2.10](https://github.com/FullStackWithLawrence/aws-rekognition/compare/v0.2.9...v0.2.10) (2023-12-22)
 
