@@ -309,7 +309,7 @@
     "strip-bom": "^5.0.0",
     "strip-final-newline": "^4.0.0",
     "strip-json-comments": "^5.0.1",
-    "supports-color": "^9.4.0",
+    "supports-color": "^10.0.0",
     "supports-hyperlinks": "^3.0.0",
     "supports-preserve-symlinks-flag": "^1.0.0",
     "temp-dir": "^3.0.0",
