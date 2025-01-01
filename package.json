@@ -229,7 +229,7 @@
     "node-emoji": "^2.1.3",
     "normalize-package-data": "^7.0.0",
     "normalize-url": "^8.0.0",
-    "npm": "^10.2.5",
+    "npm": "^11.0.0",
     "npm-run-path": "^6.0.0",
     "object-inspect": "^1.13.1",
     "object-keys": "^1.1.1",
