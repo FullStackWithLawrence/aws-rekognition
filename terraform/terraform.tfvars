@@ -24,7 +24,7 @@ shared_resource_identifier = "rekognition"
 ###############################################################################
 # Lambda parameters
 ###############################################################################
-lambda_python_runtime = "python3.12"
+lambda_python_runtime = "python3.11"
 debug_mode            = true
 lambda_memory_size    = 256
 lambda_timeout        = 60
