@@ -332,7 +332,7 @@
         "aws_rekognition_max_faces_count": 10,
         "debug_mode": true,
         "lambda_memory_size": 256,
-        "lambda_python_runtime": "python3.11",
+        "lambda_python_runtime": "python3.12",
         "lambda_timeout": 60,
         "log_retention_days": 3,
         "logging_level": "INFO",

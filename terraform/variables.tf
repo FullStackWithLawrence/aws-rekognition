@@ -112,7 +112,7 @@ variable "throttle_settings_rate_limit" {
 
 variable "lambda_python_runtime" {
   type    = string
-  default = "python3.11"
+  default = "python3.12"
 }
 variable "lambda_memory_size" {
   description = "Lambda function memory allocations in Mb"
