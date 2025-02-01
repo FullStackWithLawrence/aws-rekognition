@@ -75,7 +75,7 @@ terraform apply
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
 - [Terraform](https://www.terraform.io/).
   _If you're new to Terraform then see [Getting Started With AWS and Terraform](./doc/TERRAFORM.md)_
-- [Python 3.11](https://www.python.org/downloads/): for creating virtual environment used for building AWS Lambda Layer, and locally by pre-commit linters and code formatters.
+- [Python 3.13](https://www.python.org/downloads/): for creating virtual environment used for building AWS Lambda Layer, and locally by pre-commit linters and code formatters.
 - [NodeJS](https://nodejs.org/en/download): used with NPM for local ReactJS developer environment, and for configuring/testing Semantic Release.
 
 ## Documentation
