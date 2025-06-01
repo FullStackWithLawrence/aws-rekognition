@@ -22,7 +22,7 @@ codespell==2.4.1
 setuptools
 boto3>=1.35.71
 botocore>=1.35.76
-python-dotenv==1.0.1
+python-dotenv==1.1.0
 pydantic==2.11.5
 pydantic-settings==2.9.1
 python-hcl2==7.2.1
