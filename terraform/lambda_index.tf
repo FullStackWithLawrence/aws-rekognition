@@ -81,7 +81,7 @@ resource "aws_s3_bucket_notification" "incoming_jpg" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.index.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".jpg"
+    #filter_suffix       = ".jpg"
     #filter_prefix       = ""
   }
 
