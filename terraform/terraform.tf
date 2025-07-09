@@ -13,7 +13,7 @@ terraform {
     bucket         = "090511222473-tfstate-rekognition"
     key            = "rekognition/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "090511222473-tfstate-lock-rekognition"
+    use_lockfile = true
     profile        = "lawrence"
     encrypt        = false
   }

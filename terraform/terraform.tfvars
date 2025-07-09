@@ -46,7 +46,7 @@ aws_rekognition_face_detect_quality_filter = "AUTO"
 ###############################################################################
 # APIGateway parameters
 ###############################################################################
-aws_apigateway_create_custom_domaim = true
+aws_apigateway_create_custom_domaim = false
 aws_apigateway_root_domain          = "lawrencemcdaniel.com"
 stage                               = "v1"
 
