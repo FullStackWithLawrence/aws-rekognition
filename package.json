@@ -281,7 +281,7 @@
     "safe-buffer": "^5.1.2",
     "safe-regex-test": "^1.0.0",
     "semver": "^7.5.4",
-    "semver-diff": "^4.0.0",
+    "semver-diff": "^5.0.0",
     "semver-regex": "^4.0.5",
     "set-function-length": "^1.1.1",
     "set-function-name": "^2.0.1",
