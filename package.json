@@ -108,7 +108,7 @@
     "figures": "^6.0.1",
     "file-entry-cache": "^10.0.1",
     "fill-range": "^7.0.1",
-    "find-up": "^7.0.0",
+    "find-up": "^8.0.0",
     "find-up-simple": "^1.0.0",
     "find-versions": "^6.0.0",
     "flat-cache": "^6.1.0",
