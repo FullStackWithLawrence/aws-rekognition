@@ -244,7 +244,7 @@
     "p-each-series": "^3.0.0",
     "p-filter": "^4.1.0",
     "p-is-promise": "^4.0.0",
-    "p-limit": "^6.1.0",
+    "p-limit": "^7.1.1",
     "p-locate": "^6.0.0",
     "p-map": "^7.0.0",
     "p-reduce": "^3.0.0",
