@@ -190,7 +190,7 @@
     "js-yaml": "^4.1.0",
     "json-buffer": "^3.0.1",
     "json-parse-better-errors": "^1.0.2",
-    "json-parse-even-better-errors": "^4.0.0",
+    "json-parse-even-better-errors": "^5.0.0",
     "json-schema-traverse": "^1.0.0",
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "json-stringify-safe": "^5.0.1",
