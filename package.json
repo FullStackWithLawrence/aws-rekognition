@@ -155,7 +155,7 @@
     "index-to-position": "^1.0.0",
     "inflight": "^1.0.6",
     "inherits": "^2.0.4",
-    "ini": "^5.0.0",
+    "ini": "^6.0.0",
     "internal-slot": "^1.0.6",
     "into-stream": "^9.0.0",
     "is-array-buffer": "^3.0.2",
