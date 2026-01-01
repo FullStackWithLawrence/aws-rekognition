@@ -93,7 +93,7 @@
     "eslint-module-utils": "^2.8.0",
     "eslint-scope": "^8.0.0",
     "eslint-visitor-keys": "^5.0.0",
-    "espree": "^10.0.1",
+    "espree": "^11.0.0",
     "esprima": "^4.0.1",
     "esquery": "^1.5.0",
     "esrecurse": "^4.3.0",
