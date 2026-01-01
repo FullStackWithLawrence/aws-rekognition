@@ -129,7 +129,7 @@
     "glob-parent": "^6.0.2",
     "globals": "^16.0.0",
     "globalthis": "^1.0.3",
-    "globby": "^15.0.0",
+    "globby": "^16.1.0",
     "gopd": "^1.0.1",
     "graceful-fs": "^4.2.11",
     "graphemer": "^1.4.0",
