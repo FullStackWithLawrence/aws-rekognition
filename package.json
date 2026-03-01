@@ -228,7 +228,7 @@
     "nerf-dart": "^1.0.0",
     "node-emoji": "^2.1.3",
     "normalize-package-data": "^8.0.0",
-    "normalize-url": "^8.0.0",
+    "normalize-url": "^9.0.0",
     "npm": "^11.0.0",
     "npm-run-path": "^6.0.0",
     "object-inspect": "^1.13.1",
