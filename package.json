@@ -187,7 +187,7 @@
     "issue-parser": "^7.0.0",
     "java-properties": "^1.0.2",
     "js-tokens": "^10.0.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^5.2.0",
     "json-buffer": "^3.0.1",
     "json-parse-better-errors": "^1.0.2",
     "json-parse-even-better-errors": "^6.0.0",
