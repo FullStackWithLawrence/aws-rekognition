@@ -7,7 +7,7 @@
 #             named `venv`. Terraform modules will look for and include these
 #             requirements in the zip package for this layer.
 # -----------------------------------------------------------------------------
-python-dotenv==1.2.2
+python-dotenv==1.2.3
 pydantic==2.13.5
 pydantic-settings==2.15.0
 python-hcl2==8.1.3
