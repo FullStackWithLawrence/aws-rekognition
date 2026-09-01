@@ -31,7 +31,7 @@
     "ansi-regex": "^6.0.1",
     "ansi-styles": "^7.0.0",
     "ansicolors": "^0.3.2",
-    "argparse": "^2.0.1",
+    "argparse": "^3.0.1",
     "argv-formatter": "^1.0.0",
     "array-buffer-byte-length": "^1.0.0",
     "array-ify": "^1.0.0",
