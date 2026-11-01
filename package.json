@@ -335,7 +335,7 @@
     "universal-user-agent": "^7.0.2",
     "universalify": "^2.0.1",
     "uri-js": "^4.4.1",
-    "url-join": "^5.0.0",
+    "url-join": "^6.0.0",
     "util-deprecate": "^1.0.2",
     "validate-npm-package-license": "^3.0.4",
     "which": "^7.0.0",
